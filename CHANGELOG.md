@@ -1,5 +1,11 @@
 # Änderungen
 
+## 0.5.2
+- Geändert (Monat): Die Datumsspalte nutzt eine Festbreiten-Schrift für die Ziffern, der Wochentag steht in einer eigenen Spalte. Alle Beträge verwenden gleich breite Ziffern, damit Dezimalstellen genau untereinander stehen.
+- Geändert (Monat): Die Karten „Feste Ausgaben & Sparen“ und „Flexible Ausgaben“ werden rot dargestellt.
+- Geändert (Monat): Der untere Bereich mit Monatssummen und Hinweis entfällt. Die Summen stehen in der GESAMT-Zeile der Tabelle.
+- Geändert (Jahr): Werte der Einnahmen grün, Werte der Ausgaben (feste Ausgaben, Sparen/Vermögen, flexible Ausgaben) rot. Der Saldo ist schwarz und nur bei negativem Wert rot, in der Tabelle wie in der Karte.
+
 ## 0.5.1
 - Neu: Hinweis im README, in der Installationsanleitung und im Installer, dass das Projekt mit Hilfe von KI erstellt wurde und nicht supportet wird.
 - Geändert: „Wiederholen“ in den Sonstigen Einnahmen kopiert nur noch die Bezeichnung. Der Betrag bleibt leer und wird später eingetragen.
