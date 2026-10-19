@@ -1,5 +1,12 @@
 # Änderungen
 
+## 0.5.3
+- Geändert (Jahr): Die Zeilen Gesamteinnahmen, Gesamtausgaben und Saldo stehen jetzt oben direkt unter den Monatsnamen und bleiben beim Scrollen fixiert.
+- Neu (Jahr): Die Kennzahlen-Karten über der Tabelle sind ausblendbar (Button „Kennzahlen anzeigen/ausblenden“, Standard: ausgeblendet). Die Wahl wird im Browser gemerkt. Die Tabelle erhält dadurch mehr Platz.
+- Geändert (Jahr): Die vier Abschnitte (Einnahmen, Feste Ausgaben, Sparen / Vermögen, Flexible Ausgaben) sind farblich getrennt: farbiger Streifen links, farbige Oberkante und getönter Kopf und Summenzeile, ohne zusätzliche Zeilen.
+- Geändert (Jahr): Lange Postennamen werden nicht mehr gekürzt. Die Knöpfe ⇢ ✎ × erscheinen erst beim Darüberfahren über der Zeile (auf Touch-Geräten bleiben sie sichtbar). „+ Posten“ und „Ausgeblendet (n)“ stehen neben dem Abschnittstitel.
+- Geändert (Jahr): Leere Posten zeigen in der Prozent-Spalte nichts mehr statt „0 %“.
+
 ## 0.5.2
 - Geändert (Monat): Die Datumsspalte nutzt eine Festbreiten-Schrift für die Ziffern, der Wochentag steht in einer eigenen Spalte. Alle Beträge verwenden gleich breite Ziffern, damit Dezimalstellen genau untereinander stehen.
 - Geändert (Monat): Die Karten „Feste Ausgaben & Sparen“ und „Flexible Ausgaben“ werden rot dargestellt.

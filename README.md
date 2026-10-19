@@ -48,11 +48,15 @@ automatische Tages-, Kategorie- und Monatssummen, Monatswechsel vor/zurück.
 
 **Jahresübersicht** – entspricht dem Excel-Blatt „GESAMT“:
 
-- Blöcke *Einnahmen*, *Feste Ausgaben*, *Sparen / Vermögen* und *Flexible Ausgaben* (aus der Monatsansicht)
+- Vier farblich getrennte Abschnitte: *Einnahmen*, *Feste Ausgaben*, *Sparen / Vermögen* und *Flexible Ausgaben* (aus der Monatsansicht)
+- Gesamteinnahmen, Gesamtausgaben und Saldo stehen oben unter den Monatsnamen und bleiben beim Scrollen sichtbar.
+  Einnahmen sind grün, Ausgaben rot, der Saldo ist schwarz und nur bei Minus rot.
+- Die Kennzahlen-Karten über der Tabelle lassen sich per Button ein- und ausblenden (die Wahl wird gemerkt).
 - Beträge pro Posten und Monat direkt in der Tabelle eintragen
 - **⇢ Ausfüllen nach rechts:** Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen
-- Summen je Block, Gesamteinnahmen, Gesamtausgaben, Saldo, Jahressumme und Prozentanteile
-- Posten hinzufügen (`+ Posten`), umbenennen (✎), ausblenden (×) und über „Ausgeblendet“ wieder einblenden (↺)
+- Summen je Abschnitt, Jahressumme und Prozentanteile (leere Posten zeigen keinen Prozentwert)
+- Posten hinzufügen (`+ Posten`), umbenennen (✎), ausblenden (×) und über „Ausgeblendet“ wieder einblenden (↺).
+  Die Knöpfe ⇢ ✎ × erscheinen beim Darüberfahren über die Zeile.
 
 **Sonstige Einnahmen** (entspricht dem Excel-Blatt „SE“) – freie Einträge pro Monat mit Bezeichnung und
 Betrag, z. B. Rückzahlungen, Dividenden oder Zinsen. Beginnt die Bezeichnung mit „Div.“ oder „Dividende“,

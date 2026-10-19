@@ -71,6 +71,34 @@ body{font-variant-numeric:tabular-nums}
 #yearTable tr.out .ycell input,#yearTable tr.out .ro,#yearTable tr.out .ysum{color:var(--danger)}
 #yearTable tr.saldo .ro,#yearTable tr.saldo .ysum{color:var(--text)}
 #yearTable tr.saldo .ro.red,#yearTable tr.saldo .ysum.red{color:var(--danger)}
+
+/* Runde 2 (0.5.3): Jahresübersicht */
+@media(min-width:901px){#viewJahr .table-wrap{max-height:calc(100vh - 124px)}#viewJahr.cards .table-wrap{max-height:calc(100vh - 196px)}}
+/* Monatsnamen + Gesamtzeilen oben fixiert (Zeilenhöhe je 26 px) */
+#yearTable thead th,#yearTable thead td{position:sticky;height:26px;box-sizing:border-box;z-index:4}
+#yearTable thead tr:nth-child(1) th{top:0;z-index:6}
+#yearTable thead tr:nth-child(2) td{top:26px}
+#yearTable thead tr:nth-child(3) td{top:52px}
+#yearTable thead tr:nth-child(4) td{top:78px}
+#yearTable thead th.ylabel,#yearTable thead td.ylabel{left:0;z-index:7}
+.tot td,.tot .ylabel{background:#eef2f6}
+#yearTable thead tr.saldo td{box-shadow:0 2px 0 #c3ccd8}
+/* Abschnitte farblich trennen */
+#yearTable tr.b0{--blk:#198754;--blk-bg:#e6f4ec}
+#yearTable tr.b1{--blk:#3b6ea8;--blk-bg:#e7eff8}
+#yearTable tr.b2{--blk:#c98a00;--blk-bg:#fbf1d6}
+#yearTable tr.b3{--blk:#7c5cbf;--blk-bg:#eee8f8}
+#yearTable tr.ghead td,#yearTable tr.ghead td.ylabel,#yearTable tr.gsum td,#yearTable tr.gsum td.ylabel{background:var(--blk-bg)}
+#yearTable tr.ghead td{box-shadow:inset 0 2px 0 var(--blk);padding:3px 8px}
+#yearTable tr:is(.b0,.b1,.b2,.b3) td.ylabel{box-shadow:inset 4px 0 0 var(--blk)}
+#yearTable tr.ghead td.ylabel{box-shadow:inset 4px 0 0 var(--blk),inset 0 2px 0 var(--blk)}
+.gbtns{position:sticky;left:244px;display:inline-flex;gap:6px}.gbtns .mini{float:none;margin:0}
+/* Namen nicht mehr kürzen: Knöpfe erscheinen erst beim Darüberfahren als Überlagerung */
+.ylabel{overflow:hidden;text-overflow:ellipsis}
+.pname{max-width:100%}
+.pact{float:none;position:absolute;right:2px;top:50%;transform:translateY(-50%);background:inherit;padding-left:8px;opacity:0}
+tr:hover .pact,.pact:focus-within{opacity:1}
+@media(hover:none){.pact{position:static;transform:none;float:right;opacity:.6;padding-left:0}}
 </style>
 </head>
 <body>
@@ -83,9 +111,9 @@ body{font-variant-numeric:tabular-nums}
 <section class="card matrix-card" id="matrix"><div class="matrix-head"><div><h2>Flexible Ausgaben</h2><div class="hint">Einfach Betrag eintragen und Enter oder Tab drücken. Kategorie = Spalte.</div></div><div class="status" id="status"></div></div><div class="table-wrap"><table id="monthTable"></table></div></section>
 </div>
 <div id="viewJahr" hidden>
-<div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
-<div class="summary"><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Gesamtausgaben (Jahr)</div><div class="value red" id="y_exp">0,00 €</div></div><div class="card"><div class="label">davon Sparen/Vermögen</div><div class="value red" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
-<section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Betrag eintragen, mit Enter (nach unten) oder Tab (nach rechts) bestätigen. ⇢ kopiert den Wert der zuletzt bearbeiteten Zelle bis Dezember. Klick auf einen Monatsnamen öffnet den Monat. Ausgeblendete Posten holst du über „Ausgeblendet“ im jeweiligen Block zurück.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
+<div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" id="yCardsBtn" onclick="toggleYCards()">Kennzahlen anzeigen</button><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
+<div class="summary" id="ySummary" hidden><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Gesamtausgaben (Jahr)</div><div class="value red" id="y_exp">0,00 €</div></div><div class="card"><div class="label">davon Sparen/Vermögen</div><div class="value red" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
+<section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Enter springt nach unten, Tab nach rechts. ⇢ kopiert den Wert bis Dezember. Klick auf einen Monatsnamen öffnet den Monat.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
 </div>
 <div id="viewSE" hidden>
 <div class="top"><div><h1 id="seTitle">Sonstige Einnahmen</h1><div class="sub">Rückzahlungen, Erstattungen, Dividenden, Zinsen usw. Beginnt die Bezeichnung mit <b>Div.</b> oder <b>Dividende</b>, zählt der Betrag als Dividende, beginnt sie mit <b>Zinsen</b>, als Zinsen. Alles andere ist „Sonstiges“.</div></div><div class="monthnav"><button class="btn" onclick="moveSE(-1)">‹</button><button class="btn" onclick="goSEToday()">Heute</button><button class="btn" onclick="moveSE(1)">›</button></div></div>
@@ -110,7 +138,7 @@ const lastFocus={}, showHidden={}; let queue=Promise.resolve();
 const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(n||0));
 const fmt=n=>Number(n||0).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtz=n=>Number(n||0)?fmt(n):'';
-const pct=(a,b)=>b?(a/b*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'';
+const pct=(a,b)=>b&&a?(a/b*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'';
 const pad=n=>String(n).padStart(2,'0');
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $=id=>document.getElementById(id);
@@ -165,6 +193,9 @@ function goToday(){current=new Date();current.setDate(1);load()}
 
 /* ---------- Jahresübersicht ---------- */
 async function loadYear(){$('yearTitle').textContent=year;ymodel=await api(`/api/jahr?jahr=${year}`);renderYear()}
+function setYCards(on){$('ySummary').hidden=!on;$('viewJahr').classList.toggle('cards',on);$('yCardsBtn').textContent=on?'Kennzahlen ausblenden':'Kennzahlen anzeigen';try{localStorage.setItem('hb_y_cards',on?'1':'0')}catch(e){}}
+function toggleYCards(){setYCards($('ySummary').hidden)}
+(function(){let on=false;try{on=localStorage.getItem('hb_y_cards')==='1'}catch(e){}setYCards(on)})();
 function moveYear(n){year+=n;loadYear()}
 function goThisYear(){year=new Date().getFullYear();loadYear()}
 const findPost=id=>{for(const b of ymodel.bloecke){const p=b.posten.find(x=>x.id===id);if(p)return p}return null};
@@ -176,21 +207,23 @@ function calc(){const c={post:{},blockM:[],blockY:[],ein:[],aus:[],saldo:[],sav:
  for(let i=0;i<12;i++){c.ein[i]=E[i];c.aus[i]=F[i]+S[i]+X[i];c.saldo[i]=E[i]-c.aus[i]}
  c.sav=sum12(S);c.einY=sum12(c.ein);c.ausY=sum12(c.aus);c.saldoY=c.einY-c.ausY;c.gi=gi;return c}
 function renderYear(){const c=calc();
- let t='<thead><tr><th class="ylabel">Posten</th>'+MONATE.map((n,i)=>`<th class="mh" data-gomonth="${i}" title="Monat öffnen">${n}</th>`).join('')+'<th>Jahr</th><th>%</th></tr></thead><tbody>';
+ const row=(cls,label,k)=>`<tr class="tot ${cls}"><td class="ylabel">${label}</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="t:${k}:${i}"></td>`).join('')+`<td class="ysum" data-sum="t:${k}:y"></td><td></td></tr>`;
+ /* Monatsnamen und die drei Gesamtzeilen stehen oben im Tabellenkopf und bleiben beim Scrollen fixiert */
+ let t='<thead><tr><th class="ylabel">Posten</th>'+MONATE.map((n,i)=>`<th class="mh" data-gomonth="${i}" title="Monat öffnen">${n}</th>`).join('')+'<th>Jahr</th><th>%</th></tr>'+row('in','Gesamteinnahmen','ein')+row('out','Gesamtausgaben','aus')+row('saldo','Saldo','saldo')+'</thead><tbody>';
  ymodel.bloecke.forEach((b,gi)=>{
-  const hid=b.ausgeblendet||[];
-  t+=`<tr class="ghead"><td class="ylabel">${esc(b.titel)}${b.editierbar?`<button class="mini add" data-act="add" data-gruppe="${esc(b.gruppe)}">+ Posten</button>`:''}${hid.length?`<button class="mini add" data-act="togglehidden" data-gruppe="${esc(b.gruppe)}" title="Ausgeblendete Posten anzeigen">Ausgeblendet (${hid.length})</button>`:''}</td><td colspan="14"></td></tr>`;
-  if(hid.length&&showHidden[b.gruppe])t+=`<tr class="ghead"><td colspan="15"><div class="hidchips"><span>Zum Einblenden anklicken:</span>${hid.map(h=>`<button class="mini" data-act="unhide" data-id="${h.id}" title="Wieder einblenden">↺ ${esc(h.bezeichnung)}</button>`).join('')}</div></td></tr>`;
+  const hid=b.ausgeblendet||[],io=b.gruppe==='Einnahmen'?'in':'out';
+  const btns=(b.editierbar?`<button class="mini" data-act="add" data-gruppe="${esc(b.gruppe)}">+ Posten</button>`:'')+(hid.length?`<button class="mini" data-act="togglehidden" data-gruppe="${esc(b.gruppe)}" title="Ausgeblendete Posten anzeigen">Ausgeblendet (${hid.length})</button>`:'');
+  t+=`<tr class="ghead b${gi}"><td class="ylabel">${esc(b.titel)}</td><td colspan="14">${btns?`<div class="gbtns">${btns}</div>`:''}</td></tr>`;
+  if(hid.length&&showHidden[b.gruppe])t+=`<tr class="ghead b${gi}"><td colspan="15"><div class="hidchips"><span>Zum Einblenden anklicken:</span>${hid.map(h=>`<button class="mini" data-act="unhide" data-id="${h.id}" title="Wieder einblenden">↺ ${esc(h.bezeichnung)}</button>`).join('')}</div></td></tr>`;
   for(const p of b.posten){
-   t+=`<tr class="${b.gruppe==='Einnahmen'?'in':'out'}"><td class="ylabel"><span class="pname${p.aktiv?'':' off'}" title="${esc(p.bezeichnung)}">${esc(p.bezeichnung)}</span>`;
+   t+=`<tr class="${io} b${gi}"><td class="ylabel"><span class="pname${p.aktiv?'':' off'}" title="${esc(p.bezeichnung)}">${esc(p.bezeichnung)}</span>`;
    if(p.schreibgeschuetzt)t+='<span class="pact"><button class="mini" data-act="gose" title="Sonstige Einnahmen öffnen">↗</button></span>';else if(b.editierbar)t+=`<span class="pact"><button class="mini" data-act="fill" data-id="${p.id}" title="Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen">⇢</button><button class="mini" data-act="rename" data-id="${p.id}" title="Umbenennen">✎</button><button class="mini" data-act="${p.aktiv?'hide':'unhide'}" data-id="${p.id}" title="${p.aktiv?'Ausblenden':'Wieder einblenden'}">${p.aktiv?'×':'↺'}</button></span>`;
    t+='</td>';
    p.monate.forEach((v,i)=>{t+=(b.editierbar&&!p.schreibgeschuetzt)?`<td class="ycell"><input inputmode="decimal" value="${v?fmt(v):''}" data-id="${p.id}" data-m="${i+1}" aria-label="${esc(p.bezeichnung)} ${MONATE[i]}"></td>`:`<td class="ro">${fmtz(v)}</td>`});
    t+=`<td class="ysum" data-sum="ps:${p.id}"></td><td class="ypct" data-sum="pp:${p.id}:${gi}"></td></tr>`}
-  t+=`<tr class="gsum ${b.gruppe==='Einnahmen'?'in':'out'}"><td class="ylabel">${esc(b.titel)} gesamt</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="bs:${gi}:${i}"></td>`).join('')+`<td class="ysum" data-sum="bs:${gi}:y"></td><td class="ypct" data-sum="bp:${gi}"></td></tr>`});
- const row=(cls,label,k)=>`<tr class="tot ${cls}"><td class="ylabel">${label}</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="t:${k}:${i}"></td>`).join('')+`<td class="ysum" data-sum="t:${k}:y"></td><td></td></tr>`;
- t+=row('in','Gesamteinnahmen','ein')+row('out','Gesamtausgaben','aus')+row('saldo','Saldo','saldo')+'</tbody>';
- $('yearTable').innerHTML=t;refreshSums()}
+  t+=`<tr class="gsum ${io} b${gi}"><td class="ylabel">${esc(b.titel)} gesamt</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="bs:${gi}:${i}"></td>`).join('')+`<td class="ysum" data-sum="bs:${gi}:y"></td><td class="ypct" data-sum="bp:${gi}"></td></tr>`});
+ $('yearTable').innerHTML=t+'</tbody>';refreshSums()}
+
 function refreshSums(){const c=calc(),gE=c.gi('Einnahmen');
  document.querySelectorAll('#yearTable [data-sum]').forEach(el=>{const [k,a,b]=el.dataset.sum.split(':');let v='',saldoNeg=null;
   if(k==='ps')v=fmtz(c.post[a]);
