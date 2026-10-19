@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Haushaltsbuch</title>
+<link rel="icon" type="image/svg+xml" href="/static/icon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#198754">
+<style>
+:root{--bg:#f3f5f8;--card:#fff;--text:#172033;--muted:#687385;--line:#dfe4eb;--accent:#198754;--accent2:#e9f7ef;--danger:#b42318;--nav:#18212b;--shadow:0 5px 18px rgba(20,35,50,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.layout{min-height:100vh;display:flex}.side{position:fixed;inset:0 auto 0 0;width:220px;background:var(--nav);color:#e8eef5;padding:20px 12px;z-index:5}.brand{font-size:20px;font-weight:750;padding:8px 12px 25px}.brand small{display:block;font-size:11px;color:#94a3b8;font-weight:500;margin-top:3px}.nav button{width:100%;border:0;background:transparent;color:#cbd5e1;text-align:left;border-radius:9px;padding:11px 12px;margin:2px 0;cursor:pointer}.nav button.active,.nav button:hover{background:#263443;color:#fff}.version{position:absolute;bottom:16px;left:18px;color:#7f8ea0;font-size:11px}main{margin-left:220px;width:calc(100% - 220px);padding:24px;min-width:0}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px}.top h1{font-size:25px;margin:0}.sub{color:var(--muted);margin-top:3px}.monthnav{display:flex;align-items:center;gap:8px}.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:650}.btn:hover{background:#f8fafc}.primary{background:var(--accent);border-color:var(--accent);color:#fff}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:15px;box-shadow:var(--shadow)}.label{font-size:12px;color:var(--muted)}.value{font-size:22px;font-weight:750;margin-top:5px}.green{color:var(--accent)}.red{color:var(--danger)}.matrix-card{overflow:hidden}.matrix-head{display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--line)}.matrix-head h2{margin:0;font-size:17px}.hint{color:var(--muted);font-size:12px}.table-wrap{overflow:auto;max-height:calc(100vh - 260px)}table{border-collapse:separate;border-spacing:0;min-width:1150px;width:100%}th,td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:0}th{height:38px;background:#f8fafc;color:#536071;font-size:11px;position:sticky;top:0;z-index:2;white-space:nowrap;padding:6px 8px}th:first-child{left:0;z-index:4}th:last-child{right:0;z-index:4}.date{position:sticky;left:0;background:#fff;z-index:3;width:78px;min-width:78px;padding:7px 8px;font-weight:650}.date .dow{display:block;color:var(--muted);font-size:10px;font-weight:500}.cell{width:100px;min-width:100px}.cell input{border:0;width:100%;height:42px;padding:8px 7px;text-align:right;background:transparent;font:inherit;outline:none}.cell input:focus{background:#fffde8;box-shadow:inset 0 0 0 2px #c9a227}.cell input.saving{background:#edf8f0}.total{position:sticky;right:0;background:#fafbfc;z-index:3;width:95px;min-width:95px;text-align:right;padding:8px;font-weight:700}.total-head{position:sticky;right:0;background:#f8fafc;z-index:4}.sumrow td{background:#f5f7fa;font-weight:750;padding:10px 8px;text-align:right}.sumrow .date{text-align:left}.status{font-size:12px;color:var(--muted);min-height:17px}.lower{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:16px}.list{margin:0;padding:0;list-style:none}.list li{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line)}.empty{padding:18px;text-align:center;color:var(--muted)}@media(max-width:900px){.side{width:66px}.brand{font-size:0;text-align:center}.brand:before{content:'€';font-size:24px}.brand small{display:none}.nav button{font-size:0;text-align:center}.nav button:before{content:'•';font-size:22px}.version{display:none}main{margin-left:66px;width:calc(100% - 66px);padding:14px}.summary{grid-template-columns:repeat(2,1fr)}.top{align-items:flex-start}.monthnav{flex-wrap:wrap;justify-content:flex-end}.lower{grid-template-columns:1fr}.table-wrap{max-height:none}}
+
+[hidden]{display:none!important}
+.nav button:disabled{opacity:.4;cursor:default}.nav button:disabled:hover{background:transparent;color:#cbd5e1}
+#yearTable{min-width:1450px}.ylabel{position:sticky;left:0;z-index:3;background:#fff;text-align:left;width:230px;min-width:230px;max-width:230px;padding:5px 8px;white-space:nowrap}
+th.ylabel{z-index:5;background:#f8fafc}.mh{cursor:pointer}.mh:hover{color:var(--accent)}
+.ycell{width:84px;min-width:84px}.ycell input{border:0;width:100%;height:36px;padding:6px 7px;text-align:right;background:transparent;font:inherit;outline:none}
+.ycell input:focus{background:#fffde8;box-shadow:inset 0 0 0 2px #c9a227}.ycell input.saving{background:#edf8f0}
+.ro{text-align:right;padding:6px 8px;color:var(--muted)}.ysum,.ypct{text-align:right;padding:6px 8px;font-weight:650;white-space:nowrap;min-width:86px}.ypct{color:var(--muted);font-weight:500;min-width:58px}
+.ghead td{background:#eef2f6;font-weight:750;padding:8px}.ghead .ylabel{background:#eef2f6}
+.gsum td{background:#f5f7fa;font-weight:750}.gsum .ylabel{background:#f5f7fa}.gsum .ro{color:var(--text)}
+.tot td{background:#e9f7ef;font-weight:800}.tot .ylabel{background:#e9f7ef}.tot.saldo td{border-top:2px solid var(--line)}
+.pname{display:inline-block;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+.pname.off{color:var(--muted);text-decoration:line-through}
+.pact{float:right;opacity:.35;white-space:nowrap}tr:hover .pact{opacity:1}
+.mini{border:1px solid var(--line);background:#fff;border-radius:6px;padding:1px 6px;margin-left:2px;cursor:pointer;font-size:12px;color:var(--muted)}.mini:hover{background:#f1f5f9;color:var(--text)}
+.mini.add{float:right;color:var(--accent);font-weight:650}
+
+/* kompaktes Layout (0.3.1): Zeilenhöhe zentral über --row-h einstellbar */
+:root{--row-h:22px}
+main{padding:14px 20px}
+.top{margin-bottom:8px}.top h1{font-size:21px}.sub{font-size:12px;margin-top:1px}
+.summary{gap:8px;margin-bottom:8px}.card{padding:8px 12px}.value{font-size:18px;margin-top:2px}
+.matrix-head{padding:6px 14px}.matrix-head h2{display:inline;font-size:15px;margin-right:10px}.matrix-head .hint{display:inline}
+th{height:26px;padding:2px 8px}
+.date{width:96px;min-width:96px;padding:0 8px;white-space:nowrap}.date .dow{display:inline;margin-left:6px}
+.cell input{height:var(--row-h);padding:0 7px;font-size:13px}
+.total{padding:0 8px}.sumrow td{padding:3px 8px;position:sticky;bottom:0;z-index:2;box-shadow:0 -1px 0 var(--line)}
+.sumrow td.date,.sumrow td.total{z-index:4}
+.ycell input{height:var(--row-h);padding:0 7px;font-size:13px}
+.ro,.ysum,.ypct{padding:2px 8px}.ylabel{padding:1px 8px}.ghead td{padding:4px 8px}
+.hidchips{position:sticky;left:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:5px 0;font-weight:500}
+.hidchips .mini{padding:2px 8px;font-size:12px;color:var(--text)}
+@media(min-width:901px){.table-wrap{max-height:calc(100vh - 168px)}}
+@media(max-width:900px){main{padding:10px}}
+
+.se-grid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(460px,1.15fr);gap:12px;align-items:start}
+@media(max-width:1100px){.se-grid{grid-template-columns:1fr}}
+#seTable,#seYear{min-width:0;width:100%}
+.sebez{padding:0}.se-b{width:100%;border:0;height:var(--row-h);padding:0 8px;font:inherit;font-size:13px;background:transparent;outline:none}
+.se-b:focus{background:#fffde8;box-shadow:inset 0 0 0 2px #c9a227}
+#seTable .ycell{width:112px;min-width:112px}.se-art{padding:0 8px;color:var(--muted);font-size:12px;white-space:nowrap;width:86px}.se-x{width:34px;text-align:center}
+#seTable th,#seYear th{position:static}.se-mon{padding:2px 8px;font-weight:650}
+.seyr{cursor:pointer}.seyr:hover td{background:#f1f5f9}.seyr.cur td{background:#fff7d6}
+
+/* Marke mit Icon, Dialog (0.5.0) */
+.brand{display:flex;align-items:center;gap:10px;font-size:18px;padding:4px 6px 22px}.brand-icon{width:40px;height:40px;flex:none;border-radius:10px}.brand-t{line-height:1.15}
+@media(max-width:900px){.brand{justify-content:center;padding:4px 0 18px}.brand-t{display:none}.brand:before{content:none}.brand-icon{width:38px;height:38px}}
+#seTable .se-x{width:74px;white-space:nowrap}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal-box{background:#fff;border-radius:14px;box-shadow:0 18px 50px rgba(15,23,42,.35);width:min(440px,100%);padding:20px}
+.modal-box h2{margin:0 0 4px;font-size:18px}.modal-box label{display:block;margin:14px 0 4px;font-weight:650;font-size:13px}
+.modal-box select{width:100%;height:38px;border:1px solid var(--line);border-radius:9px;padding:0 10px;font:inherit;background:#fff}
+.rep-preview{margin-top:14px;padding:10px 12px;background:var(--accent2);border-radius:9px;font-size:13px;line-height:1.5}.rep-preview.none{background:#fff1f0;color:var(--danger)}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.btn.go{background:var(--accent);border-color:var(--accent);color:#fff}.btn.go:disabled{opacity:.45;cursor:default}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side"><div class="brand"><img class="brand-icon" src="/static/icon.svg" alt=""><span class="brand-t">Haushaltsbuch<small>Excel-ähnliche Monatsansicht</small></span></div><nav class="nav"><button id="navMonat" class="active" onclick="showView('monat')">Monat</button><button id="navJahr" onclick="showView('jahr')">Jahresübersicht</button><button id="navSE" onclick="showView('se')">Sonstige Einnahmen</button><button disabled title="Noch nicht verfügbar">Konten</button><button disabled title="Noch nicht verfügbar">Kategorien</button><button disabled title="Noch nicht verfügbar">Vermögen</button></nav><div class="version" id="version">Testversion</div></aside>
+<main>
+<div id="viewMonat">
+<div class="top"><div><h1 id="monthTitle">Oktober 2026</h1><div class="sub">Flexible Ausgaben – Werte direkt eintragen, Enter und Tab springen ein Feld nach rechts, ↑/↓ eine Zeile</div></div><div class="monthnav"><button class="btn" onclick="moveMonth(-1)">‹</button><button class="btn" onclick="goToday()">Heute</button><button class="btn" onclick="moveMonth(1)">›</button></div></div>
+<div class="summary"><div class="card"><div class="label">Einnahmen</div><div class="value green" id="income">0,00 €</div></div><div class="card"><div class="label">Feste Ausgaben &amp; Sparen</div><div class="value" id="fixed">0,00 €</div></div><div class="card"><div class="label">Flexible Ausgaben</div><div class="value" id="flexible">0,00 €</div></div><div class="card"><div class="label">Überschuss</div><div class="value" id="balance">0,00 €</div></div></div>
+<section class="card matrix-card" id="matrix"><div class="matrix-head"><div><h2>Flexible Ausgaben</h2><div class="hint">Einfach Betrag eintragen und Enter oder Tab drücken. Kategorie = Spalte.</div></div><div class="status" id="status"></div></div><div class="table-wrap"><table id="monthTable"></table></div></section>
+<div class="lower"><section class="card"><h2 style="margin:0 0 12px">Monatssummen</h2><ul class="list" id="categoryTotals"></ul></section><section class="card"><h2 style="margin:0 0 12px">Hinweis</h2><div class="sub">Einnahmen, feste Ausgaben und Sparen trägst du in der <b>Jahresübersicht</b> ein. Dividenden, Zinsen und andere Zusatzeinnahmen erfasst du unter <b>Sonstige Einnahmen</b>, sie zählen zu den Einnahmen. Die Karten oben zeigen die Summen des gewählten Monats.</div></section></div>
+</div>
+<div id="viewJahr" hidden>
+<div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
+<div class="summary"><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Gesamtausgaben (Jahr)</div><div class="value" id="y_exp">0,00 €</div></div><div class="card"><div class="label">davon Sparen/Vermögen</div><div class="value" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
+<section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Betrag eintragen, mit Enter (nach unten) oder Tab (nach rechts) bestätigen. ⇢ kopiert den Wert der zuletzt bearbeiteten Zelle bis Dezember. Klick auf einen Monatsnamen öffnet den Monat. Ausgeblendete Posten holst du über „Ausgeblendet“ im jeweiligen Block zurück.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
+</div>
+<div id="viewSE" hidden>
+<div class="top"><div><h1 id="seTitle">Sonstige Einnahmen</h1><div class="sub">Rückzahlungen, Erstattungen, Dividenden, Zinsen usw. Beginnt die Bezeichnung mit <b>Div.</b> oder <b>Dividende</b>, zählt der Betrag als Dividende, beginnt sie mit <b>Zinsen</b>, als Zinsen. Alles andere ist „Sonstiges“.</div></div><div class="monthnav"><button class="btn" onclick="moveSE(-1)">‹</button><button class="btn" onclick="goSEToday()">Heute</button><button class="btn" onclick="moveSE(1)">›</button></div></div>
+<div class="se-grid">
+<section class="card matrix-card"><div class="matrix-head"><div><h2>Einträge im Monat</h2><div class="hint">In die leere Zeile schreiben, Enter springt zum nächsten Feld. ⇢ wiederholt einen Eintrag (z. B. vierteljährlich), × löscht ihn.</div></div><div class="status" id="seStatus"></div></div><table id="seTable"></table></section>
+<section class="card matrix-card"><div class="matrix-head"><div><h2 id="seYearTitle">Jahresübersicht</h2><div class="hint">Klick auf einen Monat öffnet seine Einträge.</div></div></div><table id="seYear"></table></section>
+</div>
+</div>
+</main></div>
+<div id="repModal" class="modal" hidden><div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="repTitle">
+<h2 id="repTitle">Eintrag wiederholen</h2><div class="sub" id="repWhat"></div>
+<label for="repRhythm">Rhythmus</label><select id="repRhythm"><option value="monatlich">monatlich</option><option value="vierteljaehrlich">vierteljährlich</option><option value="halbjaehrlich">halbjährlich</option><option value="jaehrlich">jährlich</option></select>
+<label for="repUntil">Wiederholen bis</label><select id="repUntil"></select>
+<div id="repPreview" class="rep-preview"></div>
+<div class="modal-actions"><button class="btn" id="repCancel">Abbrechen</button><button class="btn go" id="repOk">Anlegen</button></div>
+</div></div>
+<script>
+const MONATE=['Jan','Feb','Mrz','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+let current=new Date(); current.setDate(1); let model=null;
+let year=new Date().getFullYear(), ymodel=null, view='monat';
+const lastFocus={}, showHidden={}; let queue=Promise.resolve();
+const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(n||0));
+const fmt=n=>Number(n||0).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtz=n=>Number(n||0)?fmt(n):'';
+const pct=(a,b)=>b?(a/b*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'';
+const pad=n=>String(n).padStart(2,'0');
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $=id=>document.getElementById(id);
+function setText(sel,t){const el=document.querySelector(sel);if(el)el.textContent=t}
+function flash(id,text,ms){$(id).textContent=text;if(ms)setTimeout(()=>{if($(id).textContent===text)$(id).textContent=''},ms)}
+function parseAmount(raw){raw=String(raw).trim().replace(/[\s€]/g,'');if(raw==='')return 0;
+ if(raw.includes(','))raw=raw.replace(/\./g,'').replace(',','.');else if(!/^\d+\.\d{1,2}$/.test(raw))raw=raw.replace(/\./g,'');
+ const n=Number(raw);return Number.isFinite(n)?n:NaN}
+async function api(url,opt){let r=await fetch(url,opt);if(!r.ok){let t=await r.text();try{const d=JSON.parse(t).detail;t=typeof d==='string'?d:t}catch(e){}throw new Error(t)}return r.json()}
+const put=(url,body,method)=>api(url,{method:method||'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+function enqueue(fn){queue=queue.catch(()=>{}).then(fn);return queue}
+
+/* ---------- Ansichten ---------- */
+const VIEWS={monat:['viewMonat','navMonat'],jahr:['viewJahr','navJahr'],se:['viewSE','navSE']};
+function showView(v){view=v;for(const [k,[vw,nv]] of Object.entries(VIEWS)){$(vw).hidden=k!==v;$(nv).classList.toggle('active',k===v)}
+ if(v==='jahr'){year=current.getFullYear();loadYear()}else if(v==='se')loadSE();else load()}
+
+/* ---------- Monatsansicht ---------- */
+function ym(){return `${current.getFullYear()}-${pad(current.getMonth()+1)}`}
+function monthName(){return current.toLocaleDateString('de-DE',{month:'long',year:'numeric'}).replace(/^./,m=>m.toUpperCase())}
+function daysInMonth(){return new Date(current.getFullYear(),current.getMonth()+1,0).getDate()}
+function dateKey(day){return `${ym()}-${pad(day)}`}
+async function load(){$('monthTitle').textContent=monthName();model=await api(`/api/monat?monat=${ym()}`);renderTable();await refreshCards()}
+async function refreshCards(){const ov=await api(`/api/uebersicht?monat=${ym()}`);
+ $('income').textContent=euro(ov.einnahmen);$('fixed').textContent=euro(ov.fixkosten);$('flexible').textContent=euro(ov.flexibel);$('balance').textContent=euro(ov.saldo);$('balance').className='value '+(ov.saldo>=0?'green':'red')}
+function renderTable(){
+ let t='<thead><tr><th>Datum</th>';for(const c of model.kategorien)t+=`<th>${esc(c.bezeichnung)}</th>`;t+='<th class="total-head">Gesamt</th></tr></thead><tbody>';
+ for(let d=1;d<=daysInMonth();d++){let key=dateKey(d),row=model.tage[key]||{},total=0;
+  t+=`<tr><td class="date">${pad(d)}.${pad(current.getMonth()+1)}.<span class="dow">${new Date(current.getFullYear(),current.getMonth(),d).toLocaleDateString('de-DE',{weekday:'short'})}</span></td>`;
+  for(const c of model.kategorien){let v=Number(row[c.id]||0);total+=v;t+=`<td class="cell"><input inputmode="decimal" value="${v?fmt(v):''}" data-day="${key}" data-cat="${c.id}" aria-label="${esc(c.bezeichnung)} ${key}"></td>`}
+  t+=`<td class="total" data-rt="${key}">${fmt(total)}</td></tr>`}
+ t+='<tr class="sumrow"><td class="date">GESAMT</td>';for(const c of model.kategorien)t+=`<td data-cs="${c.id}">${fmt(model.summen[c.id]||0)}</td>`;t+=`<td class="total" data-gt>${fmt(model.gesamt)}</td></tr></tbody>`;
+ $('monthTable').innerHTML=t;
+ $('categoryTotals').innerHTML=model.kategorien.map(c=>`<li><span>${esc(c.bezeichnung)}</span><strong data-lt="${c.id}">${euro(model.summen[c.id]||0)}</strong></li>`).join('');
+ document.querySelectorAll('#monthTable input').forEach(el=>el.addEventListener('change',saveCell))}
+/* Summen direkt im DOM aktualisieren, ohne die Tabelle neu aufzubauen, damit der Fokus beim Tabben erhalten bleibt. */
+function updateMonthSums(){const summen={};let gesamt=0;
+ for(const [key,row] of Object.entries(model.tage)){let t=0;for(const c of model.kategorien){const v=Number(row[c.id]||0);t+=v;summen[c.id]=(summen[c.id]||0)+v}gesamt+=t;setText(`[data-rt="${key}"]`,fmt(t))}
+ model.summen=summen;model.gesamt=gesamt;
+ for(const c of model.kategorien){setText(`[data-cs="${c.id}"]`,fmt(summen[c.id]||0));setText(`[data-lt="${c.id}"]`,euro(summen[c.id]||0))}
+ setText('[data-gt]',fmt(gesamt))}
+async function saveCell(e){const el=e.target,amount=parseAmount(el.value);
+ if(!(amount>=0)){const old=(model.tage[el.dataset.day]||{})[el.dataset.cat];el.value=old?fmt(old):'';return}
+ el.classList.add('saving');flash('status','Speichere …');
+ try{await put(`/api/monat/${ym()}/${el.dataset.day}/${el.dataset.cat}`,{betrag:amount.toFixed(2)});
+  const day=model.tage[el.dataset.day]||(model.tage[el.dataset.day]={});
+  if(amount>0)day[el.dataset.cat]=amount;else delete day[el.dataset.cat];
+  el.value=amount?fmt(amount):'';updateMonthSums();refreshCards();flash('status','Gespeichert',1200)}
+ catch(err){flash('status','Fehler beim Speichern');alert('Speichern fehlgeschlagen: '+err.message)}
+ finally{el.classList.remove('saving')}}
+function moveMonth(n){current.setMonth(current.getMonth()+n);load()}
+function goToday(){current=new Date();current.setDate(1);load()}
+
+/* ---------- Jahresübersicht ---------- */
+async function loadYear(){$('yearTitle').textContent=year;ymodel=await api(`/api/jahr?jahr=${year}`);renderYear()}
+function moveYear(n){year+=n;loadYear()}
+function goThisYear(){year=new Date().getFullYear();loadYear()}
+const findPost=id=>{for(const b of ymodel.bloecke){const p=b.posten.find(x=>x.id===id);if(p)return p}return null};
+const sum12=a=>a.reduce((x,y)=>x+Number(y||0),0);
+function calc(){const c={post:{},blockM:[],blockY:[],ein:[],aus:[],saldo:[],sav:0};
+ ymodel.bloecke.forEach((b,gi)=>{const m=Array(12).fill(0);for(const p of b.posten){c.post[p.id]=sum12(p.monate);p.monate.forEach((v,i)=>m[i]+=Number(v||0))}c.blockM[gi]=m;c.blockY[gi]=sum12(m)});
+ const gi=g=>ymodel.bloecke.findIndex(b=>b.gruppe===g);
+ const E=c.blockM[gi('Einnahmen')],F=c.blockM[gi('Fixe Ausgaben')],S=c.blockM[gi('Sparen/Vermögen')],X=c.blockM[gi('Flexible Ausgaben')];
+ for(let i=0;i<12;i++){c.ein[i]=E[i];c.aus[i]=F[i]+S[i]+X[i];c.saldo[i]=E[i]-c.aus[i]}
+ c.sav=sum12(S);c.einY=sum12(c.ein);c.ausY=sum12(c.aus);c.saldoY=c.einY-c.ausY;c.gi=gi;return c}
+function renderYear(){const c=calc();
+ let t='<thead><tr><th class="ylabel">Posten</th>'+MONATE.map((n,i)=>`<th class="mh" data-gomonth="${i}" title="Monat öffnen">${n}</th>`).join('')+'<th>Jahr</th><th>%</th></tr></thead><tbody>';
+ ymodel.bloecke.forEach((b,gi)=>{
+  const hid=b.ausgeblendet||[];
+  t+=`<tr class="ghead"><td class="ylabel">${esc(b.titel)}${b.editierbar?`<button class="mini add" data-act="add" data-gruppe="${esc(b.gruppe)}">+ Posten</button>`:''}${hid.length?`<button class="mini add" data-act="togglehidden" data-gruppe="${esc(b.gruppe)}" title="Ausgeblendete Posten anzeigen">Ausgeblendet (${hid.length})</button>`:''}</td><td colspan="14"></td></tr>`;
+  if(hid.length&&showHidden[b.gruppe])t+=`<tr class="ghead"><td colspan="15"><div class="hidchips"><span>Zum Einblenden anklicken:</span>${hid.map(h=>`<button class="mini" data-act="unhide" data-id="${h.id}" title="Wieder einblenden">↺ ${esc(h.bezeichnung)}</button>`).join('')}</div></td></tr>`;
+  for(const p of b.posten){
+   t+=`<tr><td class="ylabel"><span class="pname${p.aktiv?'':' off'}" title="${esc(p.bezeichnung)}">${esc(p.bezeichnung)}</span>`;
+   if(p.schreibgeschuetzt)t+='<span class="pact"><button class="mini" data-act="gose" title="Sonstige Einnahmen öffnen">↗</button></span>';else if(b.editierbar)t+=`<span class="pact"><button class="mini" data-act="fill" data-id="${p.id}" title="Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen">⇢</button><button class="mini" data-act="rename" data-id="${p.id}" title="Umbenennen">✎</button><button class="mini" data-act="${p.aktiv?'hide':'unhide'}" data-id="${p.id}" title="${p.aktiv?'Ausblenden':'Wieder einblenden'}">${p.aktiv?'×':'↺'}</button></span>`;
+   t+='</td>';
+   p.monate.forEach((v,i)=>{t+=(b.editierbar&&!p.schreibgeschuetzt)?`<td class="ycell"><input inputmode="decimal" value="${v?fmt(v):''}" data-id="${p.id}" data-m="${i+1}" aria-label="${esc(p.bezeichnung)} ${MONATE[i]}"></td>`:`<td class="ro">${fmtz(v)}</td>`});
+   t+=`<td class="ysum" data-sum="ps:${p.id}"></td><td class="ypct" data-sum="pp:${p.id}:${gi}"></td></tr>`}
+  t+=`<tr class="gsum"><td class="ylabel">${esc(b.titel)} gesamt</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="bs:${gi}:${i}"></td>`).join('')+`<td class="ysum" data-sum="bs:${gi}:y"></td><td class="ypct" data-sum="bp:${gi}"></td></tr>`});
+ const row=(cls,label,k)=>`<tr class="tot ${cls}"><td class="ylabel">${label}</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="t:${k}:${i}"></td>`).join('')+`<td class="ysum" data-sum="t:${k}:y"></td><td></td></tr>`;
+ t+=row('','Gesamteinnahmen','ein')+row('','Gesamtausgaben','aus')+row('saldo','Saldo','saldo')+'</tbody>';
+ $('yearTable').innerHTML=t;refreshSums()}
+function refreshSums(){const c=calc(),gE=c.gi('Einnahmen');
+ document.querySelectorAll('#yearTable [data-sum]').forEach(el=>{const [k,a,b]=el.dataset.sum.split(':');let v='',cls=null;
+  if(k==='ps')v=fmtz(c.post[a]);
+  else if(k==='pp')v=pct(c.post[a],c.blockY[Number(b)]);
+  else if(k==='bs'){const g=Number(a);v=fmt(b==='y'?c.blockY[g]:c.blockM[g][b])}
+  else if(k==='bp'){const g=Number(a);v=g===gE?'':pct(c.blockY[g],c.ausY)}
+  else if(k==='t'){const arr=a==='ein'?c.ein:a==='aus'?c.aus:c.saldo,val=b==='y'?(a==='ein'?c.einY:a==='aus'?c.ausY:c.saldoY):arr[b];v=fmt(val);if(a==='saldo')cls=val>=0?'green':'red'}
+  el.textContent=v;if(cls){el.classList.remove('green','red');el.classList.add(cls)}});
+ $('y_inc').textContent=euro(c.einY);$('y_exp').textContent=euro(c.ausY);$('y_sav').textContent=euro(c.sav);$('y_bal').textContent=euro(c.saldoY);$('y_bal').className='value '+(c.saldoY>=0?'green':'red')}
+const yCell=(id,m)=>document.querySelector(`#yearTable input[data-id="${id}"][data-m="${m}"]`);
+function saveYearCell(el){const id=el.dataset.id,m=Number(el.dataset.m),p=findPost(id),amount=parseAmount(el.value);
+ if(!(amount>=0)){el.value=fmtz(p.monate[m-1]);return}
+ el.classList.add('saving');flash('ystatus','Speichere …');
+ return enqueue(async()=>{try{await put(`/api/jahr/${year}/${m}/${id}`,{betrag:amount.toFixed(2)});
+   p.monate[m-1]=amount;el.value=fmtz(amount);refreshSums();flash('ystatus','Gespeichert',1200)}
+  catch(err){el.value=fmtz(p.monate[m-1]);flash('ystatus','Fehler beim Speichern');alert('Speichern fehlgeschlagen: '+err.message)}
+  finally{el.classList.remove('saving')}})}
+async function fillRow(id){await queue;const p=findPost(id);let src=lastFocus[id];
+ if(!src){src=p.monate.findIndex(v=>Number(v)>0)+1;if(src<1){flash('ystatus','Erst einen Betrag eintragen, dann ⇢ klicken.',3000);return}}
+ const amount=parseAmount(yCell(id,src).value);if(!(amount>=0)){flash('ystatus','Ungültiger Betrag.',3000);return}
+ if(src>=12){flash('ystatus','Dezember ist der letzte Monat.',3000);return}
+ const differs=p.monate.slice(src).some(v=>Number(v)>0&&Math.abs(v-amount)>0.004);
+ if(differs&&!confirm(`In den Monaten nach ${MONATE[src-1]} stehen schon andere Beträge. Überschreiben?`))return;
+ flash('ystatus','Übernehme …');
+ try{await enqueue(()=>put(`/api/jahr/${year}/${id}/fuellen`,{ab_monat:src+1,bis_monat:12,betrag:amount.toFixed(2)},'POST'));
+  for(let m=src;m<12;m++){p.monate[m]=amount;yCell(id,m+1).value=fmtz(amount)}
+  refreshSums();flash('ystatus',`${p.bezeichnung}: ${fmt(amount)} € von ${MONATE[src]} bis Dez übernommen`,3500)}
+ catch(err){flash('ystatus','Fehler beim Übernehmen');alert('Übernehmen fehlgeschlagen: '+err.message)}}
+async function postAction(act,id,gruppe){
+ try{if(act==='add'){const n=prompt('Name des neuen Postens:');if(!n||!n.trim())return;await put('/api/posten',{gruppe,bezeichnung:n},'POST')}
+  else if(act==='rename'){const p=findPost(id),n=prompt('Neuer Name:',p.bezeichnung);if(!n||!n.trim()||n.trim()===p.bezeichnung)return;await put(`/api/posten/${id}`,{bezeichnung:n},'PATCH')}
+  else if(act==='hide'){const p=findPost(id);if(!confirm(`„${p.bezeichnung}“ ausblenden? Bereits eingetragene Beträge bleiben erhalten und zählen weiter, solange sie im Jahr vorkommen.`))return;await put(`/api/posten/${id}`,{aktiv:false},'PATCH')}
+  else if(act==='unhide'){await put(`/api/posten/${id}`,{aktiv:true},'PATCH')}
+  await queue;await loadYear()}
+ catch(err){alert(err.message)}}
+(function initYearEvents(){const tb=$('yearTable');
+ tb.addEventListener('change',e=>{if(e.target.matches('input[data-id]'))saveYearCell(e.target)});
+ tb.addEventListener('focusin',e=>{if(e.target.matches('input[data-id]'))lastFocus[e.target.dataset.id]=Number(e.target.dataset.m)});
+ tb.addEventListener('click',e=>{const th=e.target.closest('[data-gomonth]');if(th){current=new Date(year,Number(th.dataset.gomonth),1);showView('monat');return}
+  const b=e.target.closest('button[data-act]');if(!b)return;const act=b.dataset.act;
+  if(act==='fill')fillRow(b.dataset.id);else if(act==='gose')goSE();else if(act==='togglehidden'){showHidden[b.dataset.gruppe]=!showHidden[b.dataset.gruppe];renderYear()}else postAction(act,b.dataset.id,b.dataset.gruppe)})})();
+
+
+/* ---------- Tastatur wie in Excel: Enter = eine Zeile tiefer, Shift+Enter = eine Zeile höher, Tab = nächste Spalte ---------- */
+function moveInGrid(input,dir){
+ const td=input.closest('td'),tr=td.parentElement,idx=td.cellIndex,rows=[...tr.closest('table').querySelectorAll('tr')];
+ const at=(r,i)=>{const c=r.cells[i];return c?c.querySelector('input'):null};
+ const pos=rows.indexOf(tr);
+ for(let i=pos+dir;i>=0&&i<rows.length;i+=dir){const n=at(rows[i],idx);if(n)return n}
+ /* Spaltenende: in die nächste (bei Shift+Enter vorherige) Spalte wechseln */
+ for(const r of (dir>0?rows:[...rows].reverse())){const n=at(r,idx+dir);if(n)return n}
+ return null}
+function gridKeys(e,rightOnEnter){const el=e.target;if(!el.matches('input')||e.isComposing)return;
+ let dir=0,side=false;if(e.key==='Enter'){dir=e.shiftKey?-1:1;side=!!rightOnEnter}else if(e.key==='ArrowDown')dir=1;else if(e.key==='ArrowUp')dir=-1;else return;
+ e.preventDefault();let n;if(side){const ins=[...el.closest('table').querySelectorAll('input')];n=ins[ins.indexOf(el)+dir]||null}else n=moveInGrid(el,dir);
+ if(n){n.focus();n.select()}else{el.blur();el.focus();el.select()}}   /* letzte Zelle: nur übernehmen */
+(function initKeys(){
+ $('monthTable').addEventListener('keydown',e=>gridKeys(e,true));$('yearTable').addEventListener('keydown',gridKeys);
+ /* Sonstige Einnahmen: Bezeichnung → Betrag → Bezeichnung der nächsten Zeile */
+ $('seTable').addEventListener('keydown',e=>{const el=e.target;if(e.key!=='Enter'||e.isComposing||!el.matches('input'))return;
+  e.preventDefault();const row=el.closest('tr'),isB=el.classList.contains('se-b'),go=n=>{n.focus();n.select()};
+  if(isB&&!e.shiftKey)return go(row.querySelector('.se-a'));
+  if(!isB&&e.shiftKey)return go(row.querySelector('.se-b'));
+  if(isB&&e.shiftKey){const p=row.previousElementSibling;return p?go(p.querySelector('.se-a')):undefined}
+  let nx=row.nextElementSibling;if(!nx){row.parentElement.insertAdjacentHTML('beforeend',seRow(null));nx=row.nextElementSibling}
+  go(nx.querySelector('.se-b'))})})();
+
+/* ---------- Sonstige Einnahmen (Excel-Blatt SE) ---------- */
+let semodel=null;
+async function loadSE(){$('seTitle').textContent='Sonstige Einnahmen – '+monthName();semodel=await api(`/api/se?monat=${ym()}`);renderSE()}
+function moveSE(n){current.setMonth(current.getMonth()+n);loadSE()}
+function goSEToday(){current=new Date();current.setDate(1);loadSE()}
+function goSE(){if(current.getFullYear()!==year)current=new Date(year,0,1);showView('se')}
+const SE_DEL='<button class="mini" data-act="serep" tabindex="-1" title="Eintrag wiederholen (monatlich, vierteljährlich, halbjährlich, jährlich)">⇢</button><button class="mini" data-act="sedel" tabindex="-1" title="Löschen">×</button>';
+function seRow(e){return `<tr data-id="${e?e.id:''}" data-b="${e?esc(e.bezeichnung):''}" data-a="${e?e.betrag:''}"><td class="sebez"><input class="se-b" maxlength="120" placeholder="${e?'':'Bezeichnung'}" value="${e?esc(e.bezeichnung):''}" aria-label="Bezeichnung"></td><td class="ycell"><input class="se-a" inputmode="decimal" placeholder="${e?'':'Betrag'}" value="${e?fmt(e.betrag):''}" aria-label="Betrag"></td><td class="se-art">${e?e.art:''}</td><td class="se-x">${e?SE_DEL:''}</td></tr>`}
+function renderSE(){
+ $('seTable').innerHTML='<thead><tr><th>Bezeichnung</th><th>Betrag</th><th>Art</th><th></th></tr></thead><tbody>'+semodel.eintraege.map(seRow).join('')+seRow(null).repeat(3)+'</tbody><tbody><tr class="sumrow"><td>Gesamt</td><td class="ro" id="seSum"></td><td></td><td></td></tr></tbody>';
+ updateSESum();renderSEYear()}
+function updateSESum(){$('seSum').textContent=fmt(semodel.summe)}
+function renderSEYear(){const j=semodel.jahr,T={d:0,z:0,s:0};
+ let t='<thead><tr><th>Monat</th><th>Dividenden</th><th>Zinsen</th><th>Sonstiges</th><th>Div.+Zinsen</th><th>Gesamt</th></tr></thead><tbody>';
+ j.monate.forEach((m,i)=>{const dz=m.dividenden+m.zinsen;T.d+=m.dividenden;T.z+=m.zinsen;T.s+=m.sonstiges;
+  t+=`<tr class="seyr${i===current.getMonth()?' cur':''}" data-m="${i}" title="Monat öffnen"><td class="se-mon">${MONATE[i]}</td><td class="ro">${fmtz(m.dividenden)}</td><td class="ro">${fmtz(m.zinsen)}</td><td class="ro">${fmtz(m.sonstiges)}</td><td class="ro">${fmtz(dz)}</td><td class="ysum">${fmtz(dz+m.sonstiges)}</td></tr>`});
+ t+=`<tr class="sumrow"><td class="se-mon">${j.jahr}</td><td class="ro">${fmt(T.d)}</td><td class="ro">${fmt(T.z)}</td><td class="ro">${fmt(T.s)}</td><td class="ro">${fmt(T.d+T.z)}</td><td class="ysum">${fmt(T.d+T.z+T.s)}</td></tr></tbody>`;
+ $('seYear').innerHTML=t;$('seYearTitle').textContent='Jahresübersicht '+j.jahr}
+/* Nach dem Speichern nur Summen, Art und Jahrestabelle aktualisieren; die Eingabefelder bleiben, damit Tab-Eingabe nicht unterbrochen wird. */
+async function refreshSE(){semodel=await api(`/api/se?monat=${ym()}`);
+ document.querySelectorAll('#seTable tbody tr[data-id]').forEach(tr=>{const e=semodel.eintraege.find(x=>x.id===tr.dataset.id);if(e){tr.dataset.b=e.bezeichnung;tr.dataset.a=e.betrag;tr.querySelector('.se-art').textContent=e.art}});
+ updateSESum();renderSEYear()}
+function ensureBlank(){const tb=document.querySelector('#seTable tbody');if(!tb.lastElementChild||tb.lastElementChild.dataset.id)tb.insertAdjacentHTML('beforeend',seRow(null))}
+function seCommit(row){return enqueue(async()=>{
+ const bEl=row.querySelector('.se-b'),aEl=row.querySelector('.se-a'),bez=bEl.value.trim(),raw=aEl.value.trim(),amt=parseAmount(raw),id=row.dataset.id;
+ const revert=()=>{bEl.value=row.dataset.b||'';aEl.value=row.dataset.a?fmt(row.dataset.a):''};
+ try{
+  if(!id){
+   if(raw==='')return;
+   if(!(amt>0)){aEl.value='';flash('seStatus','Bitte einen Betrag größer 0 eingeben.',3000);return}
+   flash('seStatus','Speichere …');
+   const r=await put('/api/se',{monat:ym(),bezeichnung:bez||'Sonstiges',betrag:amt.toFixed(2)},'POST');
+   row.dataset.id=r.id;if(!bez)bEl.value='Sonstiges';aEl.value=fmt(amt);row.querySelector('.se-x').innerHTML=SE_DEL}
+  else if(raw===''||bez===''){revert();flash('seStatus','Zum Löschen den Knopf × benutzen.',3000);return}
+  else if(!(amt>0)){revert();flash('seStatus','Bitte einen Betrag größer 0 eingeben.',3000);return}
+  else{flash('seStatus','Speichere …');await put(`/api/se/${id}`,{bezeichnung:bez,betrag:amt.toFixed(2)});aEl.value=fmt(amt)}
+  await refreshSE();flash('seStatus','Gespeichert',1200)}
+ catch(err){flash('seStatus','Fehler beim Speichern');alert('Speichern fehlgeschlagen: '+err.message)}})}
+(function initSEEvents(){const tb=$('seTable');
+ tb.addEventListener('change',e=>{const row=e.target.closest('tr[data-id]');if(row&&e.target.matches('input'))seCommit(row)});
+ tb.addEventListener('input',e=>{const row=e.target.closest('tr[data-id]'),body=row&&row.parentElement;if(row&&!row.dataset.id&&row===body.lastElementChild)body.insertAdjacentHTML('beforeend',seRow(null))});
+ tb.addEventListener('click',e=>{const rp=e.target.closest('[data-act="serep"]');if(rp){openRep(rp.closest('tr'));return}const b=e.target.closest('[data-act="sedel"]');if(!b)return;const row=b.closest('tr');
+  if(!confirm(`„${row.dataset.b}“ löschen?`))return;
+  enqueue(async()=>{try{await api(`/api/se/${row.dataset.id}`,{method:'DELETE'});row.remove();ensureBlank();await refreshSE()}catch(err){alert('Löschen fehlgeschlagen: '+err.message)}})});
+ $('seYear').addEventListener('click',e=>{const tr=e.target.closest('tr[data-m]');if(!tr)return;current=new Date(current.getFullYear(),Number(tr.dataset.m),1);loadSE()})})();
+
+/* ---------- Eintrag wiederholen (Sonstige Einnahmen) ---------- */
+const RHYTHMEN={monatlich:1,vierteljaehrlich:3,halbjaehrlich:6,jaehrlich:12};let repId=null;
+function repTargets(){const [y,m]=ym().split('-').map(Number),step=RHYTHMEN[$('repRhythm').value],until=Number($('repUntil').value),out=[];
+ for(let k=y*12+(m-1)+step;k<=until*12+11;k+=step)out.push(`${MONATE[k%12]} ${Math.floor(k/12)}`);return out}
+function repPreview(){const t=repTargets(),p=$('repPreview');
+ if(!t.length){p.className='rep-preview none';p.textContent=`Bis Dezember ${$('repUntil').value} liegt kein weiterer Termin. Wähle einen späteren Zeitraum.`;$('repOk').disabled=true}
+ else{p.className='rep-preview';p.innerHTML=`<b>${t.length} ${t.length===1?'Eintrag wird':'Einträge werden'}</b> angelegt: ${t.join(', ')}.<br>Monate, in denen es den Eintrag schon gibt, werden übersprungen. Die neuen Einträge kannst du einzeln ändern oder löschen.`;$('repOk').disabled=false}}
+function openRep(row){repId=row.dataset.id;const y=Number(ym().slice(0,4));
+ $('repWhat').textContent=`„${row.dataset.b}“ · ${fmt(row.dataset.a)} € · ${monthName()}`;
+ $('repUntil').innerHTML=`<option value="${y}">Dezember ${y}</option><option value="${y+1}">Dezember ${y+1}</option>`;
+ repPreview();$('repModal').hidden=false;$('repRhythm').focus()}
+function closeRep(){$('repModal').hidden=true;repId=null}
+(function initRep(){
+ $('repRhythm').addEventListener('change',()=>{if(!repTargets().length&&$('repUntil').selectedIndex===0)$('repUntil').selectedIndex=1;repPreview()});
+ $('repUntil').addEventListener('change',repPreview);$('repCancel').addEventListener('click',closeRep);
+ $('repModal').addEventListener('click',e=>{if(e.target===$('repModal'))closeRep()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('repModal').hidden)closeRep()});
+ $('repOk').addEventListener('click',()=>{const id=repId,rh=$('repRhythm').value,until=Number($('repUntil').value);closeRep();
+  enqueue(async()=>{try{flash('seStatus','Lege Einträge an …');
+   const r=await put(`/api/se/${id}/wiederholen`,{rhythmus:rh,bis_jahr:until},'POST'),n=r.angelegt.length;
+   await refreshSE();flash('seStatus',`${n} ${n===1?'Eintrag':'Einträge'} angelegt`+(r.uebersprungen.length?`, ${r.uebersprungen.length} übersprungen (gab es schon)`:''),5000)}
+  catch(err){flash('seStatus','Fehler beim Wiederholen');alert('Wiederholen fehlgeschlagen: '+err.message)}})})})();
+
+api('/api/setup-demo',{method:'POST'}).then(()=>api('/api/version')).then(v=>{$('version').textContent='Version '+v.version;load()}).catch(e=>{$('status').textContent='Datenbank nicht erreichbar';console.error(e)})
+</script>
+</body></html>

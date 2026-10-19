@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Haushaltsbuch">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22a06b"/>
+      <stop offset="1" stop-color="#136b49"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffd35a"/>
+      <stop offset="1" stop-color="#f2a516"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+<g transform="translate(51.2 51.2) scale(0.8)">
+  <!-- aufgeschlagenes Buch -->
+  <path d="M84 200 Q170 176 256 208 Q342 176 428 200 V404 Q342 380 256 412 Q170 380 84 404 Z" fill="#0d4a33" opacity=".35" transform="translate(0 10)"/>
+  <path d="M84 196 Q170 172 256 204 Q342 172 428 196 V400 Q342 376 256 408 Q170 376 84 400 Z" fill="#f8fafc"/>
+  <path d="M256 204 V408" stroke="#c5ced8" stroke-width="7" fill="none"/>
+  <g stroke="#c5ced8" stroke-width="9" stroke-linecap="round" fill="none">
+    <path d="M122 252 Q182 240 228 260"/><path d="M122 296 Q182 284 228 304"/><path d="M122 340 Q182 328 228 348"/>
+  </g>
+  <!-- Balken rechts: Auswertung -->
+  <g fill="#22a06b">
+    <rect x="296" y="318" width="26" height="46" rx="6"/>
+    <rect x="334" y="292" width="26" height="72" rx="6"/>
+    <rect x="372" y="262" width="26" height="102" rx="6"/>
+  </g>
+  <!-- Euro-Münze -->
+  <circle cx="340" cy="150" r="82" fill="url(#coin)" stroke="#fff" stroke-width="14"/>
+  <circle cx="340" cy="150" r="62" fill="none" stroke="#c98200" stroke-width="5" opacity=".45"/>
+  <g stroke="#7a4b00" stroke-width="17" stroke-linecap="round" fill="none">
+    <path d="M364 124 A40 40 0 1 0 364 176"/>
+    <path d="M300 141 H350"/><path d="M300 160 H350"/>
+  </g>
+
+</g>
+</svg>
