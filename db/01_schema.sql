@@ -919,7 +919,7 @@ CREATE TABLE IF NOT EXISTS sonstige_einnahmen (
     erstellt_am TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     aktualisiert_am TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT chk_se_monat CHECK (EXTRACT(DAY FROM monat) = 1),
-    CONSTRAINT chk_se_betrag CHECK (betrag > 0),
+    CONSTRAINT chk_se_betrag CHECK (betrag >= 0),
     CONSTRAINT chk_se_bezeichnung CHECK (length(trim(bezeichnung)) > 0)
 );
 CREATE INDEX IF NOT EXISTS idx_se_haushalt_monat ON sonstige_einnahmen(haushalt_id, monat, erstellt_am);

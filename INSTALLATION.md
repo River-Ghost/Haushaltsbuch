@@ -1,5 +1,7 @@
 # Installation auf Proxmox
 
+> Hinweis: Dieses Projekt wurde mit Hilfe von KI erstellt und wird nicht supportet. Nutzung auf eigene Verantwortung, siehe README.
+
 ## 1. Befehl ausführen
 
 In der Proxmox-Weboberfläche den Host auswählen, **Shell** öffnen und eingeben:

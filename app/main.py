@@ -16,7 +16,7 @@ DB = os.environ["DATABASE_URL"]
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -147,11 +147,14 @@ class CellValue(BaseModel):
 
 class SEBody(BaseModel):
     bezeichnung: str = Field(min_length=1, max_length=120)
-    betrag: Decimal = Field(gt=0, max_digits=14, decimal_places=2)
+    # 0 = Betrag noch offen (z. B. nach "Wiederholen")
+    betrag: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
 
 
 class SENew(SEBody):
     monat: str = Field(pattern=r"^\d{4}-\d{2}$")
+    # Ein neuer Eintrag per Eingabezeile braucht einen Betrag.
+    betrag: Decimal = Field(gt=0, max_digits=14, decimal_places=2)
 
 
 RHYTHMEN = {"monatlich": 1, "vierteljaehrlich": 3, "halbjaehrlich": 6, "jaehrlich": 12}
@@ -533,15 +536,16 @@ def se_update(eintrag_id: UUID, x: SEBody):
 
 @app.post("/api/se/{eintrag_id}/wiederholen")
 def se_repeat(eintrag_id: UUID, x: RepeatBody):
-    """Legt den Eintrag im gewählten Rhythmus bis Dezember von bis_jahr erneut an.
+    """Legt die Bezeichnung im gewählten Rhythmus bis Dezember von bis_jahr erneut an.
 
-    Es entstehen normale, einzeln änderbare Einträge. Existiert im Zielmonat bereits ein
-    Eintrag mit gleicher Bezeichnung, wird dieser Monat übersprungen (keine Doppelten).
+    Kopiert wird nur die Bezeichnung. Der Betrag bleibt leer (0) und wird später eingetragen.
+    Existiert im Zielmonat bereits ein Eintrag mit gleicher Bezeichnung, wird dieser Monat
+    übersprungen (keine Doppelten).
     """
     with db() as c:
         h = household(c)
         e = c.execute(
-            "SELECT monat, bezeichnung, betrag FROM sonstige_einnahmen WHERE id=%s AND haushalt_id=%s",
+            "SELECT monat, bezeichnung FROM sonstige_einnahmen WHERE id=%s AND haushalt_id=%s",
             (eintrag_id, h["id"]),
         ).fetchone()
         if not e:
@@ -566,8 +570,8 @@ def se_repeat(eintrag_id: UUID, x: RepeatBody):
                     uebersprungen.append(ziel.strftime("%Y-%m"))
                     continue
                 c.execute(
-                    "INSERT INTO sonstige_einnahmen(haushalt_id,monat,bezeichnung,betrag) VALUES(%s,%s,%s,%s)",
-                    (h["id"], ziel, e["bezeichnung"], e["betrag"]),
+                    "INSERT INTO sonstige_einnahmen(haushalt_id,monat,bezeichnung,betrag) VALUES(%s,%s,%s,0)",
+                    (h["id"], ziel, e["bezeichnung"]),
                 )
                 angelegt.append(ziel.strftime("%Y-%m"))
     return {"ok": True, "angelegt": angelegt, "uebersprungen": uebersprungen}

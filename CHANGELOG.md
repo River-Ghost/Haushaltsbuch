@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.1
+- Neu: Hinweis im README, in der Installationsanleitung und im Installer, dass das Projekt mit Hilfe von KI erstellt wurde und nicht supportet wird.
+- Geändert: „Wiederholen“ in den Sonstigen Einnahmen kopiert nur noch die Bezeichnung. Der Betrag bleibt leer und wird später eingetragen.
+- Neu: Migration 004 erlaubt für Sonstige Einnahmen den Betrag 0 („noch offen“). Ein geleertes Betragsfeld setzt den Betrag auf 0, statt zurückgesetzt zu werden.
+
 ## 0.5.0
 - Neu: Installation per Einzeiler direkt von GitHub (`ct/haushaltsbuch.sh`) mit Dialogen (Standard/Erweitert), DHCP als Standard, automatischer Wahl von CT-ID, Storage und Template und Aufräum-Angebot bei Fehlern.
 - Neu: Befehl `update` im Container und Update-Modus im Installer. Vor jedem Update wird ein Datenbank-Backup angelegt.

@@ -2,6 +2,17 @@
 
 # Haushaltsbuch
 
+> ## ⚠️ Wichtiger Hinweis
+>
+> Dieses Projekt wurde **vollständig mit Hilfe von KI-Assistenten erstellt** (u. a. Claude von Anthropic) und ist ein
+> privates Hobbyprojekt.
+>
+> - **Kein Support:** Fragen, Fehlermeldungen und Änderungswünsche werden nicht bearbeitet.
+> - **Keine Gewährleistung, keine Haftung:** Die Nutzung erfolgt auf eigene Verantwortung.
+> - **Finanzdaten:** Der Code wurde von niemandem unabhängig geprüft. Rechenergebnisse bitte selbst kontrollieren
+>   und regelmäßig Backups anlegen (z. B. Proxmox-Backup des Containers).
+> - **Nur im Heimnetz betreiben:** Es gibt keine Anmeldung. Der Dienst gehört nicht direkt ins Internet.
+
 Web-Haushaltsbuch nach dem Vorbild einer Excel-Vorlage. Es läuft in einem LXC-Container unter Proxmox
 (FastAPI + PostgreSQL in Docker) und ist von mehreren Geräten im Heimnetz erreichbar.
 Keine Bankanbindung, kein Excel-Import, keine Belegbilder.
@@ -47,9 +58,10 @@ automatische Tages-, Kategorie- und Monatssummen, Monatswechsel vor/zurück.
 Betrag, z. B. Rückzahlungen, Dividenden oder Zinsen. Beginnt die Bezeichnung mit „Div.“ oder „Dividende“,
 zählt der Betrag als Dividende, beginnt sie mit „Zins“, als Zinsen, alles andere als Sonstiges.
 
-- **⇢ Wiederholen:** Ein Eintrag lässt sich monatlich, vierteljährlich, halbjährlich oder jährlich bis Dezember
-  (dieses oder nächstes Jahr) wiederholen. Eine Vorschau zeigt die Zielmonate. Es entstehen normale Einträge,
-  die einzeln änderbar sind. Monate, in denen der Eintrag schon existiert, werden übersprungen.
+- **⇢ Wiederholen:** Die Bezeichnung eines Eintrags lässt sich monatlich, vierteljährlich, halbjährlich oder jährlich
+  bis Dezember (dieses oder nächstes Jahr) in die Folgemonate kopieren. Eine Vorschau zeigt die Zielmonate.
+  Kopiert wird **nur die Bezeichnung**, der Betrag bleibt leer und wird von dir eingetragen, sobald er feststeht.
+  Monate, in denen es den Eintrag schon gibt, werden übersprungen.
 - Die Jahrestabelle zeigt Dividenden, Zinsen, Sonstiges und „Dividenden + Zinsen“ je Monat.
 - Die Monatssummen erscheinen als schreibgeschützte Zeile „Sonstiges (SE)“ in der Jahresübersicht
   und in den Einnahmen der Monatskarten.

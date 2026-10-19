@@ -82,7 +82,7 @@ th{height:26px;padding:2px 8px}
 <div id="viewSE" hidden>
 <div class="top"><div><h1 id="seTitle">Sonstige Einnahmen</h1><div class="sub">Rückzahlungen, Erstattungen, Dividenden, Zinsen usw. Beginnt die Bezeichnung mit <b>Div.</b> oder <b>Dividende</b>, zählt der Betrag als Dividende, beginnt sie mit <b>Zinsen</b>, als Zinsen. Alles andere ist „Sonstiges“.</div></div><div class="monthnav"><button class="btn" onclick="moveSE(-1)">‹</button><button class="btn" onclick="goSEToday()">Heute</button><button class="btn" onclick="moveSE(1)">›</button></div></div>
 <div class="se-grid">
-<section class="card matrix-card"><div class="matrix-head"><div><h2>Einträge im Monat</h2><div class="hint">In die leere Zeile schreiben, Enter springt zum nächsten Feld. ⇢ wiederholt einen Eintrag (z. B. vierteljährlich), × löscht ihn.</div></div><div class="status" id="seStatus"></div></div><table id="seTable"></table></section>
+<section class="card matrix-card"><div class="matrix-head"><div><h2>Einträge im Monat</h2><div class="hint">In die leere Zeile schreiben, Enter springt zum nächsten Feld. ⇢ wiederholt die Bezeichnung (z. B. vierteljährlich), der Betrag bleibt leer. × löscht den Eintrag.</div></div><div class="status" id="seStatus"></div></div><table id="seTable"></table></section>
 <section class="card matrix-card"><div class="matrix-head"><div><h2 id="seYearTitle">Jahresübersicht</h2><div class="hint">Klick auf einen Monat öffnet seine Einträge.</div></div></div><table id="seYear"></table></section>
 </div>
 </div>
@@ -257,8 +257,8 @@ async function loadSE(){$('seTitle').textContent='Sonstige Einnahmen – '+month
 function moveSE(n){current.setMonth(current.getMonth()+n);loadSE()}
 function goSEToday(){current=new Date();current.setDate(1);loadSE()}
 function goSE(){if(current.getFullYear()!==year)current=new Date(year,0,1);showView('se')}
-const SE_DEL='<button class="mini" data-act="serep" tabindex="-1" title="Eintrag wiederholen (monatlich, vierteljährlich, halbjährlich, jährlich)">⇢</button><button class="mini" data-act="sedel" tabindex="-1" title="Löschen">×</button>';
-function seRow(e){return `<tr data-id="${e?e.id:''}" data-b="${e?esc(e.bezeichnung):''}" data-a="${e?e.betrag:''}"><td class="sebez"><input class="se-b" maxlength="120" placeholder="${e?'':'Bezeichnung'}" value="${e?esc(e.bezeichnung):''}" aria-label="Bezeichnung"></td><td class="ycell"><input class="se-a" inputmode="decimal" placeholder="${e?'':'Betrag'}" value="${e?fmt(e.betrag):''}" aria-label="Betrag"></td><td class="se-art">${e?e.art:''}</td><td class="se-x">${e?SE_DEL:''}</td></tr>`}
+const SE_DEL='<button class="mini" data-act="serep" tabindex="-1" title="Bezeichnung wiederholen (monatlich, vierteljährlich, halbjährlich, jährlich)">⇢</button><button class="mini" data-act="sedel" tabindex="-1" title="Löschen">×</button>';
+function seRow(e){return `<tr data-id="${e?e.id:''}" data-b="${e?esc(e.bezeichnung):''}" data-a="${e?e.betrag:''}"><td class="sebez"><input class="se-b" maxlength="120" placeholder="${e?'':'Bezeichnung'}" value="${e?esc(e.bezeichnung):''}" aria-label="Bezeichnung"></td><td class="ycell"><input class="se-a" inputmode="decimal" placeholder="Betrag" value="${e?fmtz(e.betrag):''}" aria-label="Betrag"></td><td class="se-art">${e?e.art:''}</td><td class="se-x">${e?SE_DEL:''}</td></tr>`}
 function renderSE(){
  $('seTable').innerHTML='<thead><tr><th>Bezeichnung</th><th>Betrag</th><th>Art</th><th></th></tr></thead><tbody>'+semodel.eintraege.map(seRow).join('')+seRow(null).repeat(3)+'</tbody><tbody><tr class="sumrow"><td>Gesamt</td><td class="ro" id="seSum"></td><td></td><td></td></tr></tbody>';
  updateSESum();renderSEYear()}
@@ -276,7 +276,7 @@ async function refreshSE(){semodel=await api(`/api/se?monat=${ym()}`);
 function ensureBlank(){const tb=document.querySelector('#seTable tbody');if(!tb.lastElementChild||tb.lastElementChild.dataset.id)tb.insertAdjacentHTML('beforeend',seRow(null))}
 function seCommit(row){return enqueue(async()=>{
  const bEl=row.querySelector('.se-b'),aEl=row.querySelector('.se-a'),bez=bEl.value.trim(),raw=aEl.value.trim(),amt=parseAmount(raw),id=row.dataset.id;
- const revert=()=>{bEl.value=row.dataset.b||'';aEl.value=row.dataset.a?fmt(row.dataset.a):''};
+ const revert=()=>{bEl.value=row.dataset.b||'';aEl.value=Number(row.dataset.a)?fmt(row.dataset.a):''};
  try{
   if(!id){
    if(raw==='')return;
@@ -284,9 +284,9 @@ function seCommit(row){return enqueue(async()=>{
    flash('seStatus','Speichere …');
    const r=await put('/api/se',{monat:ym(),bezeichnung:bez||'Sonstiges',betrag:amt.toFixed(2)},'POST');
    row.dataset.id=r.id;if(!bez)bEl.value='Sonstiges';aEl.value=fmt(amt);row.querySelector('.se-x').innerHTML=SE_DEL}
-  else if(raw===''||bez===''){revert();flash('seStatus','Zum Löschen den Knopf × benutzen.',3000);return}
-  else if(!(amt>0)){revert();flash('seStatus','Bitte einen Betrag größer 0 eingeben.',3000);return}
-  else{flash('seStatus','Speichere …');await put(`/api/se/${id}`,{bezeichnung:bez,betrag:amt.toFixed(2)});aEl.value=fmt(amt)}
+  else if(bez===''){revert();flash('seStatus','Die Bezeichnung darf nicht leer sein. Zum Löschen den Knopf × benutzen.',3500);return}
+  else if(!(amt>=0)){revert();flash('seStatus','Bitte einen gültigen Betrag eingeben.',3000);return}
+  else{flash('seStatus','Speichere …');await put(`/api/se/${id}`,{bezeichnung:bez,betrag:amt.toFixed(2)});aEl.value=fmtz(amt)}
   await refreshSE();flash('seStatus','Gespeichert',1200)}
  catch(err){flash('seStatus','Fehler beim Speichern');alert('Speichern fehlgeschlagen: '+err.message)}})}
 (function initSEEvents(){const tb=$('seTable');
@@ -303,9 +303,9 @@ function repTargets(){const [y,m]=ym().split('-').map(Number),step=RHYTHMEN[$('r
  for(let k=y*12+(m-1)+step;k<=until*12+11;k+=step)out.push(`${MONATE[k%12]} ${Math.floor(k/12)}`);return out}
 function repPreview(){const t=repTargets(),p=$('repPreview');
  if(!t.length){p.className='rep-preview none';p.textContent=`Bis Dezember ${$('repUntil').value} liegt kein weiterer Termin. Wähle einen späteren Zeitraum.`;$('repOk').disabled=true}
- else{p.className='rep-preview';p.innerHTML=`<b>${t.length} ${t.length===1?'Eintrag wird':'Einträge werden'}</b> angelegt: ${t.join(', ')}.<br>Monate, in denen es den Eintrag schon gibt, werden übersprungen. Die neuen Einträge kannst du einzeln ändern oder löschen.`;$('repOk').disabled=false}}
+ else{p.className='rep-preview';p.innerHTML=`<b>${t.length} ${t.length===1?'Eintrag wird':'Einträge werden'}</b> angelegt: ${t.join(', ')}.<br>Es wird nur die Bezeichnung kopiert, der Betrag bleibt leer und wird von dir eingetragen. Monate, in denen es den Eintrag schon gibt, werden übersprungen.`;$('repOk').disabled=false}}
 function openRep(row){repId=row.dataset.id;const y=Number(ym().slice(0,4));
- $('repWhat').textContent=`„${row.dataset.b}“ · ${fmt(row.dataset.a)} € · ${monthName()}`;
+ $('repWhat').textContent=`„${row.dataset.b}“ · ${monthName()}`;
  $('repUntil').innerHTML=`<option value="${y}">Dezember ${y}</option><option value="${y+1}">Dezember ${y+1}</option>`;
  repPreview();$('repModal').hidden=false;$('repRhythm').focus()}
 function closeRep(){$('repModal').hidden=true;repId=null}
@@ -317,7 +317,7 @@ function closeRep(){$('repModal').hidden=true;repId=null}
  $('repOk').addEventListener('click',()=>{const id=repId,rh=$('repRhythm').value,until=Number($('repUntil').value);closeRep();
   enqueue(async()=>{try{flash('seStatus','Lege Einträge an …');
    const r=await put(`/api/se/${id}/wiederholen`,{rhythmus:rh,bis_jahr:until},'POST'),n=r.angelegt.length;
-   await refreshSE();flash('seStatus',`${n} ${n===1?'Eintrag':'Einträge'} angelegt`+(r.uebersprungen.length?`, ${r.uebersprungen.length} übersprungen (gab es schon)`:''),5000)}
+   await refreshSE();flash('seStatus',`${n} ${n===1?'Eintrag':'Einträge'} angelegt (Betrag noch leer)`+(r.uebersprungen.length?`, ${r.uebersprungen.length} übersprungen (gab es schon)`:''),5000)}
   catch(err){flash('seStatus','Fehler beim Wiederholen');alert('Wiederholen fehlgeschlagen: '+err.message)}})})})();
 
 api('/api/setup-demo',{method:'POST'}).then(()=>api('/api/version')).then(v=>{$('version').textContent='Version '+v.version;load()}).catch(e=>{$('status').textContent='Datenbank nicht erreichbar';console.error(e)})

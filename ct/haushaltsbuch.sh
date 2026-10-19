@@ -299,6 +299,7 @@ main() {
   echo
   echo "  ${APP} – Installation auf Proxmox"
   echo "  ${REPO_URL}"
+  echo "  Hinweis: KI-generiertes Projekt, kein Support, Nutzung auf eigene Verantwortung."
   echo
   check_env
   local mode
