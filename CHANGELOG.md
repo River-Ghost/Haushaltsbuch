@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.4
+- Neu: Das Seitenmenü lässt sich ein- und ausklappen (Schalter unten im Menü). Eingeklappt zeigt es nur Symbole, die Breite sinkt von 220 auf 66 px. Der Zustand wird im Browser gemerkt.
+- Neu: Alle Menüpunkte haben ein Symbol und einen Tooltip. Auf schmalen Bildschirmen ersetzen die Symbole die bisherigen „•“-Punkte.
+- Geändert: Kürzere Menünamen: „Monat“, „Jahr“ (bisher „Jahresübersicht“) und „Nebeneinnahmen“ (bisher „Sonstige Einnahmen“). Überschrift und Hinweistexte wurden angepasst.
+
 ## 0.5.3
 - Geändert (Jahr): Die Zeilen Gesamteinnahmen, Gesamtausgaben und Saldo stehen jetzt oben direkt unter den Monatsnamen und bleiben beim Scrollen fixiert.
 - Neu (Jahr): Die Kennzahlen-Karten über der Tabelle sind ausblendbar (Button „Kennzahlen anzeigen/ausblenden“, Standard: ausgeblendet). Die Wahl wird im Browser gemerkt. Die Tabelle erhält dadurch mehr Platz.

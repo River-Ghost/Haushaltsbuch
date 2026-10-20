@@ -43,10 +43,13 @@ Datenbank-Backup in `/opt/haushaltsbuch/backups/` angelegt. Deine Daten und Zuga
 
 ## Funktionen
 
+Das Seitenmenü (links) enthält **Monat**, **Jahr** und **Nebeneinnahmen**. Es lässt sich über den Schalter
+unten ein- und ausklappen, der Zustand wird gemerkt.
+
 **Monat** – Excel-ähnliche Tagesmatrix für die flexiblen Ausgaben (10 Kategorien als Spalten),
 automatische Tages-, Kategorie- und Monatssummen, Monatswechsel vor/zurück.
 
-**Jahresübersicht** – entspricht dem Excel-Blatt „GESAMT“:
+**Jahr** (Jahresübersicht) – entspricht dem Excel-Blatt „GESAMT“:
 
 - Vier farblich getrennte Abschnitte: *Einnahmen*, *Feste Ausgaben*, *Sparen / Vermögen* und *Flexible Ausgaben* (aus der Monatsansicht)
 - Gesamteinnahmen, Gesamtausgaben und Saldo stehen oben unter den Monatsnamen und bleiben beim Scrollen sichtbar.
@@ -58,7 +61,7 @@ automatische Tages-, Kategorie- und Monatssummen, Monatswechsel vor/zurück.
 - Posten hinzufügen (`+ Posten`), umbenennen (✎), ausblenden (×) und über „Ausgeblendet“ wieder einblenden (↺).
   Die Knöpfe ⇢ ✎ × erscheinen beim Darüberfahren über die Zeile.
 
-**Sonstige Einnahmen** (entspricht dem Excel-Blatt „SE“) – freie Einträge pro Monat mit Bezeichnung und
+**Nebeneinnahmen** (Sonstige Einnahmen, entspricht dem Excel-Blatt „SE“) – freie Einträge pro Monat mit Bezeichnung und
 Betrag, z. B. Rückzahlungen, Dividenden oder Zinsen. Beginnt die Bezeichnung mit „Div.“ oder „Dividende“,
 zählt der Betrag als Dividende, beginnt sie mit „Zins“, als Zinsen, alles andere als Sonstiges.
 
@@ -75,8 +78,8 @@ zählt der Betrag als Dividende, beginnt sie mit „Zins“, als Zinsen, alles a
 | Ansicht | Enter | Shift+Enter | Tab | ↑ / ↓ |
 |---|---|---|---|---|
 | Monat | ein Feld nach rechts (am Zeilenende in die nächste Zeile) | ein Feld nach links | ein Feld nach rechts | eine Zeile höher / tiefer |
-| Jahresübersicht | eine Zeile tiefer (am Spaltenende in die nächste Spalte) | eine Zeile höher | ein Feld nach rechts | eine Zeile höher / tiefer |
-| Sonstige Einnahmen | Bezeichnung → Betrag → nächste Zeile | rückwärts | ein Feld nach rechts | – |
+| Jahr | eine Zeile tiefer (am Spaltenende in die nächste Spalte) | eine Zeile höher | ein Feld nach rechts | eine Zeile höher / tiefer |
+| Nebeneinnahmen | Bezeichnung → Betrag → nächste Zeile | rückwärts | ein Feld nach rechts | – |
 
 Beim Weiterspringen wird der Wert automatisch gespeichert.
 
