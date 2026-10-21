@@ -924,3 +924,12 @@ CREATE TABLE IF NOT EXISTS sonstige_einnahmen (
 );
 CREATE INDEX IF NOT EXISTS idx_se_haushalt_monat ON sonstige_einnahmen(haushalt_id, monat, erstellt_am);
 
+-- Tagesnotizen (Migration 005)
+CREATE TABLE IF NOT EXISTS tagesnotizen (
+    haushalt_id UUID NOT NULL REFERENCES haushalte(id) ON DELETE CASCADE,
+    datum DATE NOT NULL,
+    notiz VARCHAR(300) NOT NULL,
+    aktualisiert_am TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (haushalt_id, datum),
+    CONSTRAINT chk_tagesnotiz_text CHECK (length(trim(notiz)) > 0)
+);

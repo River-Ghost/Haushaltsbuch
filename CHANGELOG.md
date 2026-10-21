@@ -1,5 +1,11 @@
 # Änderungen
 
+## 0.5.5
+- **Behoben (Installer):** Auf Proxmox-Hosts, die Templates mehrerer Architekturen auflisten, wählte der Installer das alphabetisch letzte Template und damit `arm64`, auch auf Intel/AMD-Rechnern. Der Container ließ sich dann nicht starten (`sync_wait: 34 An error occurred in another process`). Jetzt wird nur ein Template der Architektur des Hosts gewählt (amd64 oder arm64), `pct create` setzt `--arch`, und bei einem Startfehler zeigt der Installer die Fehlerzeilen aus dem LXC-Protokoll.
+- Neu (Monat): Spalte „Teuerste Einkäufe“ direkt nach dem Datum, ein freies Textfeld pro Tag (wie „Die teuersten Einkaufsposten“ im Excel-Monatsblatt, bis 300 Zeichen). Leeren des Feldes löscht die Notiz. Enter springt aus der Notiz in die erste Kategorie, beim Zeilenwechsel wird das Notizfeld übersprungen. Migration 005 legt die Tabelle `tagesnotizen` an.
+- Neu: `scripts/restore.sh` stellt die Datenbank aus einer Sicherung wieder her (Format `.dump` aus backup.sh oder den automatischen „vor-update“-Sicherungen, auch `.sql`). Es prüft die Datei vor dem Überschreiben, legt eine Sicherheitskopie des bisherigen Standes an und holt fehlende Migrationen nach, sodass auch Sicherungen älterer Versionen funktionieren.
+- Geändert: Der Befehl `update` schreibt die neue Versionsnummer erst nach einem erfolgreichen Update. Bricht ein Update ab, wird es beim nächsten Aufruf erneut ausgeführt und endet mit einer verständlichen Meldung. Wirkt ab dem Update, das dieses Skript installiert.
+
 ## 0.5.4
 - Neu: Das Seitenmenü lässt sich ein- und ausklappen (Schalter unten im Menü). Eingeklappt zeigt es nur Symbole, die Breite sinkt von 220 auf 66 px. Der Zustand wird im Browser gemerkt.
 - Neu: Alle Menüpunkte haben ein Symbol und einen Tooltip. Auf schmalen Bildschirmen ersetzen die Symbole die bisherigen „•“-Punkte.

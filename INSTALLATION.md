@@ -48,9 +48,46 @@ Ein Datenbank-Backup wird vorher automatisch angelegt (`/opt/haushaltsbuch/backu
 | Meldung | Ursache und Lösung |
 |---|---|
 | „Konnte … /VERSION nicht laden“ | Der Proxmox-Host hat kein Internet, oder das GitHub-Repository ist nicht öffentlich bzw. nicht vollständig hochgeladen. |
+| Container startet nicht, Meldung `sync_wait: 34 An error occurred in another process` und ein Template mit `arm64` im Namen | Das Template passt nicht zur Prozessor-Architektur (Intel/AMD braucht `amd64`). Mit Version 0.5.5 behoben. Den unfertigen Container löschen (`pct destroy <CT-ID> --purge`) und den Installer erneut starten. Weitere Diagnose: `lxc-start -n <CT-ID> -F -l DEBUG -o /tmp/lxc.log` und die ERROR-Zeilen in der Datei lesen. |
 | „Im Container ist nach 2 Minuten kein Internet erreichbar“ | Bridge, VLAN, Gateway oder DNS falsch. Im erweiterten Modus prüfen. |
 | „Der Docker-Dienst startet nicht“ | Beim Container muss unter Optionen → Funktionen **Nesting** aktiviert sein (der Installer setzt das). |
 | Container-Start mit Fehler zu `sysctl net.ipv4.ip_unprivileged_port_start` | Bekannte Unverträglichkeit neuerer runc-Versionen in unprivilegierten LXC. Dann bitte die Logausgabe melden. |
 | „Das Haushaltsbuch antwortet nach 3 Minuten nicht“ | Die letzten Logzeilen stehen direkt darüber. Weitere Logs: `cd /opt/haushaltsbuch && docker compose logs --tail=100`. |
 
 Bricht die Installation ab, bietet das Skript an, den unfertigen Container wieder zu löschen.
+
+## Sicherung auf einen anderen Rechner kopieren
+
+Eine Sicherung ist nur dann hilfreich, wenn sie **nicht** auf demselben Datenträger liegt wie das Haushaltsbuch.
+Die folgenden Befehle laufen auf dem Proxmox-Host (statt `100` die eigene CT-ID verwenden).
+
+**Frische Sicherung erstellen und direkt auf einen anderen Rechner im Netz schicken** (schont den Datenträger, es wird
+nichts zwischengespeichert; `benutzer@rechner` ist ein Rechner mit SSH):
+
+```bash
+pct exec 100 -- bash -c 'cd /opt/haushaltsbuch && docker compose exec -T datenbank sh -c "pg_dump -U \$POSTGRES_USER -d \$POSTGRES_DB -Fc"' \
+  | ssh benutzer@rechner 'cat > haushaltsbuch_$(date +%F).dump'
+```
+
+**Vorhandene Sicherungen aus dem Container holen:**
+
+```bash
+pct exec 100 -- ls -lt /opt/haushaltsbuch/backups          # zeigt die Sicherungen, neueste zuerst
+pct pull 100 /opt/haushaltsbuch/backups/<Dateiname> /root/<Dateiname>
+```
+
+Danach die Datei vom Host auf einen anderen Rechner kopieren (z. B. mit `scp` oder WinSCP).
+
+## Wiederherstellen (z. B. auf neuer Hardware)
+
+1. Haushaltsbuch wie oben neu installieren (Einzeiler auf dem neuen Proxmox-Host).
+2. Sicherung in den neuen Container kopieren: `pct push <CT-ID> /pfad/zur/haushaltsbuch.dump /root/haushaltsbuch.dump`
+3. Im Container einspielen:
+
+```bash
+bash /opt/haushaltsbuch/scripts/restore.sh /root/haushaltsbuch.dump
+```
+
+Das Skript prüft die Datei, legt eine Sicherheitskopie des bisherigen Standes an, ersetzt die Daten, holt fehlende
+Datenbankänderungen nach und startet das Haushaltsbuch. Es funktioniert auch mit Sicherungen älterer Versionen.
+

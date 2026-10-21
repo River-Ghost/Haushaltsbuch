@@ -102,6 +102,21 @@ check_env() {
   msg_ok "${APP} ${APP_VERSION} gefunden."
 }
 
+# --- Architektur des Hosts ---------------------------------------------------
+# Neuere Proxmox-Versionen listen Templates für mehrere Architekturen (amd64 und arm64).
+# Es darf nur eines für die Architektur des Hosts gewählt werden, sonst startet der Container nicht.
+detect_arch() {
+  local a="${HB_ARCH:-}"
+  [[ -n "$a" ]] || a="$(dpkg --print-architecture 2>/dev/null || true)"
+  if [[ -z "$a" ]]; then
+    case "$(uname -m)" in x86_64) a=amd64 ;; aarch64) a=arm64 ;; esac
+  fi
+  case "$a" in
+    amd64|arm64) ARCH="$a" ;;
+    *) die "Nicht unterstützte oder unbekannte Prozessor-Architektur: '${a:-?}' (unterstützt: amd64, arm64)." ;;
+  esac
+}
+
 # --- Hilfsfunktionen für Standardwerte --------------------------------------
 valid_ctid() { [[ "$1" =~ ^[0-9]+$ ]] && ((10#$1 >= 100 && 10#$1 <= 999999999)); }
 ctid_free() { ! pct status "$1" >/dev/null 2>&1 && [[ ! -e "/etc/pve/qemu-server/$1.conf" ]]; }
@@ -186,14 +201,17 @@ Installation starten?" || cancelled
 find_template() {
   msg_info "Aktualisiere die Template-Liste …"
   pveam update >/dev/null 2>&1 || msg_warn "pveam update schlug fehl, verwende vorhandene Liste."
-  TEMPLATE="$(pveam available --section system | awk '$2 ~ /^debian-13-standard/ {print $2}' | sort -V | tail -n1)"
-  [[ -n "$TEMPLATE" ]] || TEMPLATE="$(pveam available --section system | awk '$2 ~ /^debian-12-standard/ {print $2}' | sort -V | tail -n1)"
-  [[ -n "$TEMPLATE" ]] || die "Kein Debian-13- oder Debian-12-Template gefunden."
+  local v
+  for v in 13 12; do
+    TEMPLATE="$(pveam available --section system | awk -v a="$ARCH" -v v="$v" '$2 ~ ("^debian-" v "-standard_.*_" a "[.]tar") {print $2}' | sort -V | tail -n1)"
+    [[ -n "$TEMPLATE" ]] && break
+  done
+  [[ -n "$TEMPLATE" ]] || die "Kein Debian-13- oder Debian-12-Template für die Architektur ${ARCH} gefunden."
   if ! pveam list "$TEMPLATE_STORAGE" 2>/dev/null | awk '{print $1}' | grep -qx "${TEMPLATE_STORAGE}:vztmpl/${TEMPLATE}"; then
     msg_info "Lade ${TEMPLATE} herunter …"
     pveam download "$TEMPLATE_STORAGE" "$TEMPLATE" >/dev/null || die "Template-Download fehlgeschlagen."
   fi
-  msg_ok "Template ${TEMPLATE} bereit."
+  msg_ok "Template ${TEMPLATE} bereit (Architektur ${ARCH})."
 }
 
 create_container() {
@@ -206,14 +224,23 @@ create_container() {
     "$CTID" "${TEMPLATE_STORAGE}:vztmpl/${TEMPLATE}"
     --hostname "$HOSTNAME_CT" --cores "$CORES" --memory "$RAM" --swap "$SWAP"
     --rootfs "${CONTAINER_STORAGE}:${DISK}" --net0 "$net0" --password "$ROOT_PASSWORD"
-    --unprivileged 1 --features "nesting=1,keyctl=1" --onboot 1 --tags "$TAGS"
+    --arch "$ARCH" --unprivileged 1 --features "nesting=1,keyctl=1" --onboot 1 --tags "$TAGS"
   )
   [[ -n "$DNS" ]] && args+=(--nameserver "$DNS")
   msg_info "Erstelle Container ${CTID} …"
   pct create "${args[@]}" >/dev/null
   CREATED=1
   msg_ok "Container ${CTID} wurde erstellt."
-  pct start "$CTID"
+  if ! pct start "$CTID"; then
+    msg_err "Der Container ließ sich nicht starten (Host-Architektur: ${ARCH}, Template: ${TEMPLATE})."
+    msg_info "Ausgabe von lxc-start (letzte Zeilen), hilfreich für die Fehlersuche:"
+    timeout 25 lxc-start -n "$CTID" -F -l DEBUG -o "/tmp/lxc-${CTID}.log" >/dev/null 2>&1 || true
+    if [[ -s "/tmp/lxc-${CTID}.log" ]]; then
+      grep -E 'ERROR|WARN' "/tmp/lxc-${CTID}.log" | tail -n 12 | sed 's/^/    /' >&2 || true
+      msg_info "Vollständiges Protokoll: /tmp/lxc-${CTID}.log"
+    fi
+    die "Container ${CTID} startet nicht."
+  fi
   msg_info "Warte auf das Netzwerk im Container …"
   local i
   for i in $(seq 1 60); do
@@ -302,6 +329,7 @@ main() {
   echo "  Hinweis: KI-generiertes Projekt, kein Support, Nutzung auf eigene Verantwortung."
   echo
   check_env
+  detect_arch
   local mode
   choose mode "Was möchtest du tun?  (Version ${APP_VERSION})" \
     install  "Neu installieren (empfohlen, sinnvolle Standardwerte)" \

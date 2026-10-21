@@ -48,6 +48,7 @@ unten ein- und ausklappen, der Zustand wird gemerkt.
 
 **Monat** – Excel-ähnliche Tagesmatrix für die flexiblen Ausgaben (10 Kategorien als Spalten),
 automatische Tages-, Kategorie- und Monatssummen, Monatswechsel vor/zurück.
+Die Spalte „Teuerste Einkäufe“ nimmt pro Tag einen freien Text auf (z. B. welche größeren Anschaffungen es gab).
 
 **Jahr** (Jahresübersicht) – entspricht dem Excel-Blatt „GESAMT“:
 
@@ -89,6 +90,15 @@ Die Seite hat ein Icon und ein Web-App-Manifest. Im Browser des Handys lässt si
 „Zum Startbildschirm hinzufügen“ ablegen. Über reines HTTP entsteht dabei eine Verknüpfung mit dem Icon, die
 im Browser öffnet. Als eigenständige App ohne Browserleiste lässt es sich installieren, sobald die Seite über
 HTTPS erreichbar ist (z. B. über einen vorgeschalteten Nginx mit Zertifikat).
+
+## Sicherung und Wiederherstellung
+
+- `bash /opt/haushaltsbuch/scripts/backup.sh` erstellt eine Datenbank-Sicherung in `/opt/haushaltsbuch/backups/`.
+  Vor jedem Update entsteht automatisch eine Sicherung (`vor-update_*.dump`).
+- `bash /opt/haushaltsbuch/scripts/restore.sh /pfad/zur/sicherung.dump` spielt eine Sicherung wieder ein, auch auf einem
+  frisch installierten Container oder aus einer älteren Version.
+- **Sicherungen gehören auf einen anderen Rechner.** Eine Sicherung auf demselben Datenträger schützt nicht vor einem
+  Hardwaredefekt. Anleitung zum Herauskopieren und Wiederherstellen: [INSTALLATION.md](INSTALLATION.md).
 
 ## Proxmox-Speicher und Backups
 

@@ -40,6 +40,9 @@ main() {
 
   # .env und backups/ sind nicht im Archiv und bleiben unverändert.
   cp -a "$tmp"/. "$APP_DIR"/
+  # Die Versionsnummer wird erst nach einem erfolgreichen Update geschrieben. Bricht das Update
+  # ab, erkennt der nächste Aufruf von "update", dass es noch nicht abgeschlossen ist.
+  printf '%s\n' "$old" > "$APP_DIR/VERSION"
   mkdir -p "$APP_DIR/scripts"
   chmod +x "$APP_DIR"/scripts/*.sh 2>/dev/null || true
 
@@ -49,10 +52,16 @@ exec bash /opt/haushaltsbuch/scripts/self-update.sh "$@"
 UPD
   chmod +x /usr/local/bin/update
 
-  bash "$APP_DIR/scripts/update.sh"
+  if ! bash "$APP_DIR/scripts/update.sh"; then
+    echo >&2
+    echo "Das Update ist fehlgeschlagen. Vorhandene Datenbank-Sicherungen liegen in ${APP_DIR}/backups/." >&2
+    echo "Nach der Fehlerbehebung (z. B. 'docker compose ps' prüfen) einfach erneut 'update' eingeben." >&2
+    return 1
+  fi
 
   for _ in $(seq 1 60); do
     if curl -fsS http://127.0.0.1:8080/api/health >/dev/null 2>&1; then
+      cp "$tmp/VERSION" "$APP_DIR/VERSION"
       echo
       echo "Update von ${old} auf ${new} erfolgreich."
       return 0

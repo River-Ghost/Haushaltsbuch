@@ -16,7 +16,7 @@ DB = os.environ["DATABASE_URL"]
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.4"
+VERSION = "0.5.5"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -187,6 +187,10 @@ def parse_monat(monat: str):
     return year, month
 
 
+class NoteBody(BaseModel):
+    notiz: str = Field(default="", max_length=300)
+
+
 class FillBody(BaseModel):
     ab_monat: int = Field(ge=1, le=12)
     bis_monat: int = Field(default=12, ge=1, le=12)
@@ -278,6 +282,13 @@ def month_view(monat: str = Query(..., pattern=r"^\d{4}-\d{2}$")):
                WHERE m.haushalt_id=%s AND k.gruppe=%s AND m.datum >= %s AND m.datum < %s""",
             (h["id"], GRUPPE_FLEX, first, last),
         ).fetchall()
+        notizen = {
+            r["datum"].isoformat(): r["notiz"]
+            for r in c.execute(
+                "SELECT datum, notiz FROM tagesnotizen WHERE haushalt_id=%s AND datum >= %s AND datum < %s",
+                (h["id"], first, last),
+            ).fetchall()
+        }
         by_day = {}
         totals = {}
         for row in values:
@@ -289,6 +300,7 @@ def month_view(monat: str = Query(..., pattern=r"^\d{4}-\d{2}$")):
             "monat": monat,
             "kategorien": [{"id": str(k["id"]), "bezeichnung": k["bezeichnung"]} for k in cats],
             "tage": by_day,
+            "notizen": notizen,
             "summen": totals,
             "gesamt": round(sum(float(r["betrag"]) for r in values), 2),
         }
@@ -309,6 +321,26 @@ def save_cell(monat: str, datum: date, kategorie_id: UUID, x: CellValue):
         with c.transaction():
             set_value(c, h["id"], datum, kategorie_id, x.betrag)
     return {"ok": True, "betrag": float(x.betrag)}
+
+
+@app.put("/api/notiz/{datum}")
+def save_note(datum: date, x: NoteBody):
+    """Freier Text pro Tag ("Die teuersten Einkaufsposten"). Leerer Text löscht die Notiz."""
+    if not (2000 <= datum.year <= 2100):
+        raise HTTPException(400, "Ungültiges Datum.")
+    text = x.notiz.strip()
+    with db() as c:
+        h = household(c)
+        with c.transaction():
+            if not text:
+                c.execute("DELETE FROM tagesnotizen WHERE haushalt_id=%s AND datum=%s", (h["id"], datum))
+            else:
+                c.execute(
+                    """INSERT INTO tagesnotizen(haushalt_id,datum,notiz) VALUES(%s,%s,%s)
+                       ON CONFLICT(haushalt_id,datum) DO UPDATE SET notiz=EXCLUDED.notiz, aktualisiert_am=NOW()""",
+                    (h["id"], datum, text),
+                )
+    return {"ok": True, "notiz": text}
 
 
 @app.get("/api/uebersicht")
