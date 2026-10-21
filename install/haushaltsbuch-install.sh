@@ -10,6 +10,8 @@ GH_REPO="${HB_GH_REPO:-Haushaltsbuch}"
 GH_BRANCH="${HB_GH_BRANCH:-main}"
 TARBALL_URL="${HB_TARBALL_URL:-https://github.com/${GH_USER}/${GH_REPO}/archive/refs/heads/${GH_BRANCH}.tar.gz}"
 APP_DIR="${HB_APP_DIR:-/opt/haushaltsbuch}"
+# Neutrale Sprache: der Host reicht oft "en_US.UTF-8" durch, das im schlanken Template nicht erzeugt ist.
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
 export DEBIAN_FRONTEND=noninteractive
 
 if [[ -t 1 ]]; then RD=$'\033[31m' GN=$'\033[32m' BL=$'\033[36m' CL=$'\033[0m'; else RD='' GN='' BL='' CL=''; fi

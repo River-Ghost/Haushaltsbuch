@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.6
+- Neu (Jahr): Notizen an Zellen, wie Kommentare in Excel. Zellen mit Notiz tragen eine rote Ecke und eine dezente Tönung, beim Darüberfahren erscheint der Text. Bearbeiten mit F2, Rechtsklick (auf Touch-Geräten langes Drücken) oder Klick auf die rote Ecke. Strg+Enter speichert, Esc bricht ab, ein leerer Text löscht die Notiz. Notizen verändern keine Summen und bleiben beim Umbenennen eines Postens erhalten. Migration 006 legt die Tabelle `zellnotizen` an.
+- Geändert (Jahr): Die schreibgeschützte Zeile „Sonstiges (SE)“ im Block Einnahmen heißt jetzt „Nebeneinnahmen“, passend zum Menü.
+- Behoben (Installer und Update): Die Skripte setzen im Container eine neutrale Sprache (`C.UTF-8`). Die Warnungen `perl: warning: Setting locale failed` bei der Installation verschwinden.
+
 ## 0.5.5
 - **Behoben (Installer):** Auf Proxmox-Hosts, die Templates mehrerer Architekturen auflisten, wählte der Installer das alphabetisch letzte Template und damit `arm64`, auch auf Intel/AMD-Rechnern. Der Container ließ sich dann nicht starten (`sync_wait: 34 An error occurred in another process`). Jetzt wird nur ein Template der Architektur des Hosts gewählt (amd64 oder arm64), `pct create` setzt `--arch`, und bei einem Startfehler zeigt der Installer die Fehlerzeilen aus dem LXC-Protokoll.
 - Neu (Monat): Spalte „Teuerste Einkäufe“ direkt nach dem Datum, ein freies Textfeld pro Tag (wie „Die teuersten Einkaufsposten“ im Excel-Monatsblatt, bis 300 Zeichen). Leeren des Feldes löscht die Notiz. Enter springt aus der Notiz in die erste Kategorie, beim Zeilenwechsel wird das Notizfeld übersprungen. Migration 005 legt die Tabelle `tagesnotizen` an.

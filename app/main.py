@@ -16,7 +16,7 @@ DB = os.environ["DATABASE_URL"]
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.5"
+VERSION = "0.5.6"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -189,6 +189,10 @@ def parse_monat(monat: str):
 
 class NoteBody(BaseModel):
     notiz: str = Field(default="", max_length=300)
+
+
+class CellNoteBody(BaseModel):
+    notiz: str = Field(default="", max_length=500)
 
 
 class FillBody(BaseModel):
@@ -394,6 +398,11 @@ def year_view(jahr: int = Query(..., ge=2000, le=2100)):
                ORDER BY k.sortierung, k.bezeichnung, m.datum""",
             (first, last, h["id"], ALLE_GRUPPEN),
         ).fetchall()
+        note_rows = c.execute(
+            """SELECT kategorie_id, EXTRACT(MONTH FROM datum)::int AS monat, notiz
+               FROM zellnotizen WHERE haushalt_id=%s AND datum >= %s AND datum < %s""",
+            (h["id"], first, last),
+        ).fetchall()
         se_rows = c.execute(
             """SELECT EXTRACT(MONTH FROM monat)::int AS monat, SUM(betrag) AS betrag
                FROM sonstige_einnahmen
@@ -416,6 +425,10 @@ def year_view(jahr: int = Query(..., ge=2000, le=2100)):
             order.append(p)
         if r["monat"]:
             p["monate"][r["monat"] - 1] += r["betrag"]
+
+    notizen = {}
+    for r in note_rows:
+        notizen.setdefault(str(r["kategorie_id"]), {})[str(r["monat"])] = r["notiz"]
 
     bloecke = []
     for gruppe in ALLE_GRUPPEN:
@@ -440,6 +453,7 @@ def year_view(jahr: int = Query(..., ge=2000, le=2100)):
                         "bezeichnung": p["bezeichnung"],
                         "aktiv": p["aktiv"],
                         "monate": [float(x) for x in p["monate"]],
+                        "notizen": notizen.get(p["id"], {}),
                     }
                     for p in ps
                 ],
@@ -454,10 +468,11 @@ def year_view(jahr: int = Query(..., ge=2000, le=2100)):
             b["posten"].append(
                 {
                     "id": "se",
-                    "bezeichnung": "Sonstiges (SE)",
+                    "bezeichnung": "Nebeneinnahmen",
                     "aktiv": True,
                     "schreibgeschuetzt": True,
                     "monate": se_monate,
+                    "notizen": {},
                 }
             )
     return {"jahr": jahr, "bloecke": bloecke}
@@ -473,6 +488,32 @@ def save_year_cell(jahr: int, monat: int, kategorie_id: UUID, x: CellValue):
         with c.transaction():
             set_value(c, h["id"], date(jahr, monat, 1), kategorie_id, x.betrag)
     return {"ok": True, "betrag": float(x.betrag)}
+
+
+@app.put("/api/jahr/{jahr}/{monat}/{kategorie_id}/notiz")
+def save_cell_note(jahr: int, monat: int, kategorie_id: UUID, x: CellNoteBody):
+    """Notiz an einer Zelle der Jahresübersicht (wie ein Excel-Kommentar). Leerer Text löscht sie."""
+    if not (2000 <= jahr <= 2100 and 1 <= monat <= 12):
+        raise HTTPException(400, "Ungültiges Jahr oder ungültiger Monat.")
+    text = x.notiz.strip()
+    with db() as c:
+        h = household(c)
+        require_fester_posten(c, h["id"], kategorie_id)
+        datum = date(jahr, monat, 1)
+        with c.transaction():
+            if not text:
+                c.execute(
+                    "DELETE FROM zellnotizen WHERE haushalt_id=%s AND kategorie_id=%s AND datum=%s",
+                    (h["id"], kategorie_id, datum),
+                )
+            else:
+                c.execute(
+                    """INSERT INTO zellnotizen(haushalt_id,kategorie_id,datum,notiz) VALUES(%s,%s,%s,%s)
+                       ON CONFLICT(haushalt_id,kategorie_id,datum)
+                       DO UPDATE SET notiz=EXCLUDED.notiz, aktualisiert_am=NOW()""",
+                    (h["id"], kategorie_id, datum, text),
+                )
+    return {"ok": True, "notiz": text}
 
 
 @app.post("/api/jahr/{jahr}/{kategorie_id}/fuellen")

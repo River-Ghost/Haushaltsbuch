@@ -58,6 +58,8 @@ Die Spalte „Teuerste Einkäufe“ nimmt pro Tag einen freien Text auf (z. B. w
 - Die Kennzahlen-Karten über der Tabelle lassen sich per Button ein- und ausblenden (die Wahl wird gemerkt).
 - Beträge pro Posten und Monat direkt in der Tabelle eintragen
 - **⇢ Ausfüllen nach rechts:** Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen
+- **Notizen an Zellen** (wie Excel-Kommentare, z. B. welche Aktien in einem Monat gekauft wurden): Zelle wählen und F2 drücken,
+  Rechtsklick oder Klick auf die rote Ecke. Die Notiz erscheint beim Darüberfahren. Notizen ändern keine Summen.
 - Summen je Abschnitt, Jahressumme und Prozentanteile (leere Posten zeigen keinen Prozentwert)
 - Posten hinzufügen (`+ Posten`), umbenennen (✎), ausblenden (×) und über „Ausgeblendet“ wieder einblenden (↺).
   Die Knöpfe ⇢ ✎ × erscheinen beim Darüberfahren über die Zeile.

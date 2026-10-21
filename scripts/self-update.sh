@@ -12,6 +12,7 @@ GH_REPO="${HB_GH_REPO:-Haushaltsbuch}"
 GH_BRANCH="${HB_GH_BRANCH:-main}"
 TARBALL_URL="${HB_TARBALL_URL:-https://github.com/${GH_USER}/${GH_REPO}/archive/refs/heads/${GH_BRANCH}.tar.gz}"
 APP_DIR="${HB_APP_DIR:-/opt/haushaltsbuch}"
+export LANG=C.UTF-8 LC_ALL=C.UTF-8
 
 # Das ganze Skript steckt in einer Funktion und endet mit "exit": Bash liest die Funktion
 # vollständig ein, bevor sie läuft. So ist es unkritisch, dass dieses Skript beim Update

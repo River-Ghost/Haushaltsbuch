@@ -933,3 +933,15 @@ CREATE TABLE IF NOT EXISTS tagesnotizen (
     PRIMARY KEY (haushalt_id, datum),
     CONSTRAINT chk_tagesnotiz_text CHECK (length(trim(notiz)) > 0)
 );
+
+-- Notizen an Zellen der Jahresübersicht (Migration 006)
+CREATE TABLE IF NOT EXISTS zellnotizen (
+    haushalt_id UUID NOT NULL REFERENCES haushalte(id) ON DELETE CASCADE,
+    kategorie_id UUID NOT NULL REFERENCES kategorien(id) ON DELETE CASCADE,
+    datum DATE NOT NULL,
+    notiz VARCHAR(500) NOT NULL,
+    aktualisiert_am TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (haushalt_id, kategorie_id, datum),
+    CONSTRAINT chk_zellnotiz_monat CHECK (EXTRACT(DAY FROM datum) = 1),
+    CONSTRAINT chk_zellnotiz_text CHECK (length(trim(notiz)) > 0)
+);
