@@ -16,7 +16,7 @@ DB = os.environ["DATABASE_URL"]
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.6"
+VERSION = "0.5.7"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -47,7 +47,7 @@ FLEXIBLE_KATEGORIEN = [
     "KP/Gesundheit",
     "HW/Möbel",
     "BK/Schuhe",
-    "Beh./Gaststätten",
+    "Beh./Gast.",
     "Verkehr",
     "Sonstiges",
 ]
@@ -368,13 +368,15 @@ def overview(monat: str = Query(..., pattern=r"^\d{4}-\d{2}$")):
             (h["id"], first),
         ).fetchone()["wert"]
         einnahmen = s.get("Einnahmen", Decimal(0)) + se
-        fix = s.get("Fixe Ausgaben", Decimal(0)) + s.get("Sparen/Vermögen", Decimal(0))
+        fix = s.get("Fixe Ausgaben", Decimal(0))
+        sparen = s.get("Sparen/Vermögen", Decimal(0))
         flex = s.get(GRUPPE_FLEX, Decimal(0))
         return {
             "einnahmen": float(einnahmen),
             "fixkosten": float(fix),
+            "sparen": float(sparen),
             "flexibel": float(flex),
-            "saldo": float(einnahmen - fix - flex),
+            "saldo": float(einnahmen - fix - sparen - flex),
         }
 
 

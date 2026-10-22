@@ -1,5 +1,17 @@
 # Änderungen
 
+## 0.5.7
+- **Behoben (Update):** Nach einem Update erschien die Meldung `self-update.sh: line 80: unexpected EOF`. Das Update war dabei bereits erfolgreich. Ursache: Das Skript ersetzt sich beim Update selbst, und Bash las danach in der neuen Datei weiter. `main` und `exit` stehen jetzt in einer Zeile, und an der Stelle, an der ältere Fassungen weiterlesen, steht ein `exit`. Damit endet auch das nächste Update sauber.
+- Neu: Menüpunkt **Optionen** (Zahnrad) mit Schaltern für die Hervorhebungen und die Kennzahlen der Jahresübersicht. Die Einstellungen werden im Browser gemerkt.
+- Neu (Monat und Jahr): Die **Zeile mit dem Cursor** wird hinterlegt (Option „Zeile mit dem Cursor hervorheben“).
+- Neu (Monat und Jahr): Beim Darüberfahren mit der Maus oder per Tastatur-Fokus werden **Spalten- und Zeilenüberschrift** hervorgehoben (Option „Überschriften hervorheben“).
+- Geändert (Monat): Die Kennzahlen heißen **Einnahmen, Feste Ausgaben, Flexible Ausgaben, Sparen, Überschuss**. „Feste Ausgaben & Sparen“ ist geteilt.
+- Geändert (Monat): Die Kategorie „Beh./Gaststätten“ heißt **„Beh./Gast.“** (Migration 007, Beträge bleiben erhalten). Die Spaltenbreite richtet sich nach der Überschrift, die Spalte „Teuerste Einkäufe“ ist von 200 auf 270 px verbreitert.
+- Neu (Jahr): Ein Klick auf einen Monatsbetrag bei den **flexiblen Ausgaben** öffnet den Monat, ein Klick auf einen Betrag in der Zeile **Nebeneinnahmen** öffnet die Nebeneinnahmen des Monats.
+- Geändert (Jahr): Zellen mit Notiz haben keine gelbe Hinterlegung mehr, die rote Ecke bleibt.
+- Geändert: Notizen (Monat: „Teuerste Einkäufe“, Jahr: Notiz-Editor und Hover-Anzeige) verwenden eine **Festbreiten-Schrift**. Die Notiz an einer Zelle erscheint beim Darüberfahren in einer eigenen Anzeige, damit Leerzeichen und Zeilenumbrüche erhalten bleiben.
+- Geändert: Der Text „Excel-ähnliche Monatsansicht“ in der Seitenleiste entfällt.
+
 ## 0.5.6
 - Neu (Jahr): Notizen an Zellen, wie Kommentare in Excel. Zellen mit Notiz tragen eine rote Ecke und eine dezente Tönung, beim Darüberfahren erscheint der Text. Bearbeiten mit F2, Rechtsklick (auf Touch-Geräten langes Drücken) oder Klick auf die rote Ecke. Strg+Enter speichert, Esc bricht ab, ein leerer Text löscht die Notiz. Notizen verändern keine Summen und bleiben beim Umbenennen eines Postens erhalten. Migration 006 legt die Tabelle `zellnotizen` an.
 - Geändert (Jahr): Die schreibgeschützte Zeile „Sonstiges (SE)“ im Block Einnahmen heißt jetzt „Nebeneinnahmen“, passend zum Menü.

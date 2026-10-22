@@ -49,6 +49,7 @@ unten ein- und ausklappen, der Zustand wird gemerkt.
 **Monat** – Excel-ähnliche Tagesmatrix für die flexiblen Ausgaben (10 Kategorien als Spalten),
 automatische Tages-, Kategorie- und Monatssummen, Monatswechsel vor/zurück.
 Die Spalte „Teuerste Einkäufe“ nimmt pro Tag einen freien Text auf (z. B. welche größeren Anschaffungen es gab).
+Die Kennzahlen oben zeigen Einnahmen, Feste Ausgaben, Flexible Ausgaben, Sparen und den Überschuss des Monats.
 
 **Jahr** (Jahresübersicht) – entspricht dem Excel-Blatt „GESAMT“:
 
@@ -57,6 +58,8 @@ Die Spalte „Teuerste Einkäufe“ nimmt pro Tag einen freien Text auf (z. B. w
   Einnahmen sind grün, Ausgaben rot, der Saldo ist schwarz und nur bei Minus rot.
 - Die Kennzahlen-Karten über der Tabelle lassen sich per Button ein- und ausblenden (die Wahl wird gemerkt).
 - Beträge pro Posten und Monat direkt in der Tabelle eintragen
+- Ein Klick auf einen Monatsbetrag bei den flexiblen Ausgaben öffnet den Monat, ein Klick in der Zeile Nebeneinnahmen öffnet die
+  Nebeneinnahmen dieses Monats.
 - **⇢ Ausfüllen nach rechts:** Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen
 - **Notizen an Zellen** (wie Excel-Kommentare, z. B. welche Aktien in einem Monat gekauft wurden): Zelle wählen und F2 drücken,
   Rechtsklick oder Klick auf die rote Ecke. Die Notiz erscheint beim Darüberfahren. Notizen ändern keine Summen.
@@ -75,6 +78,14 @@ zählt der Betrag als Dividende, beginnt sie mit „Zins“, als Zinsen, alles a
 - Die Jahrestabelle zeigt Dividenden, Zinsen, Sonstiges und „Dividenden + Zinsen“ je Monat.
 - Die Monatssummen erscheinen als schreibgeschützte Zeile „Sonstiges (SE)“ in der Jahresübersicht
   und in den Einnahmen der Monatskarten.
+
+## Optionen
+
+Der Menüpunkt **Optionen** (Zahnrad, unten im Seitenmenü) enthält Schalter, die für den jeweiligen Browser gespeichert werden:
+
+- Zeile mit dem Cursor hervorheben (Monat und Jahr)
+- Spalten- und Zeilenüberschrift beim Darüberfahren hervorheben (Monat und Jahr)
+- Kennzahlen in der Jahresübersicht anzeigen
 
 ## Tastatur
 

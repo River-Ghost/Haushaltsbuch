@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
-# =============================================================================
-# Haushaltsbuch – Update auf die neueste Version von GitHub (läuft im Container)
-#   update            Aktualisiert, falls eine neuere Version vorhanden ist
-#   update --force    Spielt die aktuelle Version erneut ein
-# Vor dem Update wird automatisch ein Datenbank-Backup in backups/ angelegt.
-# =============================================================================
+# Haushaltsbuch: Update auf die neueste Version von GitHub (Befehl "update", "update --force")
 set -Eeuo pipefail
 
 GH_USER="${HB_GH_USER:-River-Ghost}"
@@ -14,9 +9,8 @@ TARBALL_URL="${HB_TARBALL_URL:-https://github.com/${GH_USER}/${GH_REPO}/archive/
 APP_DIR="${HB_APP_DIR:-/opt/haushaltsbuch}"
 export LANG=C.UTF-8 LC_ALL=C.UTF-8
 
-# Das ganze Skript steckt in einer Funktion und endet mit "exit": Bash liest die Funktion
-# vollständig ein, bevor sie läuft. So ist es unkritisch, dass dieses Skript beim Update
-# durch eine neue Fassung ersetzt wird.
+# Alles steht in einer Funktion; "main" und "exit" stehen unten in EINER Zeile. So liest Bash nach dem
+# Austausch dieser Datei beim Update nicht in der neuen Datei weiter.
 main() {
   [[ -f "$APP_DIR/docker-compose.yml" ]] || { echo "Haushaltsbuch ist nicht in ${APP_DIR} installiert." >&2; return 1; }
   cd "$APP_DIR"
@@ -39,10 +33,8 @@ main() {
     return 0
   fi
 
-  # .env und backups/ sind nicht im Archiv und bleiben unverändert.
-  cp -a "$tmp"/. "$APP_DIR"/
-  # Die Versionsnummer wird erst nach einem erfolgreichen Update geschrieben. Bricht das Update
-  # ab, erkennt der nächste Aufruf von "update", dass es noch nicht abgeschlossen ist.
+  cp -a "$tmp"/. "$APP_DIR"/   # .env und backups/ sind nicht im Archiv und bleiben unberührt
+  # Die Version wird erst nach erfolgreichem Update eingetragen, ein Abbruch wird so wiederholt.
   printf '%s\n' "$old" > "$APP_DIR/VERSION"
   mkdir -p "$APP_DIR/scripts"
   chmod +x "$APP_DIR"/scripts/*.sh 2>/dev/null || true
@@ -73,5 +65,9 @@ UPD
   return 1
 }
 
-main "$@"
-exit $?
+main "$@"; exit $?
+#
+# Kompatibilität: Bis Version 0.5.6 standen "main" und "exit" in getrennten Zeilen. Diese älteren
+# Fassungen lesen nach einem Update an genau dieser Stelle der neuen Datei weiter. Das folgende
+# "exit" beendet sie sauber. Die neue Fassung erreicht diese Zeilen nie.                                                                                                                                                                                                                             
+exit

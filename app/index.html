@@ -125,21 +125,39 @@ main{margin-left:var(--side-w);width:calc(100% - var(--side-w));transition:margi
 /* Runde 5 (0.5.6): Notizen an Zellen der Jahresübersicht */
 .ycell{position:relative}
 .nmark{position:absolute;top:0;right:0;width:0;height:0;border-top:9px solid var(--danger);border-left:9px solid transparent;cursor:pointer}
-.ycell.hasnote{background-image:linear-gradient(rgba(255,214,102,.2),rgba(255,214,102,.2))}
 .notebox{position:fixed;z-index:60;width:330px;max-width:calc(100vw - 16px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 36px rgba(15,23,42,.28);padding:12px 14px}
 .note-title{font-weight:650;font-size:13px;margin-bottom:8px}
 .notebox textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:8px;padding:8px;font:inherit;font-size:13px;resize:vertical;outline:none}
 .notebox textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(25,135,84,.18)}
 .note-actions{display:flex;align-items:center;gap:8px;margin-top:10px}.note-sp{flex:1}.note-hint{font-size:11px;color:var(--muted);margin-top:8px}
+
+/* Runde 6 (0.5.7) */
+#viewMonat .summary{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:900px){#viewMonat .summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#monthTable td.cell{width:auto;min-width:0}
+.note{width:270px;min-width:270px;max-width:270px}#monthTable th.note-h{min-width:270px}
+:root{--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono","DejaVu Sans Mono",monospace}
+.note-in,#noteText{font-family:var(--mono);font-size:12.5px}
+.notetip{position:fixed;z-index:70;max-width:440px;background:#1f2937;color:#f9fafb;border-radius:8px;padding:8px 10px;font:12.5px/1.45 var(--mono);white-space:pre-wrap;pointer-events:none;box-shadow:0 8px 24px rgba(15,23,42,.35)}
+.jump{cursor:pointer}.jump:hover{background:#eef4ff;text-decoration:underline}
+.navopt{display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;padding:10px 12px;border:0;border-top:1px solid #2a3a4b;background:transparent;color:#94a3b8;border-radius:0;cursor:pointer;font:inherit;font-size:13px;text-align:left}
+.navopt:hover{color:#fff}.navopt+.navtoggle{margin-top:0;border-top:0}
+.layout.collapsed .navopt{justify-content:center;padding-left:0;padding-right:0}
+@media(max-width:900px){.navopt{justify-content:center;padding-left:0;padding-right:0}}
+.modal-box label.opt{display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:14px;margin:12px 0 0;cursor:pointer}
+.modal-box label.opt input{margin-top:3px;flex:none}
+/* Hervorhebung der Zeile mit dem Cursor und der Überschriften beim Darüberfahren/Fokus */
+body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTable tbody tr:has(input:focus) td{background-color:#e8f1fb}
+#monthTable th.hl-h,#monthTable td.date.hl-h,#yearTable th.hl-h,#yearTable td.ylabel.hl-h{background:#d4e6fb!important;color:#17407a}
 </style>
 </head>
 <body>
 <div class="layout">
-<aside class="side"><div class="brand"><img class="brand-icon" src="/static/icon.svg" alt=""><span class="brand-t">Haushaltsbuch<small>Excel-ähnliche Monatsansicht</small></span></div><nav class="nav"><button id="navMonat" class="active" onclick="showView('monat')" title="Monat: flexible Ausgaben pro Tag" aria-label="Monat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="15" r="1" fill="currentColor" stroke="none"/></svg><span class="nl">Monat</span></button><button id="navJahr" onclick="showView('jahr')" title="Jahr: Einnahmen, feste Ausgaben und Sparen" aria-label="Jahr"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16"/></svg><span class="nl">Jahr</span></button><button id="navSE" onclick="showView('se')" title="Nebeneinnahmen: Rückzahlungen, Dividenden, Zinsen" aria-label="Nebeneinnahmen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span class="nl">Nebeneinnahmen</span></button><button disabled title="Konten (noch nicht verfügbar)" aria-label="Konten"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5h16a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5z"/><path d="M3 7.5 15 4v3.5M16.5 14h2.5"/></svg><span class="nl">Konten</span></button><button disabled title="Kategorien (noch nicht verfügbar)" aria-label="Kategorien"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg><span class="nl">Kategorien</span></button><button disabled title="Vermögen (noch nicht verfügbar)" aria-label="Vermögen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg><span class="nl">Vermögen</span></button></nav><button class="navtoggle" id="navToggle" onclick="toggleNav()" title="Menü einklappen" aria-expanded="true"><svg class="ni chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="nl">Menü einklappen</span></button><div class="version" id="version">Testversion</div></aside>
+<aside class="side"><div class="brand"><img class="brand-icon" src="/static/icon.svg" alt=""><span class="brand-t">Haushaltsbuch</span></div><nav class="nav"><button id="navMonat" class="active" onclick="showView('monat')" title="Monat: flexible Ausgaben pro Tag" aria-label="Monat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="15" r="1" fill="currentColor" stroke="none"/></svg><span class="nl">Monat</span></button><button id="navJahr" onclick="showView('jahr')" title="Jahr: Einnahmen, feste Ausgaben und Sparen" aria-label="Jahr"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16"/></svg><span class="nl">Jahr</span></button><button id="navSE" onclick="showView('se')" title="Nebeneinnahmen: Rückzahlungen, Dividenden, Zinsen" aria-label="Nebeneinnahmen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span class="nl">Nebeneinnahmen</span></button><button disabled title="Konten (noch nicht verfügbar)" aria-label="Konten"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5h16a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7.5z"/><path d="M3 7.5 15 4v3.5M16.5 14h2.5"/></svg><span class="nl">Konten</span></button><button disabled title="Kategorien (noch nicht verfügbar)" aria-label="Kategorien"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg><span class="nl">Kategorien</span></button><button disabled title="Vermögen (noch nicht verfügbar)" aria-label="Vermögen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg><span class="nl">Vermögen</span></button></nav><button class="navopt" id="navOpt" onclick="openOptions()" title="Optionen" aria-label="Optionen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="nl">Optionen</span></button><button class="navtoggle" id="navToggle" onclick="toggleNav()" title="Menü einklappen" aria-expanded="true"><svg class="ni chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="nl">Menü einklappen</span></button><div class="version" id="version">Testversion</div></aside>
 <main>
 <div id="viewMonat">
 <div class="top"><div><h1 id="monthTitle">Oktober 2026</h1><div class="sub">Flexible Ausgaben – Enter und Tab springen ein Feld nach rechts, ↑/↓ eine Zeile. Einnahmen und feste Ausgaben stehen unter „Jahr“</div></div><div class="monthnav"><button class="btn" onclick="moveMonth(-1)">‹</button><button class="btn" onclick="goToday()">Heute</button><button class="btn" onclick="moveMonth(1)">›</button></div></div>
-<div class="summary"><div class="card"><div class="label">Einnahmen</div><div class="value green" id="income">0,00 €</div></div><div class="card"><div class="label">Feste Ausgaben &amp; Sparen</div><div class="value red" id="fixed">0,00 €</div></div><div class="card"><div class="label">Flexible Ausgaben</div><div class="value red" id="flexible">0,00 €</div></div><div class="card"><div class="label">Überschuss</div><div class="value" id="balance">0,00 €</div></div></div>
+<div class="summary"><div class="card"><div class="label">Einnahmen</div><div class="value green" id="income">0,00 €</div></div><div class="card"><div class="label">Feste Ausgaben</div><div class="value red" id="fixed">0,00 €</div></div><div class="card"><div class="label">Flexible Ausgaben</div><div class="value red" id="flexible">0,00 €</div></div><div class="card"><div class="label">Sparen</div><div class="value red" id="saving">0,00 €</div></div><div class="card"><div class="label">Überschuss</div><div class="value" id="balance">0,00 €</div></div></div>
 <section class="card matrix-card" id="matrix"><div class="matrix-head"><div><h2>Flexible Ausgaben</h2><div class="hint">Einfach Betrag eintragen und Enter oder Tab drücken. Kategorie = Spalte.</div></div><div class="status" id="status"></div></div><div class="table-wrap"><table id="monthTable"></table></div></section>
 </div>
 <div id="viewJahr" hidden>
@@ -155,6 +173,14 @@ main{margin-left:var(--side-w);width:calc(100% - var(--side-w));transition:margi
 </div>
 </div>
 </main></div>
+<div id="optModal" class="modal" hidden><div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="optTitle">
+<h2 id="optTitle">Optionen</h2><div class="sub">Die Einstellungen gelten für diesen Browser.</div>
+<label class="opt"><input type="checkbox" id="optHlRow"><span>Zeile mit dem Cursor hervorheben</span></label>
+<label class="opt"><input type="checkbox" id="optHlHead"><span>Spalten- und Zeilenüberschrift beim Darüberfahren hervorheben</span></label>
+<label class="opt"><input type="checkbox" id="optCards"><span>Kennzahlen in der Jahresübersicht anzeigen</span></label>
+<div class="modal-actions"><button class="btn go" id="optClose">Schließen</button></div>
+</div></div>
+<div id="noteTip" class="notetip" hidden></div>
 <div id="noteBox" class="notebox" hidden role="dialog" aria-labelledby="noteTitle">
 <div class="note-title" id="noteTitle"></div>
 <textarea id="noteText" rows="4" maxlength="500" placeholder="z. B. Siemens 5 Stk, zusammen 492,00 €"></textarea>
@@ -204,10 +230,11 @@ function daysInMonth(){return new Date(current.getFullYear(),current.getMonth()+
 function dateKey(day){return `${ym()}-${pad(day)}`}
 async function load(){$('monthTitle').textContent=monthName();model=await api(`/api/monat?monat=${ym()}`);renderTable();await refreshCards()}
 async function refreshCards(){const ov=await api(`/api/uebersicht?monat=${ym()}`);
- $('income').textContent=euro(ov.einnahmen);$('fixed').textContent=euro(ov.fixkosten);$('flexible').textContent=euro(ov.flexibel);$('balance').textContent=euro(ov.saldo);$('balance').className='value '+(ov.saldo>=0?'green':'red')}
+ $('income').textContent=euro(ov.einnahmen);$('fixed').textContent=euro(ov.fixkosten);$('saving').textContent=euro(ov.sparen);$('flexible').textContent=euro(ov.flexibel);$('balance').textContent=euro(ov.saldo);$('balance').className='value '+(ov.saldo>=0?'green':'red')}
+const colW=n=>Math.max(84,Math.min(112,Math.round(String(n).length*6.6+24)));
 function renderTable(){
  const notes=model.notizen||(model.notizen={});
- let t='<thead><tr><th>Datum</th><th class="note-h" title="Die teuersten Einkaufsposten des Tages">Teuerste Einkäufe</th>';for(const c of model.kategorien)t+=`<th>${esc(c.bezeichnung)}</th>`;t+='<th class="total-head">Gesamt</th></tr></thead><tbody>';
+ let t='<thead><tr><th>Datum</th><th class="note-h" title="Die teuersten Einkaufsposten des Tages">Teuerste Einkäufe</th>';for(const c of model.kategorien)t+=`<th style="min-width:${colW(c.bezeichnung)}px">${esc(c.bezeichnung)}</th>`;t+='<th class="total-head">Gesamt</th></tr></thead><tbody>';
  for(let d=1;d<=daysInMonth();d++){let key=dateKey(d),row=model.tage[key]||{},total=0;
   t+=`<tr><td class="date"><span class="dnum">${pad(d)}.${pad(current.getMonth()+1)}.</span><span class="dow">${new Date(current.getFullYear(),current.getMonth(),d).toLocaleDateString('de-DE',{weekday:'short'})}</span></td><td class="note"><input class="note-in" maxlength="300" value="${esc(notes[key]||'')}" title="${esc(notes[key]||'')}" data-note="${key}" aria-label="Teuerste Einkäufe ${key}"></td>`;
   for(const c of model.kategorien){let v=Number(row[c.id]||0);total+=v;t+=`<td class="cell"><input inputmode="decimal" value="${v?fmt(v):''}" data-day="${key}" data-cat="${c.id}" aria-label="${esc(c.bezeichnung)} ${key}"></td>`}
@@ -268,9 +295,10 @@ function renderYear(){closeNote(false);const c=calc();
    t+=`<tr class="${io} b${gi}"><td class="ylabel"><span class="pname${p.aktiv?'':' off'}" title="${esc(p.bezeichnung)}">${esc(p.bezeichnung)}</span>`;
    if(p.schreibgeschuetzt)t+='<span class="pact"><button class="mini" data-act="gose" title="Nebeneinnahmen öffnen">↗</button></span>';else if(b.editierbar)t+=`<span class="pact"><button class="mini" data-act="fill" data-id="${p.id}" title="Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen">⇢</button><button class="mini" data-act="rename" data-id="${p.id}" title="Umbenennen">✎</button><button class="mini" data-act="${p.aktiv?'hide':'unhide'}" data-id="${p.id}" title="${p.aktiv?'Ausblenden':'Wieder einblenden'}">${p.aktiv?'×':'↺'}</button></span>`;
    t+='</td>';
-   p.monate.forEach((v,i)=>{const nt=(p.notizen||{})[i+1];t+=(b.editierbar&&!p.schreibgeschuetzt)?`<td class="ycell${nt?' hasnote':''}"><input inputmode="decimal" value="${v?fmt(v):''}" data-id="${p.id}" data-m="${i+1}" aria-label="${esc(p.bezeichnung)} ${MONATE[i]}"${nt?` title="${esc(nt)}"`:''}>${nt?'<span class="nmark" title="Notiz bearbeiten"></span>':''}</td>`:`<td class="ro">${fmtz(v)}</td>`});
+   const jmp=b.gruppe==='Flexible Ausgaben'?'monat':(p.schreibgeschuetzt?'se':'');
+   p.monate.forEach((v,i)=>{const nt=(p.notizen||{})[i+1];t+=(b.editierbar&&!p.schreibgeschuetzt)?`<td class="ycell${nt?' hasnote':''}"><input inputmode="decimal" value="${v?fmt(v):''}" data-id="${p.id}" data-m="${i+1}" aria-label="${esc(p.bezeichnung)} ${MONATE[i]}">${nt?'<span class="nmark"></span>':''}</td>`:`<td class="ro${jmp?' jump':''}"${jmp?` data-jump="${jmp}:${i}" title="${jmp==='se'?'Nebeneinnahmen':'Monat'} öffnen"`:''}>${fmtz(v)}</td>`});
    t+=`<td class="ysum" data-sum="ps:${p.id}"></td><td class="ypct" data-sum="pp:${p.id}:${gi}"></td></tr>`}
-  t+=`<tr class="gsum ${io} b${gi}"><td class="ylabel">${esc(b.titel)} gesamt</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="bs:${gi}:${i}"></td>`).join('')+`<td class="ysum" data-sum="bs:${gi}:y"></td><td class="ypct" data-sum="bp:${gi}"></td></tr>`});
+  t+=`<tr class="gsum ${io} b${gi}"><td class="ylabel">${esc(b.titel)} gesamt</td>`+Array.from({length:12},(_,i)=>`<td class="ro${b.gruppe==='Flexible Ausgaben'?' jump':''}" data-sum="bs:${gi}:${i}"${b.gruppe==='Flexible Ausgaben'?` data-jump="monat:${i}" title="Monat öffnen"`:''}></td>`).join('')+`<td class="ysum" data-sum="bs:${gi}:y"></td><td class="ypct" data-sum="bp:${gi}"></td></tr>`});
  $('yearTable').innerHTML=t+'</tbody>';refreshSums()}
 
 function refreshSums(){const c=calc(),gE=c.gi('Einnahmen');
@@ -312,6 +340,7 @@ async function postAction(act,id,gruppe){
  tb.addEventListener('change',e=>{if(e.target.matches('input[data-id]'))saveYearCell(e.target)});
  tb.addEventListener('focusin',e=>{if(e.target.matches('input[data-id]'))lastFocus[e.target.dataset.id]=Number(e.target.dataset.m)});
  tb.addEventListener('click',e=>{const th=e.target.closest('[data-gomonth]');if(th){current=new Date(year,Number(th.dataset.gomonth),1);showView('monat');return}
+  const jp=e.target.closest('[data-jump]');if(jp){const [v,mi]=jp.dataset.jump.split(':');current=new Date(year,Number(mi),1);showView(v==='se'?'se':'monat');return}
   const b=e.target.closest('button[data-act]');if(!b)return;const act=b.dataset.act;
   if(act==='fill')fillRow(b.dataset.id);else if(act==='gose')goSE();else if(act==='togglehidden'){showHidden[b.dataset.gruppe]=!showHidden[b.dataset.gruppe];renderYear()}else postAction(act,b.dataset.id,b.dataset.gruppe)})})();
 
@@ -340,9 +369,44 @@ function gridKeys(e,rightOnEnter){const el=e.target;if(!el.matches('input')||e.i
   let nx=row.nextElementSibling;if(!nx){row.parentElement.insertAdjacentHTML('beforeend',seRow(null));nx=row.nextElementSibling}
   go(nx.querySelector('.se-b'))})})();
 
+/* ---------- Optionen und Hervorhebungen ---------- */
+const OPTKEY={hlrow:'hb_opt_hlrow',hlhead:'hb_opt_hlhead'};
+function getOpt(k){try{const v=localStorage.getItem(OPTKEY[k]);return v===null?true:v==='1'}catch(e){return true}}
+function setOpt(k,on){try{localStorage.setItem(OPTKEY[k],on?'1':'0')}catch(e){}}
+function applyOpts(){document.body.classList.toggle('opt-hlrow',getOpt('hlrow'));document.body.classList.toggle('opt-hlhead',getOpt('hlhead'));['monthTable','yearTable'].forEach(id=>refreshHl($(id)))}
+function openOptions(){$('optHlRow').checked=getOpt('hlrow');$('optHlHead').checked=getOpt('hlhead');$('optCards').checked=!$('ySummary').hidden;$('optModal').hidden=false;$('optHlRow').focus()}
+function closeOptions(){$('optModal').hidden=true}
+function hlTarget(tbl){const h=tbl._hov;if(h&&h.isConnected)return h;const a=document.activeElement;return a&&tbl.contains(a)?a.closest('td'):null}
+function refreshHl(tbl){tbl.querySelectorAll('.hl-h').forEach(e=>e.classList.remove('hl-h'));if(!document.body.classList.contains('opt-hlhead'))return;
+ const td=hlTarget(tbl);if(!td||!td.closest('tbody')||td.parentElement.cells.length<3)return;
+ const head=tbl.tHead&&tbl.tHead.rows[0],cell=head&&head.cells[td.cellIndex],first=td.parentElement.cells[0];
+ if(cell&&cell!==td)cell.classList.add('hl-h');if(first!==td)first.classList.add('hl-h')}
+(function initOptions(){
+ for(const id of ['monthTable','yearTable']){const t=$(id);
+  t.addEventListener('mouseover',e=>{t._hov=e.target.closest('td');refreshHl(t)});
+  t.addEventListener('mouseleave',()=>{t._hov=null;refreshHl(t)});
+  t.addEventListener('focusin',()=>refreshHl(t));t.addEventListener('focusout',()=>setTimeout(()=>refreshHl(t),0))}
+ $('optHlRow').addEventListener('change',e=>{setOpt('hlrow',e.target.checked);applyOpts()});
+ $('optHlHead').addEventListener('change',e=>{setOpt('hlhead',e.target.checked);applyOpts()});
+ $('optCards').addEventListener('change',e=>setYCards(e.target.checked));
+ $('optClose').addEventListener('click',closeOptions);
+ $('optModal').addEventListener('click',e=>{if(e.target===$('optModal'))closeOptions()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('optModal').hidden)closeOptions()});
+ applyOpts()})();
+/* Tooltip für Notizen an Zellen (eigene Darstellung, damit der Text in Festbreiten-Schrift untereinander steht) */
+function hideTip(){$('noteTip').hidden=true}
+function showTip(td){const inp=td.querySelector('input[data-id]');if(!inp)return hideTip();const p=findPost(inp.dataset.id),txt=p&&(p.notizen||{})[inp.dataset.m];if(!txt)return hideTip();
+ const tip=$('noteTip');tip.textContent=txt;tip.hidden=false;const r=td.getBoundingClientRect(),tw=tip.offsetWidth,th=tip.offsetHeight;
+ let left=Math.min(Math.max(8,r.left),Math.max(8,window.innerWidth-tw-8)),top=r.bottom+4;if(top+th>window.innerHeight-8)top=Math.max(8,r.top-th-4);
+ tip.style.left=left+'px';tip.style.top=top+'px'}
+(function initTip(){const t=$('yearTable');
+ t.addEventListener('mouseover',e=>{const td=e.target.closest('td.hasnote');if(td)showTip(td);else hideTip()});
+ t.addEventListener('mouseleave',hideTip);
+ document.addEventListener('scroll',hideTip,true)})();
+
 /* ---------- Notizen an Zellen der Jahresübersicht (wie Excel-Kommentare) ---------- */
 let noteCtx=null;
-function openNote(input){const id=input.dataset.id,m=Number(input.dataset.m),p=findPost(id);if(!p)return;
+function openNote(input){hideTip();const id=input.dataset.id,m=Number(input.dataset.m),p=findPost(id);if(!p)return;
  noteCtx={id,m,input};const box=$('noteBox'),cur=(p.notizen||{})[m]||'';
  $('noteTitle').textContent=`${p.bezeichnung} · ${MONATE[m-1]} ${year}`;$('noteText').value=cur;$('noteDel').hidden=!cur;
  box.hidden=false;
@@ -354,8 +418,8 @@ function saveCellNote(del){const c=noteCtx;if(!c)return;const text=del?'':$('not
  return enqueue(async()=>{try{await put(`/api/jahr/${year}/${c.m}/${c.id}/notiz`,{notiz:text});
    p.notizen=p.notizen||{};if(text)p.notizen[c.m]=text;else delete p.notizen[c.m];
    const td=c.input.closest('td');td.classList.toggle('hasnote',!!text);let mk=td.querySelector('.nmark');
-   if(text){c.input.title=text;if(!mk){mk=document.createElement('span');mk.className='nmark';mk.title='Notiz bearbeiten';td.appendChild(mk)}}
-   else{c.input.removeAttribute('title');if(mk)mk.remove()}
+   if(text){if(!mk){mk=document.createElement('span');mk.className='nmark';td.appendChild(mk)}}
+   else if(mk)mk.remove()
    flash('ystatus',text?'Notiz gespeichert':'Notiz gelöscht',1500)}
   catch(err){flash('ystatus','Fehler beim Speichern');alert('Notiz speichern fehlgeschlagen: '+err.message)}})}
 (function initNotes(){const tb=$('yearTable');
