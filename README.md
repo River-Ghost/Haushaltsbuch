@@ -57,6 +57,8 @@ Die Kennzahlen oben zeigen Einnahmen, Feste Ausgaben, Flexible Ausgaben, Sparen 
 - Gesamteinnahmen, Gesamtausgaben und Saldo stehen oben unter den Monatsnamen und bleiben beim Scrollen sichtbar.
   Einnahmen sind grün, Ausgaben rot, der Saldo ist schwarz und nur bei Minus rot.
 - Die Kennzahlen-Karten über der Tabelle lassen sich per Button ein- und ausblenden (die Wahl wird gemerkt).
+- Die vier Abschnitte lassen sich per Klick auf den Titel ein- und ausklappen, sodass nur Überschrift und Summenzeile stehen
+  bleiben. Der Knopf „Alle einklappen“ steuert alle gemeinsam. Der Zustand wird im Browser gemerkt.
 - Beträge pro Posten und Monat direkt in der Tabelle eintragen
 - Ein Klick auf einen Monatsbetrag bei den flexiblen Ausgaben öffnet den Monat, ein Klick in der Zeile Nebeneinnahmen öffnet die
   Nebeneinnahmen dieses Monats.

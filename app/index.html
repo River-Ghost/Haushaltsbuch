@@ -149,6 +149,13 @@ main{margin-left:var(--side-w);width:calc(100% - var(--side-w));transition:margi
 /* Hervorhebung der Zeile mit dem Cursor und der Überschriften beim Darüberfahren/Fokus */
 body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTable tbody tr:has(input:focus) td{background-color:#e8f1fb}
 #monthTable th.hl-h,#monthTable td.date.hl-h,#yearTable th.hl-h,#yearTable td.ylabel.hl-h{background:#d4e6fb!important;color:#17407a}
+
+/* Runde 7 (0.5.8): Abschnitte ein- und ausklappen */
+#yearTable tr.cx{display:none}
+#yearTable tr.gcol .gbtns{display:none}
+.gtoggle{cursor:pointer;user-select:none}.gtoggle:hover{filter:brightness(.96)}
+.gchev{display:inline-block;width:14px;color:var(--blk)}
+#yearTable tr.ghead td.ylabel.gtoggle:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
 </style>
 </head>
 <body>
@@ -161,7 +168,7 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 <section class="card matrix-card" id="matrix"><div class="matrix-head"><div><h2>Flexible Ausgaben</h2><div class="hint">Einfach Betrag eintragen und Enter oder Tab drücken. Kategorie = Spalte.</div></div><div class="status" id="status"></div></div><div class="table-wrap"><table id="monthTable"></table></div></section>
 </div>
 <div id="viewJahr" hidden>
-<div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" id="yCardsBtn" onclick="toggleYCards()">Kennzahlen anzeigen</button><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
+<div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" id="yAllBtn" onclick="toggleAllBlocks()">Alle einklappen</button><button class="btn" id="yCardsBtn" onclick="toggleYCards()">Kennzahlen anzeigen</button><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
 <div class="summary" id="ySummary" hidden><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Gesamtausgaben (Jahr)</div><div class="value red" id="y_exp">0,00 €</div></div><div class="card"><div class="label">davon Sparen/Vermögen</div><div class="value red" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
 <section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Enter springt nach unten, Tab nach rechts. ⇢ kopiert den Wert bis Dezember. F2 oder Rechtsklick: Notiz an der Zelle. Klick auf einen Monatsnamen öffnet den Monat.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
 </div>
@@ -287,19 +294,19 @@ function renderYear(){closeNote(false);const c=calc();
  /* Monatsnamen und die drei Gesamtzeilen stehen oben im Tabellenkopf und bleiben beim Scrollen fixiert */
  let t='<thead><tr><th class="ylabel">Posten</th>'+MONATE.map((n,i)=>`<th class="mh" data-gomonth="${i}" title="Monat öffnen">${n}</th>`).join('')+'<th>Jahr</th><th>%</th></tr>'+row('in','Gesamteinnahmen','ein')+row('out','Gesamtausgaben','aus')+row('saldo','Saldo','saldo')+'</thead><tbody>';
  ymodel.bloecke.forEach((b,gi)=>{
-  const hid=b.ausgeblendet||[],io=b.gruppe==='Einnahmen'?'in':'out';
+  const hid=b.ausgeblendet||[],io=b.gruppe==='Einnahmen'?'in':'out',col=collapsedSet().has(b.gruppe);
   const btns=(b.editierbar?`<button class="mini" data-act="add" data-gruppe="${esc(b.gruppe)}">+ Posten</button>`:'')+(hid.length?`<button class="mini" data-act="togglehidden" data-gruppe="${esc(b.gruppe)}" title="Ausgeblendete Posten anzeigen">Ausgeblendet (${hid.length})</button>`:'');
-  t+=`<tr class="ghead b${gi}"><td class="ylabel">${esc(b.titel)}</td><td colspan="14">${btns?`<div class="gbtns">${btns}</div>`:''}</td></tr>`;
-  if(hid.length&&showHidden[b.gruppe])t+=`<tr class="ghead b${gi}"><td colspan="15"><div class="hidchips"><span>Zum Einblenden anklicken:</span>${hid.map(h=>`<button class="mini" data-act="unhide" data-id="${h.id}" title="Wieder einblenden">↺ ${esc(h.bezeichnung)}</button>`).join('')}</div></td></tr>`;
+  t+=`<tr class="ghead b${gi}${col?' gcol':''}" data-gi="${gi}"><td class="ylabel gtoggle" role="button" tabindex="0" aria-expanded="${!col}" title="Abschnitt ein- oder ausklappen"><span class="gchev" aria-hidden="true">${col?'▸':'▾'}</span> ${esc(b.titel)}</td><td colspan="14">${btns?`<div class="gbtns">${btns}</div>`:''}</td></tr>`;
+  if(hid.length&&showHidden[b.gruppe])t+=`<tr class="ghead b${gi}${col?' cx':''}" data-blk="${gi}"><td colspan="15"><div class="hidchips"><span>Zum Einblenden anklicken:</span>${hid.map(h=>`<button class="mini" data-act="unhide" data-id="${h.id}" title="Wieder einblenden">↺ ${esc(h.bezeichnung)}</button>`).join('')}</div></td></tr>`;
   for(const p of b.posten){
-   t+=`<tr class="${io} b${gi}"><td class="ylabel"><span class="pname${p.aktiv?'':' off'}" title="${esc(p.bezeichnung)}">${esc(p.bezeichnung)}</span>`;
+   t+=`<tr class="${io} b${gi}${col?' cx':''}" data-blk="${gi}"><td class="ylabel"><span class="pname${p.aktiv?'':' off'}" title="${esc(p.bezeichnung)}">${esc(p.bezeichnung)}</span>`;
    if(p.schreibgeschuetzt)t+='<span class="pact"><button class="mini" data-act="gose" title="Nebeneinnahmen öffnen">↗</button></span>';else if(b.editierbar)t+=`<span class="pact"><button class="mini" data-act="fill" data-id="${p.id}" title="Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen">⇢</button><button class="mini" data-act="rename" data-id="${p.id}" title="Umbenennen">✎</button><button class="mini" data-act="${p.aktiv?'hide':'unhide'}" data-id="${p.id}" title="${p.aktiv?'Ausblenden':'Wieder einblenden'}">${p.aktiv?'×':'↺'}</button></span>`;
    t+='</td>';
    const jmp=b.gruppe==='Flexible Ausgaben'?'monat':(p.schreibgeschuetzt?'se':'');
    p.monate.forEach((v,i)=>{const nt=(p.notizen||{})[i+1];t+=(b.editierbar&&!p.schreibgeschuetzt)?`<td class="ycell${nt?' hasnote':''}"><input inputmode="decimal" value="${v?fmt(v):''}" data-id="${p.id}" data-m="${i+1}" aria-label="${esc(p.bezeichnung)} ${MONATE[i]}">${nt?'<span class="nmark"></span>':''}</td>`:`<td class="ro${jmp?' jump':''}"${jmp?` data-jump="${jmp}:${i}" title="${jmp==='se'?'Nebeneinnahmen':'Monat'} öffnen"`:''}>${fmtz(v)}</td>`});
    t+=`<td class="ysum" data-sum="ps:${p.id}"></td><td class="ypct" data-sum="pp:${p.id}:${gi}"></td></tr>`}
   t+=`<tr class="gsum ${io} b${gi}"><td class="ylabel">${esc(b.titel)} gesamt</td>`+Array.from({length:12},(_,i)=>`<td class="ro${b.gruppe==='Flexible Ausgaben'?' jump':''}" data-sum="bs:${gi}:${i}"${b.gruppe==='Flexible Ausgaben'?` data-jump="monat:${i}" title="Monat öffnen"`:''}></td>`).join('')+`<td class="ysum" data-sum="bs:${gi}:y"></td><td class="ypct" data-sum="bp:${gi}"></td></tr>`});
- $('yearTable').innerHTML=t+'</tbody>';refreshSums()}
+ $('yearTable').innerHTML=t+'</tbody>';refreshSums();updateAllBtn()}
 
 function refreshSums(){const c=calc(),gE=c.gi('Einnahmen');
  document.querySelectorAll('#yearTable [data-sum]').forEach(el=>{const [k,a,b]=el.dataset.sum.split(':');let v='',saldoNeg=null;
@@ -348,7 +355,7 @@ async function postAction(act,id,gruppe){
 /* ---------- Tastatur wie in Excel: Enter = eine Zeile tiefer, Shift+Enter = eine Zeile höher, Tab = nächste Spalte ---------- */
 function moveInGrid(input,dir){
  const td=input.closest('td'),tr=td.parentElement,idx=td.cellIndex,rows=[...tr.closest('table').querySelectorAll('tr')];
- const at=(r,i)=>{const c=r.cells[i];return c?c.querySelector('input'):null};
+ const at=(r,i)=>{if(r.classList.contains('cx'))return null;const c=r.cells[i];return c?c.querySelector('input'):null};
  const pos=rows.indexOf(tr);
  for(let i=pos+dir;i>=0&&i<rows.length;i+=dir){const n=at(rows[i],idx);if(n)return n}
  /* Spaltenende: in die nächste (bei Shift+Enter vorherige) Spalte wechseln */
@@ -368,6 +375,22 @@ function gridKeys(e,rightOnEnter){const el=e.target;if(!el.matches('input')||e.i
   if(isB&&e.shiftKey){const p=row.previousElementSibling;return p?go(p.querySelector('.se-a')):undefined}
   let nx=row.nextElementSibling;if(!nx){row.parentElement.insertAdjacentHTML('beforeend',seRow(null));nx=row.nextElementSibling}
   go(nx.querySelector('.se-b'))})})();
+
+/* ---------- Abschnitte der Jahresübersicht ein- und ausklappen ---------- */
+const COLKEY='hb_y_collapsed';
+function collapsedSet(){try{return new Set(JSON.parse(localStorage.getItem(COLKEY)||'[]'))}catch(e){return new Set()}}
+function saveCollapsed(st){try{localStorage.setItem(COLKEY,JSON.stringify([...st]))}catch(e){}}
+function setBlock(gi,collapse){const b=ymodel.bloecke[gi],st=collapsedSet();if(collapse)st.add(b.gruppe);else st.delete(b.gruppe);saveCollapsed(st);
+ const tb=$('yearTable');tb.querySelectorAll(`tr[data-blk="${gi}"]`).forEach(r=>r.classList.toggle('cx',collapse));
+ const h=tb.querySelector(`tr.ghead[data-gi="${gi}"]`);if(h){h.classList.toggle('gcol',collapse);const t=h.querySelector('.gtoggle');t.setAttribute('aria-expanded',String(!collapse));t.querySelector('.gchev').textContent=collapse?'▸':'▾'}
+ hideTip();updateAllBtn()}
+function toggleBlock(gi){setBlock(gi,!collapsedSet().has(ymodel.bloecke[gi].gruppe))}
+function allCollapsed(){const st=collapsedSet();return !!ymodel&&ymodel.bloecke.every(b=>st.has(b.gruppe))}
+function updateAllBtn(){$('yAllBtn').textContent=allCollapsed()?'Alle ausklappen':'Alle einklappen'}
+function toggleAllBlocks(){const c=allCollapsed();ymodel.bloecke.forEach((b,gi)=>setBlock(gi,!c))}
+(function initBlocks(){const tb=$('yearTable');
+ tb.addEventListener('click',e=>{const g=e.target.closest('.gtoggle');if(g)toggleBlock(Number(g.parentElement.dataset.gi))});
+ tb.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('gtoggle')){e.preventDefault();toggleBlock(Number(e.target.parentElement.dataset.gi))}})})();
 
 /* ---------- Optionen und Hervorhebungen ---------- */
 const OPTKEY={hlrow:'hb_opt_hlrow',hlhead:'hb_opt_hlhead'};

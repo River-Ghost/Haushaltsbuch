@@ -1,5 +1,11 @@
 # Änderungen
 
+## 0.5.8
+- Neu (Jahr): Die vier Abschnitte (Einnahmen, Feste Ausgaben, Sparen / Vermögen, Flexible Ausgaben) lassen sich **ein- und ausklappen**. Ein Klick auf den Abschnittstitel (oder Enter bzw. Leertaste bei fokussiertem Titel) blendet die Posten aus, Überschrift und Summenzeile bleiben stehen. Eingeklappt sind auch „+ Posten“ und „Ausgeblendet“ verborgen.
+- Neu (Jahr): Knopf **„Alle einklappen“ / „Alle ausklappen“** neben „Kennzahlen“.
+- Der Zustand wird im Browser gemerkt und gilt für alle Jahre. Standard: alle Abschnitte offen.
+- Die Tastaturnavigation (Enter, Shift+Enter, Pfeile) überspringt eingeklappte Zeilen.
+
 ## 0.5.7
 - **Behoben (Update):** Nach einem Update erschien die Meldung `self-update.sh: line 80: unexpected EOF`. Das Update war dabei bereits erfolgreich. Ursache: Das Skript ersetzt sich beim Update selbst, und Bash las danach in der neuen Datei weiter. `main` und `exit` stehen jetzt in einer Zeile, und an der Stelle, an der ältere Fassungen weiterlesen, steht ein `exit`. Damit endet auch das nächste Update sauber.
 - Neu: Menüpunkt **Optionen** (Zahnrad) mit Schaltern für die Hervorhebungen und die Kennzahlen der Jahresübersicht. Die Einstellungen werden im Browser gemerkt.
