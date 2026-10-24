@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.9
+- Geändert (Monat): Die Kennzahl „Überschuss“ heißt jetzt **„Saldo“**, wird schwarz dargestellt und nur bei negativem Wert rot (gleiche Regel wie in der Jahresübersicht).
+- Entfernt: Die deaktivierten Menüpunkte „Konten“, „Kategorien“ und „Vermögen“. Dahinter gab es keine Funktion. (Die unbenutzten Konten „Girokonto“ und „Bargeld“ in der Datenbank bleiben unberührt und sind harmlos.)
+- Dokumentation: Abschnitt zum Update über mehrere Versionen in der INSTALLATION.md.
+
 ## 0.5.8
 - Neu (Jahr): Die vier Abschnitte (Einnahmen, Feste Ausgaben, Sparen / Vermögen, Flexible Ausgaben) lassen sich **ein- und ausklappen**. Ein Klick auf den Abschnittstitel (oder Enter bzw. Leertaste bei fokussiertem Titel) blendet die Posten aus, Überschrift und Summenzeile bleiben stehen. Eingeklappt sind auch „+ Posten“ und „Ausgeblendet“ verborgen.
 - Neu (Jahr): Knopf **„Alle einklappen“ / „Alle ausklappen“** neben „Kennzahlen“.

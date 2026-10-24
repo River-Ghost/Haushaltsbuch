@@ -43,6 +43,21 @@ Oder auf dem Proxmox-Host den Installationsbefehl erneut ausführen und
 „Vorhandenen Container aktualisieren“ wählen. Das Skript erkennt den Container am Tag `haushaltsbuch`.
 Ein Datenbank-Backup wird vorher automatisch angelegt (`/opt/haushaltsbuch/backups/`).
 
+### Update über mehrere Versionen auf einmal
+
+Ein Update installiert immer den kompletten neuesten Stand und spielt alle Datenbankänderungen, die dem Container noch fehlen,
+der Reihe nach ein. Man kann also Versionen überspringen, z. B. direkt von 0.5.1 auf die neueste Version. Die Daten bleiben erhalten,
+und vorher wird automatisch eine Sicherung angelegt.
+
+Bei Installationen **älter als 0.5.7** meldet der Befehl `update` am Ende eventuell `unexpected EOF while looking for matching`.
+Das Update ist dann trotzdem vollständig durchgelaufen. Die Meldung vermeidest du, indem du zuerst das neue Update-Skript holst:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/River-Ghost/Haushaltsbuch/main/scripts/self-update.sh -o /opt/haushaltsbuch/scripts/self-update.sh && update
+```
+
+Der Weg über den Installer auf dem Proxmox-Host („Vorhandenen Container aktualisieren“) macht das automatisch.
+
 ## Fehlersuche
 
 | Meldung | Ursache und Lösung |
