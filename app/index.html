@@ -196,7 +196,7 @@ body.mobile.m-se #mob{display:none}
 .mrow small{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;margin-top:2px;white-space:pre-wrap}
 .mrow.sum{font-weight:750}
 .mcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.mcards .card{padding:10px 12px}.mcards .card:last-child{grid-column:1/-1}.mcards .value{font-size:18px}
+.mcards .card{padding:10px 12px}.mcards .card:last-child{grid-column:1/-1;text-align:center}.mcards .value{font-size:18px}
 #mTabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--nav);padding-bottom:env(safe-area-inset-bottom,0px)}
 #mTabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border:0;background:transparent;color:#94a3b8;font:inherit;font-size:12px}
 #mTabs button.on{color:#fff}#mTabs .ni{width:24px;height:24px}
@@ -229,7 +229,7 @@ body.mobile.m-se #mob{display:none}
 </div>
 <div id="viewJahr" hidden>
 <div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" id="yAllBtn" onclick="toggleAllBlocks()">Alle einklappen</button><button class="btn" id="yCardsBtn" onclick="toggleYCards()">Kennzahlen anzeigen</button><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
-<div class="summary" id="ySummary" hidden><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Gesamtausgaben (Jahr)</div><div class="value red" id="y_exp">0,00 €</div></div><div class="card"><div class="label">davon Sparen/Vermögen</div><div class="value red" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
+<div class="summary" id="ySummary" hidden><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Ausgaben (Fix + Flex)</div><div class="value red" id="y_exp">0,00 €</div></div><div class="card"><div class="label">Sparen/Vermögen</div><div class="value red" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
 <section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Enter springt nach unten, Tab nach rechts. ⇢ kopiert den Wert bis Dezember. F2 oder Rechtsklick: Notiz an der Zelle. Klick auf einen Monatsnamen öffnet den Monat.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
 </div>
 <div id="viewSE" hidden>
@@ -410,7 +410,7 @@ function refreshSums(){const c=calc(),gE=c.gi('Einnahmen');
   else if(k==='t'){const arr=a==='ein'?c.ein:a==='aus'?c.aus:c.saldo,val=b==='y'?(a==='ein'?c.einY:a==='aus'?c.ausY:c.saldoY):arr[b];v=fmt(val);if(a==='saldo')saldoNeg=Math.round(val*100)<0}
   el.textContent=v;if(saldoNeg!==null)el.classList.toggle('red',saldoNeg);
   if(k==='pp'||k==='bp'||k==='ta'){const arr=k==='pp'?(findPost(a)||{}).monate:k==='bp'?c.blockM[Number(a)]:(a==='ein'?c.ein:a==='aus'?c.aus:c.saldo);el.title=arr?avgText(arr,year):''}});
- $('y_inc').textContent=euro(c.einY);$('y_exp').textContent=euro(c.ausY);$('y_sav').textContent=euro(c.sav);$('y_bal').textContent=euro(c.saldoY);$('y_bal').className='value'+(Math.round(c.saldoY*100)<0?' red':'')}
+ $('y_inc').textContent=euro(c.einY);$('y_exp').textContent=euro(c.ausY-c.sav);$('y_sav').textContent=euro(c.sav);$('y_bal').textContent=euro(c.saldoY);$('y_bal').className='value'+(Math.round(c.saldoY*100)<0?' red':'')}
 const yCell=(id,m)=>document.querySelector(`#yearTable input[data-id="${id}"][data-m="${m}"]`);
 function saveYearCell(el){const id=el.dataset.id,m=Number(el.dataset.m),p=findPost(id),amount=parseAmount(el.value);
  if(!(amount>=0)){el.value=fmtz(p.monate[m-1]);return}
