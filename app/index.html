@@ -184,7 +184,7 @@ body.mobile.m-se #mob{display:none}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
 .chip{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:22px;background:#fff;font:inherit;font-size:15px;color:var(--text)}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}
-.chip input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0}
+.hid-date{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .mlabel{font-weight:650;font-size:13px;color:var(--muted);margin-top:8px}
 #mAmt{width:100%;height:64px;font-size:32px;text-align:right;padding:0 16px;border:1px solid var(--line);border-radius:14px;margin:6px 0 4px;font-variant-numeric:tabular-nums}
 #mNote{width:100%;height:46px;font-size:16px;padding:0 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0 12px;font-family:var(--mono)}
@@ -196,7 +196,7 @@ body.mobile.m-se #mob{display:none}
 .mrow small{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;margin-top:2px;white-space:pre-wrap}
 .mrow.sum{font-weight:750}
 .mcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.mcards .card{padding:10px 12px}.mcards .value{font-size:18px}
+.mcards .card{padding:10px 12px}.mcards .card:last-child{grid-column:1/-1}.mcards .value{font-size:18px}
 #mTabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--nav);padding-bottom:env(safe-area-inset-bottom,0px)}
 #mTabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border:0;background:transparent;color:#94a3b8;font:inherit;font-size:12px}
 #mTabs button.on{color:#fff}#mTabs .ni{width:24px;height:24px}
@@ -645,9 +645,9 @@ const today=()=>iso(new Date()),yest=()=>{const t=new Date();return iso(new Date
 const dl=k=>{const d=new Date(k+'T00:00:00');return d.toLocaleDateString('de-DE',{weekday:'short'})+' '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'};
 const r2=n=>Math.round(n*100)/100,rowSum=r=>Object.values(r||{}).reduce((a,b)=>a+Number(b||0),0);
 const get=m=>api('/api/monat?monat='+m);
-let tab='erf',mDate=today(),mCat=null,em=null,mon=new Date(),mYear=new Date().getFullYear(),sheetDate=null;mon.setDate(1);
+let tab='erf',mDate=today(),mCat=null,em=null,sheetDate=null;
 const mq=window.matchMedia?matchMedia('(max-width:700px)'):null;
-function apply(){const on=!!(mq&&mq.matches);document.body.classList.toggle('mobile',on);if(!on)document.body.classList.remove('m-se');$('mob').hidden=!on||document.body.classList.contains('m-se');if(on&&!$('mob').hidden)show(tab)}
+function apply(){const on=!!(mq&&mq.matches);document.body.classList.toggle('mobile',on);if(!on){document.body.classList.remove('m-se');if(typeof showView==='function'&&model)showView(view)}$('mob').hidden=!on||document.body.classList.contains('m-se');if(on&&!$('mob').hidden)show(tab)}
 function show(t){tab=t;for(const s of ['erf','mon','jahr','mehr'])$('m'+{erf:'Erf',mon:'Mon',jahr:'Jahr',mehr:'Mehr'}[s]).hidden=s!==t;
  document.querySelectorAll('#mTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
  if(t==='erf')loadErf();else if(t==='mon')loadMon();else if(t==='jahr')loadYr();else $('mVer').textContent=$('version').textContent}
@@ -655,7 +655,7 @@ const msg=(t,ok)=>{const e=$('mMsg');e.textContent=t;e.className='mmsg'+(ok?' ok
 /* Erfassen */
 async function loadErf(){em=await get(mDate.slice(0,7));if(!em.kategorien.some(c=>c.id===mCat))mCat=null;renderErf()}
 function renderErf(){const t=today(),y=yest();
- $('mDateChips').innerHTML=[['Heute',t],['Gestern',y]].map(([l,d])=>`<button class="chip${mDate===d?' on':''}" data-d="${d}">${l}</button>`).join('')+`<label class="chip${mDate!==t&&mDate!==y?' on':''}">${mDate!==t&&mDate!==y?dl(mDate):'Anderes Datum'}<input type="date" id="mDateIn" value="${mDate}" aria-label="Anderes Datum"></label>`;
+ $('mDateChips').innerHTML=[['Heute',t],['Gestern',y]].map(([l,d])=>`<button class="chip${mDate===d?' on':''}" data-d="${d}">${l}</button>`).join('')+`<button class="chip${mDate!==t&&mDate!==y?' on':''}" data-other="1">${mDate!==t&&mDate!==y?dl(mDate):'Anderes Datum'}</button><input type="date" id="mDateIn" class="hid-date" value="${mDate}" tabindex="-1" aria-label="Anderes Datum">`;
  $('mCatChips').innerHTML=em.kategorien.map(c=>`<button class="chip${c.id===mCat?' on':''}" data-c="${c.id}">${esc(c.bezeichnung)}</button>`).join('');
  const row=em.tage[mDate]||{};$('mErfTitle').textContent=mDate===t?'Heute erfasst':'Erfasst am '+dl(mDate);
  const items=em.kategorien.filter(c=>Number(row[c.id]||0)>0).map(c=>`<button class="mrow" data-c="${c.id}"><span>${esc(c.bezeichnung)}</span><b>${fmt(row[c.id])} €</b></button>`).join('');
@@ -681,31 +681,31 @@ async function openDay(day,focusCat){sheetDate=day;const m=await get(day.slice(0
   catch(err){box.textContent='Fehler: '+err.message;box.className='mmsg'}finally{el.classList.remove('saving')}}}
 function closeDay(){$('mSheet').hidden=true;$('mSheetBody').onchange=null;if(tab==='erf')loadErf();else if(tab==='mon')loadMon()}
 /* Monat */
-async function loadMon(){const ym=`${mon.getFullYear()}-${pad(mon.getMonth()+1)}`;
- $('mMonTitle').textContent=mon.toLocaleDateString('de-DE',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
+async function loadMon(){const ym=`${current.getFullYear()}-${pad(current.getMonth()+1)}`;
+ $('mMonTitle').textContent=current.toLocaleDateString('de-DE',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
  const [m,ov]=await Promise.all([get(ym),api('/api/uebersicht?monat='+ym)]);
- const aus=Number(ov.fixkosten)+Number(ov.sparen)+Number(ov.flexibel),neg=Math.round(ov.saldo*100)<0;
- $('mCards').innerHTML=[['Einnahmen',ov.einnahmen,'green'],['Ausgaben gesamt',aus,'red'],['Flexible Ausgaben',ov.flexibel,'red'],['Saldo',ov.saldo,neg?'red':'']].map(([l,v,c])=>`<div class="card"><div class="label">${l}</div><div class="value ${c}">${euro(v)}</div></div>`).join('');
+ const neg=Math.round(ov.saldo*100)<0;
+ $('mCards').innerHTML=[['Einnahmen',ov.einnahmen,'green'],['Sparen',ov.sparen,'red'],['Feste Ausgaben',ov.fixkosten,'red'],['Saldo',ov.saldo,neg?'red':''],['Flexible Ausgaben',ov.flexibel,'red']].map(([l,v,c])=>`<div class="card"><div class="label">${l}</div><div class="value ${c}">${euro(v)}</div></div>`).join('');
  const keys=[...new Set([...Object.keys(m.tage),...Object.keys(m.notizen||{})])].filter(k=>rowSum(m.tage[k])>0||(m.notizen||{})[k]).sort().reverse();
  $('mDays').innerHTML=keys.length?keys.map(k=>`<button class="mrow" data-day="${k}"><span>${dl(k)}${(m.notizen||{})[k]?`<small>${esc(m.notizen[k])}</small>`:''}</span><b>${fmt(rowSum(m.tage[k]))} €</b></button>`).join(''):'<div class="mrow"><span style="color:var(--muted)">In diesem Monat gibt es noch keine Ausgaben.</span></div>'}
 /* Jahr (nur Ansicht) */
-async function loadYr(){$('mYearTitle').textContent=mYear;const y=await api('/api/jahr?jahr='+mYear),cols=['#198754','#3b6ea8','#c98a00','#7c5cbf'];
+async function loadYr(){$('mYearTitle').textContent=year;const y=await api('/api/jahr?jahr='+year),cols=['#198754','#3b6ea8','#c98a00','#7c5cbf'];
  const bs=y.bloecke.map(b=>({b,m:Array.from({length:12},(_,i)=>b.posten.reduce((a,p)=>a+Number(p.monate[i]||0),0))}));
  const tot=g=>bs.filter(x=>g?x.b.gruppe==='Einnahmen':x.b.gruppe!=='Einnahmen').reduce((a,x)=>a+x.m.reduce((p,q)=>p+q,0),0),ein=tot(true),aus=tot(false),sal=ein-aus;
  $('mYearTot').innerHTML=`<div class="mtot in"><span>Gesamteinnahmen</span><b>${euro(ein)}</b></div><div class="mtot out"><span>Gesamtausgaben</span><b>${euro(aus)}</b></div><div class="mtot"><span>Saldo</span><b class="${sal<-0.004?'red':''}">${euro(sal)}</b></div>`;
  $('mBlocks').innerHTML=bs.map(({b,m},i)=>`<details class="mblock" style="--blk:${cols[i%4]}"><summary><span>${esc(b.titel)}</span><span>${euro(m.reduce((p,q)=>p+q,0))}</span></summary>${b.posten.filter(p=>p.monate.some(v=>Number(v||0))).map(p=>`<details class="mpost"><summary><span>${esc(p.bezeichnung)}</span><span>${euro(p.monate.reduce((a,v)=>a+Number(v||0),0))}</span></summary>${p.monate.map((v,k)=>Number(v||0)?`<div class="mpm"><span>${MONATE_LANG[k]}</span><span>${euro(v)}</span></div>`:'').join('')}</details>`).join('')||'<div class="mpm">Keine Beträge.</div>'}</details>`).join('')}
 /* Verdrahtung */
 $('mTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)});
-$('mDateChips').addEventListener('click',e=>{const b=e.target.closest('button[data-d]');if(b){mDate=b.dataset.d;loadErf()}});
+$('mDateChips').addEventListener('click',e=>{const o=e.target.closest('button[data-other]');if(o){const i=$('mDateIn');try{i.showPicker()}catch(x){i.focus();i.click()}return}const b=e.target.closest('button[data-d]');if(b){mDate=b.dataset.d;loadErf()}});
 $('mDateChips').addEventListener('change',e=>{if(e.target.id==='mDateIn'&&e.target.value){mDate=e.target.value;loadErf()}});
 $('mCatChips').addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(b){mCat=b.dataset.c;renderErf();$('mAmt').focus()}});
 $('mErfList').addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(b)openDay(mDate,b.dataset.c)});
 $('mDays').addEventListener('click',e=>{const b=e.target.closest('button[data-day]');if(b)openDay(b.dataset.day)});
 $('mSaveBtn').onclick=save;$('mAmt').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save()}});
 $('mSheetClose').onclick=closeDay;$('mSheet').addEventListener('click',e=>{if(e.target===$('mSheet'))closeDay()});
-const mv=n=>{mon.setMonth(mon.getMonth()+n);loadMon()};
-$('mMonPrev').onclick=()=>mv(-1);$('mMonNext').onclick=()=>mv(1);$('mMonNow').onclick=()=>{mon=new Date();mon.setDate(1);loadMon()};
-$('mYearPrev').onclick=()=>{mYear--;loadYr()};$('mYearNext').onclick=()=>{mYear++;loadYr()};$('mYearNow').onclick=()=>{mYear=new Date().getFullYear();loadYr()};
+const mv=n=>{current.setMonth(current.getMonth()+n);loadMon()};
+$('mMonPrev').onclick=()=>mv(-1);$('mMonNext').onclick=()=>mv(1);$('mMonNow').onclick=()=>{current=new Date();current.setDate(1);loadMon()};
+$('mYearPrev').onclick=()=>{year--;loadYr()};$('mYearNext').onclick=()=>{year++;loadYr()};$('mYearNow').onclick=()=>{year=new Date().getFullYear();loadYr()};
 $('mGoOpt').onclick=openOptions;
 $('mGoSE').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true;showView('se')};
 window.mBack=()=>{document.body.classList.remove('m-se');$('mob').hidden=false;show('mehr')};

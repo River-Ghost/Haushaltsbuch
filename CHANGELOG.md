@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.12
+- **Behoben (Handy):** Beim Drehen des Geräts bleibt der gewählte **Monat** (und das Jahr) erhalten. Handy- und Desktop-Ansicht verwenden jetzt denselben Monat.
+- **Geändert (Handy, Monat):** Es gibt wieder **fünf Kennzahlen** wie am Desktop: Einnahmen und Sparen, Feste Ausgaben und Saldo, darunter Flexible Ausgaben als breites Feld.
+- **Behoben (Handy, Erfassen):** „Anderes Datum“ öffnet die Datumsauswahl jetzt zuverlässig (eigener Knopf statt eines unsichtbaren Feldes).
+
 ## 0.5.11
 - **Neu: Handy-Ansicht.** Bei schmalen Bildschirmen (bis 700 px Breite) schaltet die Seite automatisch um, der Desktop bleibt unverändert. Unten eine Leiste mit **Erfassen, Monat, Jahr, Mehr**.
 - **Erfassen:** Datum (Heute, Gestern, Anderes Datum), großes Betragsfeld mit Zahlentastatur, Kategorie per Antippen, optional „Teuerste Einkäufe“. Gibt es für Tag und Kategorie schon einen Betrag, wird der neue **addiert**. Darunter „Heute erfasst“ mit Summe; Antippen öffnet den Tag zum Korrigieren.
