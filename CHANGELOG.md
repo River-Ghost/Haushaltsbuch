@@ -1,5 +1,13 @@
 # Änderungen
 
+## 0.5.11
+- **Neu: Handy-Ansicht.** Bei schmalen Bildschirmen (bis 700 px Breite) schaltet die Seite automatisch um, der Desktop bleibt unverändert. Unten eine Leiste mit **Erfassen, Monat, Jahr, Mehr**.
+- **Erfassen:** Datum (Heute, Gestern, Anderes Datum), großes Betragsfeld mit Zahlentastatur, Kategorie per Antippen, optional „Teuerste Einkäufe“. Gibt es für Tag und Kategorie schon einen Betrag, wird der neue **addiert**. Darunter „Heute erfasst“ mit Summe; Antippen öffnet den Tag zum Korrigieren.
+- **Monat:** vier Kennzahlen (Einnahmen, Ausgaben gesamt, Flexible Ausgaben, Saldo), Tagesliste mit Summe und Notiz; Antippen öffnet den Tag zum Bearbeiten.
+- **Jahr:** Abschnitte und Posten zum Aufklappen mit Summen (nur Ansicht; Eintragen weiterhin am Computer).
+- **Mehr:** Nebeneinnahmen (bekannte Ansicht mit Zurück-Knopf) und Optionen mit Datensicherung.
+- Keine Änderung an Datenbank oder Schnittstellen.
+
 ## 0.5.10
 - **Neu: Datensicherung und Wiederherstellung in den Optionen.** „Sicherung herunterladen“ speichert alle Daten als Datei (`haushaltsbuch_<Datum>.json.gz`). „Sicherung wiederherstellen …“ liest eine solche Datei, zeigt eine Zusammenfassung (Erstellungsdatum, Version, Datensätze je Tabelle) und ersetzt nach Eingabe von „WIEDERHERSTELLEN“ alle Daten. Vorher wird automatisch eine Sicherheitskopie auf dem Server gespeichert (`backups/vor-restore_*.json.gz`, die letzten 20 bleiben). Das Einspielen erfolgt in einer einzigen Transaktion: bei einem Fehler ändert sich nichts. Die Sicherung ist unabhängig von der PostgreSQL-Version und lässt sich auf einem zweiten Server einspielen. Sicherungen aus älteren Versionen werden unterstützt.
 - Neu: `scripts/restore.sh` versteht auch diese `.json.gz`-Sicherungen (Notweg über die Kommandozeile). Der Web-Container hat dafür den Ordner `backups/` eingebunden.

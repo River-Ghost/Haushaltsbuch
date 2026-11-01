@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="de">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Haushaltsbuch</title>
 <link rel="icon" type="image/svg+xml" href="/static/icon.svg"><link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32.png">
 <link rel="apple-touch-icon" href="/static/apple-touch-icon.png"><link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#198754">
@@ -170,6 +170,52 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 .bk-warn{margin:8px 0;padding:6px 8px;background:#fdecea;color:#8a1c12;border-radius:6px}
 .modal-box label.bk-type{font-weight:500;font-size:13px;margin:10px 0 0}
 .bk-type input{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;font:inherit;letter-spacing:.04em}
+
+/* Runde 9 (0.5.11): Handy-Ansicht (automatisch bei schmalen Bildschirmen, Desktop bleibt unverändert) */
+#mob{display:none}
+body.mobile #mob{display:block}body.mobile .layout{display:none}
+body.mobile.m-se .layout{display:block}body.m-se .side{display:none}body.m-se main{margin-left:0;width:100%}
+body.mobile.m-se #mob{display:none}
+.mback{display:none}body.mobile .mback{display:inline-block;margin-bottom:8px}
+#mob{min-height:100vh;padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+.mv{padding:12px 14px}.mv h1{font-size:20px;margin:2px 0 10px}
+.mnav{display:flex;align-items:center;gap:8px;margin-bottom:10px}.mnav h1{flex:1;margin:0}
+.mnav .btn{min-width:44px;height:40px;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.chip{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:22px;background:#fff;font:inherit;font-size:15px;color:var(--text)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}
+.chip input[type=date]{position:absolute;inset:0;width:100%;height:100%;opacity:0}
+.mlabel{font-weight:650;font-size:13px;color:var(--muted);margin-top:8px}
+#mAmt{width:100%;height:64px;font-size:32px;text-align:right;padding:0 16px;border:1px solid var(--line);border-radius:14px;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+#mNote{width:100%;height:46px;font-size:16px;padding:0 12px;border:1px solid var(--line);border-radius:12px;margin:6px 0 12px;font-family:var(--mono)}
+#mSaveBtn{width:100%;height:54px;font-size:17px;font-weight:700;border-radius:14px}
+.mmsg{min-height:22px;margin:8px 0;font-size:14px;color:var(--danger)}.mmsg.ok{color:#0d5c37}
+.mlist{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-top:6px}
+.mrow{display:flex;justify-content:space-between;gap:10px;width:100%;padding:13px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;font:inherit;font-size:15px;text-align:left;color:var(--text)}
+.mrow:last-child{border-bottom:0}.mrow b{font-variant-numeric:tabular-nums;white-space:nowrap}
+.mrow small{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;margin-top:2px;white-space:pre-wrap}
+.mrow.sum{font-weight:750}
+.mcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mcards .card{padding:10px 12px}.mcards .value{font-size:18px}
+#mTabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--nav);padding-bottom:env(safe-area-inset-bottom,0px)}
+#mTabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border:0;background:transparent;color:#94a3b8;font:inherit;font-size:12px}
+#mTabs button.on{color:#fff}#mTabs .ni{width:24px;height:24px}
+.msheet{position:fixed;inset:0;z-index:55;background:rgba(15,23,42,.45);display:flex;align-items:flex-end}
+.msheet-box{background:#fff;width:100%;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+.msheet-box h2{margin:0 0 8px;font-size:18px}
+.mfield{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0}
+.mfield input{width:130px;height:44px;font-size:17px;text-align:right;padding:0 10px;border:1px solid var(--line);border-radius:10px}
+.mfield input.saving{background:#edf8f0}
+.msheet-box textarea{width:100%;font:inherit;font-size:15px;font-family:var(--mono);border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:6px}
+.mblock{margin-bottom:8px;background:#fff;border-radius:12px;box-shadow:var(--shadow);border-left:5px solid var(--blk)}
+.mblock>summary,.mpost>summary{display:flex;justify-content:space-between;gap:10px;padding:13px 12px;font-weight:700;cursor:pointer;list-style:none}
+.mblock>summary::-webkit-details-marker,.mpost>summary::-webkit-details-marker{display:none}
+.mpost>summary{font-weight:500;padding:10px 12px 10px 16px;border-top:1px solid var(--line)}
+.mpm{display:flex;justify-content:space-between;padding:4px 12px 4px 28px;color:var(--muted);font-size:14px}
+.mpm:last-child{padding-bottom:10px}
+.mtot{display:flex;justify-content:space-between;padding:4px 2px;font-weight:700}
+.mtot.in b{color:var(--accent)}.mtot.out b,.red{color:var(--danger)}
+.mmore .mrow{border-radius:0}
 </style>
 </head>
 <body>
@@ -187,6 +233,7 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 <section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Enter springt nach unten, Tab nach rechts. ⇢ kopiert den Wert bis Dezember. F2 oder Rechtsklick: Notiz an der Zelle. Klick auf einen Monatsnamen öffnet den Monat.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
 </div>
 <div id="viewSE" hidden>
+<button class="btn mback" onclick="mBack()">‹ Zurück</button>
 <div class="top"><div><h1 id="seTitle">Nebeneinnahmen</h1><div class="sub">Rückzahlungen, Erstattungen, Dividenden, Zinsen usw. Beginnt die Bezeichnung mit <b>Div.</b> oder <b>Dividende</b>, zählt der Betrag als Dividende, beginnt sie mit <b>Zinsen</b>, als Zinsen. Alles andere ist „Sonstiges“.</div></div><div class="monthnav"><button class="btn" onclick="moveSE(-1)">‹</button><button class="btn" onclick="goSEToday()">Heute</button><button class="btn" onclick="moveSE(1)">›</button></div></div>
 <div class="se-grid">
 <section class="card matrix-card"><div class="matrix-head"><div><h2>Einträge im Monat</h2><div class="hint">In die leere Zeile schreiben, Enter springt zum nächsten Feld. ⇢ wiederholt die Bezeichnung (z. B. vierteljährlich), der Betrag bleibt leer. × löscht den Eintrag.</div></div><div class="status" id="seStatus"></div></div><table id="seTable"></table></section>
@@ -194,6 +241,22 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 </div>
 </div>
 </main></div>
+<div id="mob" hidden>
+<section id="mErf" class="mv"><h1>Erfassen</h1>
+<div class="mlabel">Datum</div><div class="chips" id="mDateChips"></div>
+<div class="mlabel">Betrag</div><input id="mAmt" inputmode="decimal" placeholder="0,00" autocomplete="off" aria-label="Betrag in Euro">
+<div class="mlabel">Kategorie</div><div class="chips" id="mCatChips"></div>
+<div class="mlabel">Teuerste Einkäufe (optional)</div><input id="mNote" maxlength="300" placeholder="z. B. Siemens 5 Stk" autocomplete="off">
+<button class="btn go" id="mSaveBtn">Speichern</button><div class="mmsg" id="mMsg" role="status"></div>
+<div class="mlabel" id="mErfTitle">Heute erfasst</div><div class="mlist" id="mErfList"></div></section>
+<section id="mMon" class="mv" hidden><div class="mnav"><h1 id="mMonTitle"></h1><button class="btn" id="mMonPrev" aria-label="Vorheriger Monat">‹</button><button class="btn" id="mMonNow">Heute</button><button class="btn" id="mMonNext" aria-label="Nächster Monat">›</button></div>
+<div class="mcards" id="mCards"></div><div class="mlist" id="mDays"></div></section>
+<section id="mJahr" class="mv" hidden><div class="mnav"><h1 id="mYearTitle"></h1><button class="btn" id="mYearPrev" aria-label="Vorheriges Jahr">‹</button><button class="btn" id="mYearNow">Jetzt</button><button class="btn" id="mYearNext" aria-label="Nächstes Jahr">›</button></div>
+<div id="mYearTot"></div><div id="mBlocks"></div><div class="sub" style="margin-top:8px">Zum Eintragen und Ändern die Jahresübersicht am Computer nutzen.</div></section>
+<section id="mMehr" class="mv mmore" hidden><h1>Mehr</h1><div class="mlist"><button class="mrow" id="mGoSE">Nebeneinnahmen<b>›</b></button><button class="mrow" id="mGoOpt">Optionen und Datensicherung<b>›</b></button></div><div class="sub" id="mVer" style="margin-top:10px"></div></section>
+<nav id="mTabs" aria-label="Hauptmenü"><button data-t="erf"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Erfassen</button><button data-t="mon"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Monat</button><button data-t="jahr"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16"/></svg>Jahr</button><button data-t="mehr"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mehr</button></nav>
+</div>
+<div id="mSheet" class="msheet" hidden><div class="msheet-box" role="dialog" aria-modal="true" aria-labelledby="mSheetTitle"><h2 id="mSheetTitle"></h2><div id="mSheetBody"></div><div class="modal-actions"><button class="btn go" id="mSheetClose">Fertig</button></div></div></div>
 <div id="optModal" class="modal" hidden><div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="optTitle">
 <h2 id="optTitle">Optionen</h2><div class="sub">Die Einstellungen gelten für diesen Browser.</div>
 <label class="opt"><input type="checkbox" id="optHlRow"><span>Zeile mit dem Cursor hervorheben</span></label>
@@ -575,6 +638,81 @@ function closeRep(){$('repModal').hidden=true;repId=null}
    await refreshSE();flash('seStatus',`${n} ${n===1?'Eintrag':'Einträge'} angelegt (Betrag noch leer)`+(r.uebersprungen.length?`, ${r.uebersprungen.length} übersprungen (gab es schon)`:''),5000)}
   catch(err){flash('seStatus','Fehler beim Wiederholen');alert('Wiederholen fehlgeschlagen: '+err.message)}})})})();
 
-api('/api/setup-demo',{method:'POST'}).then(()=>api('/api/version')).then(v=>{$('version').textContent='Version '+v.version;load()}).catch(e=>{$('status').textContent='Datenbank nicht erreichbar';console.error(e)})
+/* ---------- Handy-Ansicht (0.5.11) ---------- */
+(function(){
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=()=>iso(new Date()),yest=()=>{const t=new Date();return iso(new Date(t.getFullYear(),t.getMonth(),t.getDate()-1))};
+const dl=k=>{const d=new Date(k+'T00:00:00');return d.toLocaleDateString('de-DE',{weekday:'short'})+' '+pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'};
+const r2=n=>Math.round(n*100)/100,rowSum=r=>Object.values(r||{}).reduce((a,b)=>a+Number(b||0),0);
+const get=m=>api('/api/monat?monat='+m);
+let tab='erf',mDate=today(),mCat=null,em=null,mon=new Date(),mYear=new Date().getFullYear(),sheetDate=null;mon.setDate(1);
+const mq=window.matchMedia?matchMedia('(max-width:700px)'):null;
+function apply(){const on=!!(mq&&mq.matches);document.body.classList.toggle('mobile',on);if(!on)document.body.classList.remove('m-se');$('mob').hidden=!on||document.body.classList.contains('m-se');if(on&&!$('mob').hidden)show(tab)}
+function show(t){tab=t;for(const s of ['erf','mon','jahr','mehr'])$('m'+{erf:'Erf',mon:'Mon',jahr:'Jahr',mehr:'Mehr'}[s]).hidden=s!==t;
+ document.querySelectorAll('#mTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+ if(t==='erf')loadErf();else if(t==='mon')loadMon();else if(t==='jahr')loadYr();else $('mVer').textContent=$('version').textContent}
+const msg=(t,ok)=>{const e=$('mMsg');e.textContent=t;e.className='mmsg'+(ok?' ok':'')};
+/* Erfassen */
+async function loadErf(){em=await get(mDate.slice(0,7));if(!em.kategorien.some(c=>c.id===mCat))mCat=null;renderErf()}
+function renderErf(){const t=today(),y=yest();
+ $('mDateChips').innerHTML=[['Heute',t],['Gestern',y]].map(([l,d])=>`<button class="chip${mDate===d?' on':''}" data-d="${d}">${l}</button>`).join('')+`<label class="chip${mDate!==t&&mDate!==y?' on':''}">${mDate!==t&&mDate!==y?dl(mDate):'Anderes Datum'}<input type="date" id="mDateIn" value="${mDate}" aria-label="Anderes Datum"></label>`;
+ $('mCatChips').innerHTML=em.kategorien.map(c=>`<button class="chip${c.id===mCat?' on':''}" data-c="${c.id}">${esc(c.bezeichnung)}</button>`).join('');
+ const row=em.tage[mDate]||{};$('mErfTitle').textContent=mDate===t?'Heute erfasst':'Erfasst am '+dl(mDate);
+ const items=em.kategorien.filter(c=>Number(row[c.id]||0)>0).map(c=>`<button class="mrow" data-c="${c.id}"><span>${esc(c.bezeichnung)}</span><b>${fmt(row[c.id])} €</b></button>`).join('');
+ $('mErfList').innerHTML=items?items+`<div class="mrow sum"><span>Summe</span><b>${fmt(rowSum(row))} €</b></div>`:'<div class="mrow"><span style="color:var(--muted)">Noch nichts erfasst.</span></div>'}
+async function save(){const amt=parseAmount($('mAmt').value);
+ if(!(amt>0))return msg('Bitte einen Betrag eingeben.');if(!mCat)return msg('Bitte eine Kategorie wählen.');
+ const b=$('mSaveBtn'),day=mDate,cat=mCat;b.disabled=true;msg('Speichere …',true);
+ try{const m=await get(day.slice(0,7));const old=Number((m.tage[day]||{})[cat]||0),sum=r2(old+amt);
+  await put(`/api/monat/${day.slice(0,7)}/${day}/${cat}`,{betrag:sum.toFixed(2)});
+  const n=$('mNote').value.trim(),o=(m.notizen||{})[day];if(n)await put(`/api/notiz/${day}`,{notiz:(o?o+', '+n:n).slice(0,300)});
+  const name=(em.kategorien.find(c=>c.id===cat)||{}).bezeichnung;
+  $('mAmt').value='';$('mNote').value='';msg(`${fmt(amt)} € bei ${name} gespeichert${old?' (jetzt '+fmt(sum)+' €)':''}.`,true);await loadErf()}
+ catch(e){msg('Speichern fehlgeschlagen: '+e.message)}finally{b.disabled=false}}
+/* Tag bearbeiten (Antippen in Erfassen und Monat) */
+async function openDay(day,focusCat){sheetDate=day;const m=await get(day.slice(0,7)),row=m.tage[day]||{};
+ $('mSheetTitle').textContent=dl(day);
+ $('mSheetBody').innerHTML=m.kategorien.map(c=>`<label class="mfield"><span>${esc(c.bezeichnung)}</span><input inputmode="decimal" data-c="${c.id}" value="${Number(row[c.id]||0)?fmt(row[c.id]):''}" placeholder="0,00"></label>`).join('')+`<div class="mlabel">Teuerste Einkäufe</div><textarea rows="2" maxlength="300" id="mSheetNote">${esc((m.notizen||{})[day]||'')}</textarea><div class="mmsg" id="mSheetMsg"></div>`;
+ $('mSheet').hidden=false;const f=focusCat&&$('mSheetBody').querySelector(`input[data-c="${focusCat}"]`);if(f){f.focus();f.select()}
+ $('mSheetBody').onchange=async e=>{const el=e.target,box=$('mSheetMsg');el.classList.add('saving');
+  try{if(el.id==='mSheetNote')await put(`/api/notiz/${day}`,{notiz:el.value.trim()});
+   else{const a=parseAmount(el.value);if(!(a>=0))throw new Error('Ungültiger Betrag.');await put(`/api/monat/${day.slice(0,7)}/${day}/${el.dataset.c}`,{betrag:a.toFixed(2)});el.value=a?fmt(a):''}
+   box.textContent='Gespeichert';box.className='mmsg ok'}
+  catch(err){box.textContent='Fehler: '+err.message;box.className='mmsg'}finally{el.classList.remove('saving')}}}
+function closeDay(){$('mSheet').hidden=true;$('mSheetBody').onchange=null;if(tab==='erf')loadErf();else if(tab==='mon')loadMon()}
+/* Monat */
+async function loadMon(){const ym=`${mon.getFullYear()}-${pad(mon.getMonth()+1)}`;
+ $('mMonTitle').textContent=mon.toLocaleDateString('de-DE',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
+ const [m,ov]=await Promise.all([get(ym),api('/api/uebersicht?monat='+ym)]);
+ const aus=Number(ov.fixkosten)+Number(ov.sparen)+Number(ov.flexibel),neg=Math.round(ov.saldo*100)<0;
+ $('mCards').innerHTML=[['Einnahmen',ov.einnahmen,'green'],['Ausgaben gesamt',aus,'red'],['Flexible Ausgaben',ov.flexibel,'red'],['Saldo',ov.saldo,neg?'red':'']].map(([l,v,c])=>`<div class="card"><div class="label">${l}</div><div class="value ${c}">${euro(v)}</div></div>`).join('');
+ const keys=[...new Set([...Object.keys(m.tage),...Object.keys(m.notizen||{})])].filter(k=>rowSum(m.tage[k])>0||(m.notizen||{})[k]).sort().reverse();
+ $('mDays').innerHTML=keys.length?keys.map(k=>`<button class="mrow" data-day="${k}"><span>${dl(k)}${(m.notizen||{})[k]?`<small>${esc(m.notizen[k])}</small>`:''}</span><b>${fmt(rowSum(m.tage[k]))} €</b></button>`).join(''):'<div class="mrow"><span style="color:var(--muted)">In diesem Monat gibt es noch keine Ausgaben.</span></div>'}
+/* Jahr (nur Ansicht) */
+async function loadYr(){$('mYearTitle').textContent=mYear;const y=await api('/api/jahr?jahr='+mYear),cols=['#198754','#3b6ea8','#c98a00','#7c5cbf'];
+ const bs=y.bloecke.map(b=>({b,m:Array.from({length:12},(_,i)=>b.posten.reduce((a,p)=>a+Number(p.monate[i]||0),0))}));
+ const tot=g=>bs.filter(x=>g?x.b.gruppe==='Einnahmen':x.b.gruppe!=='Einnahmen').reduce((a,x)=>a+x.m.reduce((p,q)=>p+q,0),0),ein=tot(true),aus=tot(false),sal=ein-aus;
+ $('mYearTot').innerHTML=`<div class="mtot in"><span>Gesamteinnahmen</span><b>${euro(ein)}</b></div><div class="mtot out"><span>Gesamtausgaben</span><b>${euro(aus)}</b></div><div class="mtot"><span>Saldo</span><b class="${sal<-0.004?'red':''}">${euro(sal)}</b></div>`;
+ $('mBlocks').innerHTML=bs.map(({b,m},i)=>`<details class="mblock" style="--blk:${cols[i%4]}"><summary><span>${esc(b.titel)}</span><span>${euro(m.reduce((p,q)=>p+q,0))}</span></summary>${b.posten.filter(p=>p.monate.some(v=>Number(v||0))).map(p=>`<details class="mpost"><summary><span>${esc(p.bezeichnung)}</span><span>${euro(p.monate.reduce((a,v)=>a+Number(v||0),0))}</span></summary>${p.monate.map((v,k)=>Number(v||0)?`<div class="mpm"><span>${MONATE_LANG[k]}</span><span>${euro(v)}</span></div>`:'').join('')}</details>`).join('')||'<div class="mpm">Keine Beträge.</div>'}</details>`).join('')}
+/* Verdrahtung */
+$('mTabs').addEventListener('click',e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)});
+$('mDateChips').addEventListener('click',e=>{const b=e.target.closest('button[data-d]');if(b){mDate=b.dataset.d;loadErf()}});
+$('mDateChips').addEventListener('change',e=>{if(e.target.id==='mDateIn'&&e.target.value){mDate=e.target.value;loadErf()}});
+$('mCatChips').addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(b){mCat=b.dataset.c;renderErf();$('mAmt').focus()}});
+$('mErfList').addEventListener('click',e=>{const b=e.target.closest('button[data-c]');if(b)openDay(mDate,b.dataset.c)});
+$('mDays').addEventListener('click',e=>{const b=e.target.closest('button[data-day]');if(b)openDay(b.dataset.day)});
+$('mSaveBtn').onclick=save;$('mAmt').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();save()}});
+$('mSheetClose').onclick=closeDay;$('mSheet').addEventListener('click',e=>{if(e.target===$('mSheet'))closeDay()});
+const mv=n=>{mon.setMonth(mon.getMonth()+n);loadMon()};
+$('mMonPrev').onclick=()=>mv(-1);$('mMonNext').onclick=()=>mv(1);$('mMonNow').onclick=()=>{mon=new Date();mon.setDate(1);loadMon()};
+$('mYearPrev').onclick=()=>{mYear--;loadYr()};$('mYearNext').onclick=()=>{mYear++;loadYr()};$('mYearNow').onclick=()=>{mYear=new Date().getFullYear();loadYr()};
+$('mGoOpt').onclick=openOptions;
+$('mGoSE').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true;showView('se')};
+window.mBack=()=>{document.body.classList.remove('m-se');$('mob').hidden=false;show('mehr')};
+if(mq){mq.addEventListener?mq.addEventListener('change',apply):mq.addListener(apply)}
+window.mobApply=apply;
+})();
+
+api('/api/setup-demo',{method:'POST'}).then(()=>api('/api/version')).then(v=>{$('version').textContent='Version '+v.version;load();if(window.mobApply)mobApply()}).catch(e=>{$('status').textContent='Datenbank nicht erreichbar';console.error(e)})
 </script>
 </body></html>
