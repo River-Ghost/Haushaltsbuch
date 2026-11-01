@@ -5,7 +5,8 @@
 #   bash /opt/haushaltsbuch/scripts/restore.sh /pfad/zur/sicherung.dump
 #
 # Geeignet für Sicherungen aus backup.sh bzw. den automatischen "vor-update_*.dump"
-# (Format "custom") sowie für reine SQL-Dateien (*.sql).
+# (Format "custom"), für reine SQL-Dateien (*.sql) und für die in den Optionen der Weboberfläche
+# erstellten Sicherungen (*.json.gz).
 # ACHTUNG: Alle aktuellen Daten in der Datenbank werden durch die Sicherung ersetzt.
 # Vorher wird eine Sicherheitskopie des aktuellen Standes in backups/ angelegt.
 # =============================================================================
@@ -22,7 +23,11 @@ fi
 
 DB_EXEC=(docker compose exec -T datenbank)
 CUSTOM=1
-[[ "$FILE" == *.sql ]] && CUSTOM=0
+JSON=0
+case "$FILE" in
+  *.sql) CUSTOM=0 ;;
+  *.json.gz|*.json) CUSTOM=0; JSON=1 ;;
+esac
 
 echo "Haushaltsbuch – Wiederherstellung"
 echo "================================="
@@ -49,6 +54,18 @@ mkdir -p backups
 STAMP="$(date +%Y%m%d_%H%M%S)"
 "${DB_EXEC[@]}" sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" -Fc' > "backups/vor-restore_${STAMP}.dump"
 echo "Sicherheitskopie des bisherigen Standes: backups/vor-restore_${STAMP}.dump"
+
+if ((JSON)); then
+  # Die JSON-Sicherung wird vom Web-Container eingespielt (er prüft die Datei und ändert bei einem Fehler nichts).
+  docker compose up -d web >/dev/null
+  echo "Spiele die Sicherung ein …"
+  docker compose exec -T web python /app/dbbackup.py import < "$FILE"
+  bash scripts/migrate.sh
+  docker compose up -d
+  echo
+  echo "Wiederherstellung abgeschlossen. Bitte die Weboberfläche öffnen und die Daten prüfen."
+  exit 0
+fi
 
 docker compose stop web >/dev/null 2>&1 || true
 

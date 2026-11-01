@@ -71,6 +71,31 @@ Der Weg über den Installer auf dem Proxmox-Host („Vorhandenen Container aktua
 
 Bricht die Installation ab, bietet das Skript an, den unfertigen Container wieder zu löschen.
 
+## Datensicherung über die Oberfläche
+
+In den **Optionen** (Zahnrad im Seitenmenü) gibt es den Abschnitt „Datensicherung“:
+
+- **Sicherung herunterladen** speichert alle Daten als Datei `haushaltsbuch_<Datum>.json.gz` auf dem Gerät, mit dem du gerade arbeitest.
+  Die Datei ist klein (wenige Kilobyte bis einige Megabyte) und unabhängig von Proxmox und der PostgreSQL-Version.
+- **Sicherung wiederherstellen …**: Datei auswählen, die Zusammenfassung prüfen und „WIEDERHERSTELLEN“ eingeben. Danach ersetzen die Daten
+  der Sicherung alle aktuellen Daten. Vorher legt das Haushaltsbuch automatisch eine Sicherheitskopie in `/opt/haushaltsbuch/backups/`
+  an (`vor-restore_*.json.gz`, die letzten 20 bleiben). Wer sich vertan hat, spielt diese Sicherheitskopie einfach wieder ein.
+  Schlägt das Einspielen fehl, bleibt der bisherige Stand unverändert.
+
+**Haushaltsbuch auf einem zweiten Server aufbauen:**
+
+1. Auf dem zweiten Proxmox-Host den Einzeiler ausführen (Installation wie oben).
+2. Weboberfläche öffnen, Optionen → „Sicherung wiederherstellen …“ → heruntergeladene Datei auswählen → bestätigen.
+
+Auf dem zweiten Server sollte dieselbe oder eine neuere Version laufen als beim Erstellen der Sicherung. Bei einer Sicherung aus einer
+neueren Version zeigt das Haushaltsbuch einen Hinweis an. Sicherungen aus älteren Versionen funktionieren.
+
+**Wichtig:** Das Haushaltsbuch hat keine Anmeldung. Jeder, der die Seite im Netz erreicht, kann die Daten herunterladen und überschreiben.
+Betreibe es deshalb nur im Heimnetz (siehe README). Die Datensicherung ersetzt die Sicherung des Containers über Proxmox nicht, sie ergänzt sie:
+Eine Proxmox-Sicherung enthält alles, die Datei aus den Optionen ist klein, einfach zu kopieren und lässt sich auch auf anderer Hardware einspielen.
+
+Notweg, falls die Weboberfläche nicht läuft: `bash /opt/haushaltsbuch/scripts/restore.sh /pfad/zur/haushaltsbuch_….json.gz`
+
 ## Sicherung auf einen anderen Rechner kopieren
 
 Eine Sicherung ist nur dann hilfreich, wenn sie **nicht** auf demselben Datenträger liegt wie das Haushaltsbuch.

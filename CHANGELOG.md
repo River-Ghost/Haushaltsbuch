@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.10
+- **Neu: Datensicherung und Wiederherstellung in den Optionen.** „Sicherung herunterladen“ speichert alle Daten als Datei (`haushaltsbuch_<Datum>.json.gz`). „Sicherung wiederherstellen …“ liest eine solche Datei, zeigt eine Zusammenfassung (Erstellungsdatum, Version, Datensätze je Tabelle) und ersetzt nach Eingabe von „WIEDERHERSTELLEN“ alle Daten. Vorher wird automatisch eine Sicherheitskopie auf dem Server gespeichert (`backups/vor-restore_*.json.gz`, die letzten 20 bleiben). Das Einspielen erfolgt in einer einzigen Transaktion: bei einem Fehler ändert sich nichts. Die Sicherung ist unabhängig von der PostgreSQL-Version und lässt sich auf einem zweiten Server einspielen. Sicherungen aus älteren Versionen werden unterstützt.
+- Neu: `scripts/restore.sh` versteht auch diese `.json.gz`-Sicherungen (Notweg über die Kommandozeile). Der Web-Container hat dafür den Ordner `backups/` eingebunden.
+- **Neu (Jahr): Durchschnitt als Popup.** Beim Darüberfahren über das %-Feld einer Zeile (auch Summenzeilen und die fixierten Gesamtzeilen) erscheint der Durchschnitt pro Monat über die abgeschlossenen Monate, z. B. „∅ von Januar bis September: 570,00 €“. Frühere Jahre: Januar bis Dezember, laufendes Jahr: bis zum Vormonat, spätere Jahre: kein Popup. Zeilen ohne Beträge zeigen keins.
+
 ## 0.5.9
 - Geändert (Monat): Die Kennzahl „Überschuss“ heißt jetzt **„Saldo“**, wird schwarz dargestellt und nur bei negativem Wert rot (gleiche Regel wie in der Jahresübersicht).
 - Entfernt: Die deaktivierten Menüpunkte „Konten“, „Kategorien“ und „Vermögen“. Dahinter gab es keine Funktion. (Die unbenutzten Konten „Girokonto“ und „Bargeld“ in der Datenbank bleiben unberührt und sind harmlos.)

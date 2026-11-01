@@ -65,7 +65,8 @@ Die Kennzahlen oben zeigen Einnahmen, Feste Ausgaben, Flexible Ausgaben, Sparen 
 - **⇢ Ausfüllen nach rechts:** Wert der zuletzt bearbeiteten Zelle bis Dezember übernehmen
 - **Notizen an Zellen** (wie Excel-Kommentare, z. B. welche Aktien in einem Monat gekauft wurden): Zelle wählen und F2 drücken,
   Rechtsklick oder Klick auf die rote Ecke. Die Notiz erscheint beim Darüberfahren. Notizen ändern keine Summen.
-- Summen je Abschnitt, Jahressumme und Prozentanteile (leere Posten zeigen keinen Prozentwert)
+- Summen je Abschnitt, Jahressumme und Prozentanteile (leere Posten zeigen keinen Prozentwert). Beim Darüberfahren über das %-Feld
+  erscheint der **Durchschnitt pro Monat** über die abgeschlossenen Monate, z. B. „∅ von Januar bis September: 570,00 €“.
 - Posten hinzufügen (`+ Posten`), umbenennen (✎), ausblenden (×) und über „Ausgeblendet“ wieder einblenden (↺).
   Die Knöpfe ⇢ ✎ × erscheinen beim Darüberfahren über die Zeile.
 
@@ -88,6 +89,7 @@ Der Menüpunkt **Optionen** (Zahnrad, unten im Seitenmenü) enthält Schalter, d
 - Zeile mit dem Cursor hervorheben (Monat und Jahr)
 - Spalten- und Zeilenüberschrift beim Darüberfahren hervorheben (Monat und Jahr)
 - Kennzahlen in der Jahresübersicht anzeigen
+- **Datensicherung:** alle Daten als Datei herunterladen und wieder einspielen (siehe unten)
 
 ## Tastatur
 
@@ -107,6 +109,10 @@ im Browser öffnet. Als eigenständige App ohne Browserleiste lässt es sich ins
 HTTPS erreichbar ist (z. B. über einen vorgeschalteten Nginx mit Zertifikat).
 
 ## Sicherung und Wiederherstellung
+
+- **In der Oberfläche (empfohlen):** Optionen → Datensicherung. „Sicherung herunterladen“ speichert alle Daten in einer kleinen Datei,
+  „Sicherung wiederherstellen …“ spielt sie wieder ein (auch in einer neuen Installation auf einem zweiten Server).
+  Vor jeder Wiederherstellung wird automatisch eine Sicherheitskopie auf dem Server gespeichert.
 
 - `bash /opt/haushaltsbuch/scripts/backup.sh` erstellt eine Datenbank-Sicherung in `/opt/haushaltsbuch/backups/`.
   Vor jedem Update entsteht automatisch eine Sicherung (`vor-update_*.dump`).

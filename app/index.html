@@ -156,6 +156,20 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 .gtoggle{cursor:pointer;user-select:none}.gtoggle:hover{filter:brightness(.96)}
 .gchev{display:inline-block;width:14px;color:var(--blk)}
 #yearTable tr.ghead td.ylabel.gtoggle:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+
+/* Runde 8 (0.5.10): Datensicherung in den Optionen */
+.modal-box{max-height:calc(100vh - 32px);overflow:auto}
+.opt-sep{border-top:1px solid var(--line);margin:16px 0 12px}.opt-head{font-weight:700;font-size:14px;margin-bottom:2px}
+.bk-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
+.bk-msg{margin-top:10px;font-size:13px;padding:8px 10px;border-radius:8px;background:#eef2f6;line-height:1.45}
+.bk-msg.ok{background:#e6f4ec;color:#0d5c37}.bk-msg.err{background:#fdecea;color:#8a1c12}
+.bk-confirm{margin-top:12px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
+.bk-file{font-weight:650;word-break:break-all}
+.bk-list{margin:6px 0;padding:0;list-style:none;columns:2;column-gap:18px}.bk-list li{display:flex;justify-content:space-between;gap:8px;padding:1px 0;break-inside:avoid}
+.bk-hint{color:#8a5a00;background:#fff6e0;border-radius:6px;padding:4px 8px;margin-top:6px}
+.bk-warn{margin:8px 0;padding:6px 8px;background:#fdecea;color:#8a1c12;border-radius:6px}
+.modal-box label.bk-type{font-weight:500;font-size:13px;margin:10px 0 0}
+.bk-type input{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;font:inherit;letter-spacing:.04em}
 </style>
 </head>
 <body>
@@ -185,6 +199,17 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 <label class="opt"><input type="checkbox" id="optHlRow"><span>Zeile mit dem Cursor hervorheben</span></label>
 <label class="opt"><input type="checkbox" id="optHlHead"><span>Spalten- und Zeilenüberschrift beim Darüberfahren hervorheben</span></label>
 <label class="opt"><input type="checkbox" id="optCards"><span>Kennzahlen in der Jahresübersicht anzeigen</span></label>
+<div class="opt-sep"></div>
+<div class="opt-head">Datensicherung</div>
+<div class="sub">Eine Sicherung enthält alle Daten. Du kannst sie auf einem anderen Haushaltsbuch, auch auf einem zweiten Server, wieder einspielen.</div>
+<div class="bk-actions"><a class="btn" id="bkDownload" href="/api/backup" download>Sicherung herunterladen</a><button class="btn" id="bkPick">Sicherung wiederherstellen …</button><input type="file" id="bkFile" accept=".gz,.json" hidden></div>
+<div id="bkMsg" class="bk-msg" hidden></div>
+<div id="bkConfirm" class="bk-confirm" hidden>
+<div id="bkSummary"></div>
+<div class="bk-warn">Achtung: Alle aktuellen Daten werden durch diese Sicherung ersetzt. Vorher wird automatisch eine Sicherheitskopie auf dem Server gespeichert.</div>
+<label class="bk-type">Zum Bestätigen <b>WIEDERHERSTELLEN</b> eingeben:<input type="text" id="bkWord" autocomplete="off" spellcheck="false"></label>
+<div class="modal-actions"><button class="btn" id="bkCancel">Abbrechen</button><button class="btn go" id="bkDo" disabled>Jetzt wiederherstellen</button></div>
+</div>
 <div class="modal-actions"><button class="btn go" id="optClose">Schließen</button></div>
 </div></div>
 <div id="noteTip" class="notetip" hidden></div>
@@ -209,6 +234,11 @@ const lastFocus={}, showHidden={}; let queue=Promise.resolve();
 const euro=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR'}).format(Number(n||0));
 const fmt=n=>Number(n||0).toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtz=n=>Number(n||0)?fmt(n):'';
+const MONATE_LANG=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+/* Durchschnitt pro Monat über die abgeschlossenen Monate: frühere Jahre 12, laufendes Jahr bis zum Vormonat, spätere Jahre keiner. */
+function avgText(monate,yr,now){now=now||new Date();const n=yr<now.getFullYear()?12:(yr===now.getFullYear()?now.getMonth():0);if(n<1)return '';
+ const sum=monate.slice(0,n).reduce((a,b)=>a+Number(b||0),0);if(Math.abs(sum)<0.005)return '';
+ return `∅ von ${MONATE_LANG[0]}${n>1?' bis '+MONATE_LANG[n-1]:''}: ${fmt(sum/n)} €`}
 const pct=(a,b)=>b&&a?(a/b*100).toLocaleString('de-DE',{maximumFractionDigits:1})+' %':'';
 const pad=n=>String(n).padStart(2,'0');
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -290,7 +320,7 @@ function calc(){const c={post:{},blockM:[],blockY:[],ein:[],aus:[],saldo:[],sav:
  for(let i=0;i<12;i++){c.ein[i]=E[i];c.aus[i]=F[i]+S[i]+X[i];c.saldo[i]=E[i]-c.aus[i]}
  c.sav=sum12(S);c.einY=sum12(c.ein);c.ausY=sum12(c.aus);c.saldoY=c.einY-c.ausY;c.gi=gi;return c}
 function renderYear(){closeNote(false);const c=calc();
- const row=(cls,label,k)=>`<tr class="tot ${cls}"><td class="ylabel">${label}</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="t:${k}:${i}"></td>`).join('')+`<td class="ysum" data-sum="t:${k}:y"></td><td></td></tr>`;
+ const row=(cls,label,k)=>`<tr class="tot ${cls}"><td class="ylabel">${label}</td>`+Array.from({length:12},(_,i)=>`<td class="ro" data-sum="t:${k}:${i}"></td>`).join('')+`<td class="ysum" data-sum="t:${k}:y"></td><td class="ypct" data-sum="ta:${k}"></td></tr>`;
  /* Monatsnamen und die drei Gesamtzeilen stehen oben im Tabellenkopf und bleiben beim Scrollen fixiert */
  let t='<thead><tr><th class="ylabel">Posten</th>'+MONATE.map((n,i)=>`<th class="mh" data-gomonth="${i}" title="Monat öffnen">${n}</th>`).join('')+'<th>Jahr</th><th>%</th></tr>'+row('in','Gesamteinnahmen','ein')+row('out','Gesamtausgaben','aus')+row('saldo','Saldo','saldo')+'</thead><tbody>';
  ymodel.bloecke.forEach((b,gi)=>{
@@ -315,7 +345,8 @@ function refreshSums(){const c=calc(),gE=c.gi('Einnahmen');
   else if(k==='bs'){const g=Number(a);v=fmt(b==='y'?c.blockY[g]:c.blockM[g][b])}
   else if(k==='bp'){const g=Number(a);v=g===gE?'':pct(c.blockY[g],c.ausY)}
   else if(k==='t'){const arr=a==='ein'?c.ein:a==='aus'?c.aus:c.saldo,val=b==='y'?(a==='ein'?c.einY:a==='aus'?c.ausY:c.saldoY):arr[b];v=fmt(val);if(a==='saldo')saldoNeg=Math.round(val*100)<0}
-  el.textContent=v;if(saldoNeg!==null)el.classList.toggle('red',saldoNeg)});
+  el.textContent=v;if(saldoNeg!==null)el.classList.toggle('red',saldoNeg);
+  if(k==='pp'||k==='bp'||k==='ta'){const arr=k==='pp'?(findPost(a)||{}).monate:k==='bp'?c.blockM[Number(a)]:(a==='ein'?c.ein:a==='aus'?c.aus:c.saldo);el.title=arr?avgText(arr,year):''}});
  $('y_inc').textContent=euro(c.einY);$('y_exp').textContent=euro(c.ausY);$('y_sav').textContent=euro(c.sav);$('y_bal').textContent=euro(c.saldoY);$('y_bal').className='value'+(Math.round(c.saldoY*100)<0?' red':'')}
 const yCell=(id,m)=>document.querySelector(`#yearTable input[data-id="${id}"][data-m="${m}"]`);
 function saveYearCell(el){const id=el.dataset.id,m=Number(el.dataset.m),p=findPost(id),amount=parseAmount(el.value);
@@ -392,13 +423,36 @@ function toggleAllBlocks(){const c=allCollapsed();ymodel.bloecke.forEach((b,gi)=
  tb.addEventListener('click',e=>{const g=e.target.closest('.gtoggle');if(g)toggleBlock(Number(g.parentElement.dataset.gi))});
  tb.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.classList&&e.target.classList.contains('gtoggle')){e.preventDefault();toggleBlock(Number(e.target.parentElement.dataset.gi))}})})();
 
+/* ---------- Datensicherung und Wiederherstellung (Optionen) ---------- */
+let bkRaw=null;
+const TABELLEN_NAMEN={monatswerte:'Monatswerte',kategorien:'Posten und Kategorien',haushalte:'Haushalt',sonstige_einnahmen:'Nebeneinnahmen',tagesnotizen:'Tagesnotizen (Monat)',zellnotizen:'Zellnotizen (Jahr)',konten:'Konten',benutzer:'Benutzer',haendler:'Händler',aenderungsprotokoll:'Änderungsprotokoll'};
+function bkSay(text,kind){const m=$('bkMsg');m.hidden=!text;m.textContent=text||'';m.className='bk-msg'+(kind?' '+kind:'')}
+function bkReset(){bkRaw=null;$('bkConfirm').hidden=true;$('bkWord').value='';$('bkDo').disabled=true;bkSay('')}
+function readFile(file){return file.arrayBuffer?file.arrayBuffer():new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(new Error('Datei konnte nicht gelesen werden.'));r.readAsArrayBuffer(file)})}
+function fmtDt(iso){try{const d=new Date(iso);return isNaN(d)?(iso||'unbekannt'):d.toLocaleString('de-DE',{dateStyle:'medium',timeStyle:'short'})}catch(e){return iso||'unbekannt'}}
+function bkSummaryHtml(i,name){return `<div class="bk-file">${esc(name)}</div><div>Erstellt am <b>${esc(fmtDt(i.erstellt))}</b> mit Version <b>${esc(i.app_version||'?')}</b></div><div>${i.zeilen_gesamt} Datensätze:</div><ul class="bk-list">${i.tabellen.map(t=>`<li><span>${esc(TABELLEN_NAMEN[t.name]||t.name)}</span><b>${t.zeilen}</b></li>`).join('')}</ul>${i.hinweise.map(h=>`<div class="bk-hint">${esc(h)}</div>`).join('')}`}
+async function bkFileChosen(file){bkReset();if(!file)return;bkSay('Prüfe die Datei …');
+ try{bkRaw=await readFile(file);const info=await api('/api/restore/pruefen',{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:bkRaw});
+  bkSay('');$('bkSummary').innerHTML=bkSummaryHtml(info,file.name);$('bkConfirm').hidden=false;$('bkWord').focus()}
+ catch(err){bkRaw=null;bkSay(err.message,'err')}}
+function reloadPage(){location.reload()}
+async function bkRestore(){if(!bkRaw||$('bkWord').value!=='WIEDERHERSTELLEN')return;$('bkDo').disabled=true;bkSay('Stelle wieder her …');
+ try{const r=await api('/api/restore?bestaetigt=WIEDERHERSTELLEN',{method:'POST',headers:{'Content-Type':'application/octet-stream'},body:bkRaw});
+  $('bkConfirm').hidden=true;bkRaw=null;bkSay(`Wiederhergestellt: ${r.zeilen} Datensätze. Sicherheitskopie des vorherigen Stands: backups/${r.sicherheitskopie} auf dem Server. Die Seite wird neu geladen …`,'ok');setTimeout(()=>reloadPage(),2500)}
+ catch(err){bkSay(err.message,'err');$('bkDo').disabled=false}}
+(function initBackup(){
+ $('bkPick').addEventListener('click',()=>$('bkFile').click());
+ $('bkFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';bkFileChosen(f)});
+ $('bkWord').addEventListener('input',e=>{$('bkDo').disabled=e.target.value!=='WIEDERHERSTELLEN'});
+ $('bkDo').addEventListener('click',bkRestore);$('bkCancel').addEventListener('click',bkReset)})();
+
 /* ---------- Optionen und Hervorhebungen ---------- */
 const OPTKEY={hlrow:'hb_opt_hlrow',hlhead:'hb_opt_hlhead'};
 function getOpt(k){try{const v=localStorage.getItem(OPTKEY[k]);return v===null?true:v==='1'}catch(e){return true}}
 function setOpt(k,on){try{localStorage.setItem(OPTKEY[k],on?'1':'0')}catch(e){}}
 function applyOpts(){document.body.classList.toggle('opt-hlrow',getOpt('hlrow'));document.body.classList.toggle('opt-hlhead',getOpt('hlhead'));['monthTable','yearTable'].forEach(id=>refreshHl($(id)))}
 function openOptions(){$('optHlRow').checked=getOpt('hlrow');$('optHlHead').checked=getOpt('hlhead');$('optCards').checked=!$('ySummary').hidden;$('optModal').hidden=false;$('optHlRow').focus()}
-function closeOptions(){$('optModal').hidden=true}
+function closeOptions(){$('optModal').hidden=true;bkReset()}
 function hlTarget(tbl){const h=tbl._hov;if(h&&h.isConnected)return h;const a=document.activeElement;return a&&tbl.contains(a)?a.closest('td'):null}
 function refreshHl(tbl){tbl.querySelectorAll('.hl-h').forEach(e=>e.classList.remove('hl-h'));if(!document.body.classList.contains('opt-hlhead'))return;
  const td=hlTarget(tbl);if(!td||!td.closest('tbody')||td.parentElement.cells.length<3)return;

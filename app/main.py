@@ -1,22 +1,25 @@
 import os
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Literal
 from pathlib import Path
 from uuid import UUID
 
+import dbbackup
 import psycopg
 from psycopg.rows import dict_row
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import FileResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 DB = os.environ["DATABASE_URL"]
+BACKUP_DIR = Path(os.getenv("BACKUP_DIR", "/backups"))
+MAX_UPLOAD = int(os.getenv("HB_MAX_UPLOAD", str(100 * 1024 * 1024)))
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.9"
+VERSION = "0.5.10"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -532,6 +535,79 @@ def fill_row(jahr: int, kategorie_id: UUID, x: FillBody):
             for monat in range(x.ab_monat, x.bis_monat + 1):
                 set_value(c, h["id"], date(jahr, monat, 1), kategorie_id, x.betrag)
     return {"ok": True, "ab_monat": x.ab_monat, "bis_monat": x.bis_monat, "betrag": float(x.betrag)}
+
+
+# ---------------------------------------------------------------------------
+# Datensicherung und Wiederherstellung (Optionen)
+# ---------------------------------------------------------------------------
+async def _upload_body(request: Request) -> bytes:
+    laenge = request.headers.get("content-length")
+    if laenge and laenge.isdigit() and int(laenge) > MAX_UPLOAD:
+        raise HTTPException(413, "Die Datei ist zu groß.")
+    roh = await request.body()
+    if len(roh) > MAX_UPLOAD:
+        raise HTTPException(413, "Die Datei ist zu groß.")
+    return roh
+
+
+def _sicherheitskopie() -> str:
+    """Sichert den aktuellen Stand serverseitig, bevor eine Wiederherstellung etwas überschreibt."""
+    name = datetime.now().strftime("vor-restore_%Y%m%d_%H%M%S.json.gz")
+    try:
+        BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+        with psycopg.connect(DB, row_factory=dict_row) as c:
+            roh = dbbackup.export_backup(c, VERSION)
+        (BACKUP_DIR / name).write_bytes(roh)
+        for alt in sorted(BACKUP_DIR.glob("vor-restore_*.json.gz"))[:-20]:
+            alt.unlink(missing_ok=True)
+    except OSError:
+        raise HTTPException(500, "Die Sicherheitskopie konnte nicht gespeichert werden. Es wurde nichts verändert.")
+    return name
+
+
+@app.get("/api/backup")
+def backup_download():
+    with psycopg.connect(DB, row_factory=dict_row) as c:
+        roh = dbbackup.export_backup(c, VERSION)
+    name = datetime.now().strftime("haushaltsbuch_%Y-%m-%d_%H%M.json.gz")
+    return Response(
+        roh,
+        media_type="application/gzip",
+        headers={"Content-Disposition": f'attachment; filename="{name}"', "Cache-Control": "no-store"},
+    )
+
+
+@app.post("/api/restore/pruefen")
+async def restore_check(request: Request):
+    roh = await _upload_body(request)
+    try:
+        daten = dbbackup.lese_sicherung(roh)
+        with psycopg.connect(DB, row_factory=dict_row) as c:
+            return dbbackup.zusammenfassung(c, daten, VERSION)
+    except dbbackup.BackupError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.post("/api/restore")
+async def restore_do(request: Request, bestaetigt: str = ""):
+    if bestaetigt != "WIEDERHERSTELLEN":
+        raise HTTPException(400, "Die Bestätigung fehlt. Es wurde nichts verändert.")
+    roh = await _upload_body(request)
+    try:
+        daten = dbbackup.lese_sicherung(roh)
+    except dbbackup.BackupError as e:
+        raise HTTPException(400, str(e))
+    kopie = _sicherheitskopie()
+    try:
+        with psycopg.connect(DB, row_factory=dict_row) as c:
+            erg = dbbackup.stelle_wieder_her(c, daten)
+    except dbbackup.BackupError as e:
+        raise HTTPException(400, str(e))
+    except psycopg.Error as e:
+        raise HTTPException(
+            400, "Die Sicherung passt nicht zur Datenbank (" + str(e).splitlines()[0] + "). Es wurde nichts verändert."
+        )
+    return {"ok": True, **erg, "sicherheitskopie": kopie}
 
 
 # ---------------------------------------------------------------------------
