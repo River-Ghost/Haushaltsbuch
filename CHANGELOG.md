@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.14
+- **Neu (Monat, Desktop und Handy):** Die Kennzahl **„Flexible Ausgaben“** ist hervorgehoben (neutral getönte Karte mit Rand, größere Zahl).
+- Geändert (Handy, Monat): Die vier anderen Kennzahlen sind flacher (Bezeichnung links, Betrag rechts in einer Zeile), „Flexible Ausgaben“ steht als breites Feld darunter im Fokus.
+
 ## 0.5.13
 - Geändert (Handy, Monat): Der Wert bei „Flexible Ausgaben“ (breites Feld) steht zentriert.
 - Geändert (Jahr): Die Kennzahlen heißen **Einnahmen, Ausgaben (Fix + Flex), Sparen/Vermögen, Saldo**. „Ausgaben“ enthält jetzt nur feste und flexible Ausgaben, Sparen/Vermögen steht getrennt. Der Saldo bleibt unverändert (Einnahmen minus alles). Die fixierten Gesamtzeilen in der Tabelle sind unverändert.

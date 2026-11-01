@@ -196,7 +196,9 @@ body.mobile.m-se #mob{display:none}
 .mrow small{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;margin-top:2px;white-space:pre-wrap}
 .mrow.sum{font-weight:750}
 .mcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.mcards .card{padding:10px 12px}.mcards .card:last-child{grid-column:1/-1;text-align:center}.mcards .value{font-size:18px}
+.mcards .card{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px}.mcards .value{font-size:16px;margin:0}.mcards .label{font-size:12px}
+.mcards .card.hl{grid-column:1/-1;display:block;text-align:center;padding:8px 12px}.mcards .card.hl .value{font-size:24px;margin-top:2px}
+.card.hl{background:#eef2f6;border:2px solid #94a3b8;padding:6px 10px}.card.hl .value{font-size:22px}.mcards .value{font-size:18px}
 #mTabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--nav);padding-bottom:env(safe-area-inset-bottom,0px)}
 #mTabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border:0;background:transparent;color:#94a3b8;font:inherit;font-size:12px}
 #mTabs button.on{color:#fff}#mTabs .ni{width:24px;height:24px}
@@ -224,7 +226,7 @@ body.mobile.m-se #mob{display:none}
 <main>
 <div id="viewMonat">
 <div class="top"><div><h1 id="monthTitle">Oktober 2026</h1><div class="sub">Flexible Ausgaben – Enter und Tab springen ein Feld nach rechts, ↑/↓ eine Zeile. Einnahmen und feste Ausgaben stehen unter „Jahr“</div></div><div class="monthnav"><button class="btn" onclick="moveMonth(-1)">‹</button><button class="btn" onclick="goToday()">Heute</button><button class="btn" onclick="moveMonth(1)">›</button></div></div>
-<div class="summary"><div class="card"><div class="label">Einnahmen</div><div class="value green" id="income">0,00 €</div></div><div class="card"><div class="label">Feste Ausgaben</div><div class="value red" id="fixed">0,00 €</div></div><div class="card"><div class="label">Flexible Ausgaben</div><div class="value red" id="flexible">0,00 €</div></div><div class="card"><div class="label">Sparen</div><div class="value red" id="saving">0,00 €</div></div><div class="card"><div class="label">Saldo</div><div class="value" id="balance">0,00 €</div></div></div>
+<div class="summary"><div class="card"><div class="label">Einnahmen</div><div class="value green" id="income">0,00 €</div></div><div class="card"><div class="label">Feste Ausgaben</div><div class="value red" id="fixed">0,00 €</div></div><div class="card hl"><div class="label">Flexible Ausgaben</div><div class="value red" id="flexible">0,00 €</div></div><div class="card"><div class="label">Sparen</div><div class="value red" id="saving">0,00 €</div></div><div class="card"><div class="label">Saldo</div><div class="value" id="balance">0,00 €</div></div></div>
 <section class="card matrix-card" id="matrix"><div class="matrix-head"><div><h2>Flexible Ausgaben</h2><div class="hint">Einfach Betrag eintragen und Enter oder Tab drücken. Kategorie = Spalte.</div></div><div class="status" id="status"></div></div><div class="table-wrap"><table id="monthTable"></table></div></section>
 </div>
 <div id="viewJahr" hidden>
@@ -685,7 +687,7 @@ async function loadMon(){const ym=`${current.getFullYear()}-${pad(current.getMon
  $('mMonTitle').textContent=current.toLocaleDateString('de-DE',{month:'long',year:'numeric'}).replace(/^./,c=>c.toUpperCase());
  const [m,ov]=await Promise.all([get(ym),api('/api/uebersicht?monat='+ym)]);
  const neg=Math.round(ov.saldo*100)<0;
- $('mCards').innerHTML=[['Einnahmen',ov.einnahmen,'green'],['Sparen',ov.sparen,'red'],['Feste Ausgaben',ov.fixkosten,'red'],['Saldo',ov.saldo,neg?'red':''],['Flexible Ausgaben',ov.flexibel,'red']].map(([l,v,c])=>`<div class="card"><div class="label">${l}</div><div class="value ${c}">${euro(v)}</div></div>`).join('');
+ $('mCards').innerHTML=[['Einnahmen',ov.einnahmen,'green'],['Sparen',ov.sparen,'red'],['Feste Ausgaben',ov.fixkosten,'red'],['Saldo',ov.saldo,neg?'red':''],['Flexible Ausgaben',ov.flexibel,'red']].map(([l,v,c],i)=>`<div class="card${i===4?' hl':''}"><div class="label">${l}</div><div class="value ${c}">${euro(v)}</div></div>`).join('');
  const keys=[...new Set([...Object.keys(m.tage),...Object.keys(m.notizen||{})])].filter(k=>rowSum(m.tage[k])>0||(m.notizen||{})[k]).sort().reverse();
  $('mDays').innerHTML=keys.length?keys.map(k=>`<button class="mrow" data-day="${k}"><span>${dl(k)}${(m.notizen||{})[k]?`<small>${esc(m.notizen[k])}</small>`:''}</span><b>${fmt(rowSum(m.tage[k]))} €</b></button>`).join(''):'<div class="mrow"><span style="color:var(--muted)">In diesem Monat gibt es noch keine Ausgaben.</span></div>'}
 /* Jahr (nur Ansicht) */
