@@ -19,7 +19,7 @@ MAX_UPLOAD = int(os.getenv("HB_MAX_UPLOAD", str(100 * 1024 * 1024)))
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.14"
+VERSION = "0.5.15"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 

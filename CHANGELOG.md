@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.15
+- **Behoben:** Beim Drehen des Handys bleibt die **Ansicht** erhalten (Monat bleibt Monat, Jahr bleibt Jahr, Nebeneinnahmen bleiben Nebeneinnahmen). „Erfassen“ und „Mehr“ gehen am Desktop zur Monatsansicht.
+- Geändert: Die hervorgehobene Karte „Flexible Ausgaben“ hat eine kräftigere Farbe.
+
 ## 0.5.14
 - **Neu (Monat, Desktop und Handy):** Die Kennzahl **„Flexible Ausgaben“** ist hervorgehoben (neutral getönte Karte mit Rand, größere Zahl).
 - Geändert (Handy, Monat): Die vier anderen Kennzahlen sind flacher (Bezeichnung links, Betrag rechts in einer Zeile), „Flexible Ausgaben“ steht als breites Feld darunter im Fokus.

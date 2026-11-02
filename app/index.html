@@ -198,7 +198,7 @@ body.mobile.m-se #mob{display:none}
 .mcards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .mcards .card{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px}.mcards .value{font-size:16px;margin:0}.mcards .label{font-size:12px}
 .mcards .card.hl{grid-column:1/-1;display:block;text-align:center;padding:8px 12px}.mcards .card.hl .value{font-size:24px;margin-top:2px}
-.card.hl{background:#eef2f6;border:2px solid #94a3b8;padding:6px 10px}.card.hl .value{font-size:22px}.mcards .value{font-size:18px}
+.card.hl{background:#d5e0ec;border:2px solid #4f6b8a;padding:6px 10px}.card.hl .value{font-size:22px}.mcards .value{font-size:18px}
 #mTabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--nav);padding-bottom:env(safe-area-inset-bottom,0px)}
 #mTabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 7px;border:0;background:transparent;color:#94a3b8;font:inherit;font-size:12px}
 #mTabs button.on{color:#fff}#mTabs .ni{width:24px;height:24px}
@@ -649,7 +649,12 @@ const r2=n=>Math.round(n*100)/100,rowSum=r=>Object.values(r||{}).reduce((a,b)=>a
 const get=m=>api('/api/monat?monat='+m);
 let tab='erf',mDate=today(),mCat=null,em=null,sheetDate=null;
 const mq=window.matchMedia?matchMedia('(max-width:700px)'):null;
-function apply(){const on=!!(mq&&mq.matches);document.body.classList.toggle('mobile',on);if(!on){document.body.classList.remove('m-se');if(typeof showView==='function'&&model)showView(view)}$('mob').hidden=!on||document.body.classList.contains('m-se');if(on&&!$('mob').hidden)show(tab)}
+function apply(ev){const B=document.body,was=B.classList.contains('mobile'),on=!!(mq&&mq.matches);
+ if(ev&&on&&!was){if(view==='se')B.classList.add('m-se');else tab=view==='jahr'?'jahr':'mon'}
+ const goDesk=ev&&!on&&was,seNow=B.classList.contains('m-se'),dest=seNow?'se':tab==='jahr'?'jahr':'monat';
+ B.classList.toggle('mobile',on);if(!on)B.classList.remove('m-se');
+ $('mob').hidden=!on||B.classList.contains('m-se');if(on&&!$('mob').hidden)show(tab);
+ if(goDesk&&typeof showView==='function')showView(dest)}
 function show(t){tab=t;for(const s of ['erf','mon','jahr','mehr'])$('m'+{erf:'Erf',mon:'Mon',jahr:'Jahr',mehr:'Mehr'}[s]).hidden=s!==t;
  document.querySelectorAll('#mTabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
  if(t==='erf')loadErf();else if(t==='mon')loadMon();else if(t==='jahr')loadYr();else $('mVer').textContent=$('version').textContent}
@@ -711,7 +716,7 @@ $('mYearPrev').onclick=()=>{year--;loadYr()};$('mYearNext').onclick=()=>{year++;
 $('mGoOpt').onclick=openOptions;
 $('mGoSE').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true;showView('se')};
 window.mBack=()=>{document.body.classList.remove('m-se');$('mob').hidden=false;show('mehr')};
-if(mq){mq.addEventListener?mq.addEventListener('change',apply):mq.addListener(apply)}
+if(mq){mq.addEventListener?mq.addEventListener('change',()=>apply(true)):mq.addListener(()=>apply(true))}
 window.mobApply=apply;
 })();
 
