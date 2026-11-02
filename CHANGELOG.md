@@ -1,5 +1,13 @@
 # Änderungen
 
+## 0.5.16
+- **Neu: Menüpunkt „Auswertungen“** (Desktop: Seitenmenü, Handy: „Mehr“). Zeitraum von/bis in Jahren, Ansicht „Pro Jahr“ oder „Pro Monat“.
+- Sechs Kennzahlen mit Summe und Ø pro Monat (abgeschlossene Monate): Einnahmen, Fixe Ausgaben, Flexible Ausgaben, Sparen/Vermögen, Saldo (Cash) und **Ausgaben ohne Sparen**.
+- **Aufbrechen:** Ein Klick auf einen Hauptposten zeigt ihn in einzelnen Posten (gestapelt), Posten sind einzeln an- und abwählbar. Der Saldo ist berechnet und nicht aufbrechbar.
+- Darstellung „Auto“ (pro Jahr Säulen, pro Monat Linien), umschaltbar auf Säulen oder Linien. Optional **Ø-Linien pro Jahr** in der Monatsansicht.
+- **Werte beim Darüberfahren** (am Handy per Antippen) als Hinweisfenster am Diagramm.
+- Keine Änderung an Datenbank oder Schnittstellen (nutzt `/api/jahr`).
+
 ## 0.5.15
 - **Behoben:** Beim Drehen des Handys bleibt die **Ansicht** erhalten (Monat bleibt Monat, Jahr bleibt Jahr, Nebeneinnahmen bleiben Nebeneinnahmen). „Erfassen“ und „Mehr“ gehen am Desktop zur Monatsansicht.
 - Geändert: Die hervorgehobene Karte „Flexible Ausgaben“ hat eine kräftigere Farbe.

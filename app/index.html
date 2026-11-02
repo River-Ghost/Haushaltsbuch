@@ -218,11 +218,31 @@ body.mobile.m-se #mob{display:none}
 .mtot{display:flex;justify-content:space-between;padding:4px 2px;font-weight:700}
 .mtot.in b{color:var(--accent)}.mtot.out b,.red{color:var(--danger)}
 .mmore .mrow{border-radius:0}
+
+/* 0.5.16: Auswertungen */
+.aw-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 12px;font-size:14px}
+.aw-bar select{height:34px;font:inherit;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.aw-seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.aw-seg button{border:0;background:transparent;padding:0 12px;height:34px;font:inherit;color:var(--text);cursor:pointer}
+.aw-seg button.on{background:var(--nav);color:#fff;font-weight:650}
+.aw-bar label{display:flex;gap:6px;align-items:center}
+.aw-kp{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.aw-kp button{text-align:left;background:#fff;border:2px solid transparent;border-radius:10px;padding:7px 10px;box-shadow:var(--shadow);font:inherit;color:var(--text);cursor:pointer}
+.aw-kp button.sel{border-color:#4f6b8a;background:#eef2f6}
+.aw-kp small{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}.aw-kp i{width:9px;height:9px;border-radius:2px;display:inline-block}
+.aw-kp .v{font-weight:700;font-variant-numeric:tabular-nums}.aw-kp .a{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.aw-crumb{min-height:24px;margin:4px 0 8px;font-size:14px}.aw-crumb a{cursor:pointer;text-decoration:underline}
+.aw-main{display:flex;gap:14px;align-items:flex-start;background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:12px}
+#awBox{position:relative;flex:1;min-width:0}#awBox svg{display:block;width:100%;height:auto;touch-action:pan-y}
+#awPosts{width:190px;font-size:13px}#awPosts label{display:flex;align-items:center;gap:6px;padding:3px 0}#awPosts i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.awtip{position:absolute;z-index:5;pointer-events:none;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;padding:6px 10px;font-size:12.5px;white-space:nowrap}
+.awtip b{display:block;margin-bottom:2px}.awtip i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px}.awtip span{float:right;margin-left:14px;font-variant-numeric:tabular-nums}
+@media(max-width:700px){.aw-kp{display:flex;overflow-x:auto}.aw-kp button{min-width:150px;flex:0 0 auto}.aw-main{flex-direction:column}#awPosts{width:100%}}
 </style>
 </head>
 <body>
 <div class="layout">
-<aside class="side"><div class="brand"><img class="brand-icon" src="/static/icon.svg" alt=""><span class="brand-t">Haushaltsbuch</span></div><nav class="nav"><button id="navMonat" class="active" onclick="showView('monat')" title="Monat: flexible Ausgaben pro Tag" aria-label="Monat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="15" r="1" fill="currentColor" stroke="none"/></svg><span class="nl">Monat</span></button><button id="navJahr" onclick="showView('jahr')" title="Jahr: Einnahmen, feste Ausgaben und Sparen" aria-label="Jahr"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16"/></svg><span class="nl">Jahr</span></button><button id="navSE" onclick="showView('se')" title="Nebeneinnahmen: Rückzahlungen, Dividenden, Zinsen" aria-label="Nebeneinnahmen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span class="nl">Nebeneinnahmen</span></button></nav><button class="navopt" id="navOpt" onclick="openOptions()" title="Optionen" aria-label="Optionen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="nl">Optionen</span></button><button class="navtoggle" id="navToggle" onclick="toggleNav()" title="Menü einklappen" aria-expanded="true"><svg class="ni chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="nl">Menü einklappen</span></button><div class="version" id="version">Testversion</div></aside>
+<aside class="side"><div class="brand"><img class="brand-icon" src="/static/icon.svg" alt=""><span class="brand-t">Haushaltsbuch</span></div><nav class="nav"><button id="navMonat" class="active" onclick="showView('monat')" title="Monat: flexible Ausgaben pro Tag" aria-label="Monat"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/><circle cx="16" cy="15" r="1" fill="currentColor" stroke="none"/></svg><span class="nl">Monat</span></button><button id="navJahr" onclick="showView('jahr')" title="Jahr: Einnahmen, feste Ausgaben und Sparen" aria-label="Jahr"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16"/></svg><span class="nl">Jahr</span></button><button id="navSE" onclick="showView('se')" title="Nebeneinnahmen: Rückzahlungen, Dividenden, Zinsen" aria-label="Nebeneinnahmen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span class="nl">Nebeneinnahmen</span></button><button id="navAusw" onclick="showView('ausw')" title="Auswertungen: Verläufe und Vergleiche" aria-label="Auswertungen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span class="nl">Auswertungen</span></button></nav><button class="navopt" id="navOpt" onclick="openOptions()" title="Optionen" aria-label="Optionen"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 0 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 0 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 0 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 0 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="nl">Optionen</span></button><button class="navtoggle" id="navToggle" onclick="toggleNav()" title="Menü einklappen" aria-expanded="true"><svg class="ni chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="nl">Menü einklappen</span></button><div class="version" id="version">Testversion</div></aside>
 <main>
 <div id="viewMonat">
 <div class="top"><div><h1 id="monthTitle">Oktober 2026</h1><div class="sub">Flexible Ausgaben – Enter und Tab springen ein Feld nach rechts, ↑/↓ eine Zeile. Einnahmen und feste Ausgaben stehen unter „Jahr“</div></div><div class="monthnav"><button class="btn" onclick="moveMonth(-1)">‹</button><button class="btn" onclick="goToday()">Heute</button><button class="btn" onclick="moveMonth(1)">›</button></div></div>
@@ -233,6 +253,17 @@ body.mobile.m-se #mob{display:none}
 <div class="top"><div><h1 id="yearTitle">2026</h1><div class="sub">Einnahmen, feste Ausgaben und Sparen – Beträge direkt eintragen. Mit <b>⇢</b> den Wert bis Dezember übernehmen.</div></div><div class="monthnav"><button class="btn" id="yAllBtn" onclick="toggleAllBlocks()">Alle einklappen</button><button class="btn" id="yCardsBtn" onclick="toggleYCards()">Kennzahlen anzeigen</button><button class="btn" onclick="moveYear(-1)">‹</button><button class="btn" onclick="goThisYear()">Dieses Jahr</button><button class="btn" onclick="moveYear(1)">›</button></div></div>
 <div class="summary" id="ySummary" hidden><div class="card"><div class="label">Einnahmen (Jahr)</div><div class="value green" id="y_inc">0,00 €</div></div><div class="card"><div class="label">Ausgaben (Fix + Flex)</div><div class="value red" id="y_exp">0,00 €</div></div><div class="card"><div class="label">Sparen/Vermögen</div><div class="value red" id="y_sav">0,00 €</div></div><div class="card"><div class="label">Saldo (Jahr)</div><div class="value" id="y_bal">0,00 €</div></div></div>
 <section class="card matrix-card"><div class="matrix-head"><div><h2>Jahresübersicht</h2><div class="hint">Enter springt nach unten, Tab nach rechts. ⇢ kopiert den Wert bis Dezember. F2 oder Rechtsklick: Notiz an der Zelle. Klick auf einen Monatsnamen öffnet den Monat.</div></div><div class="status" id="ystatus"></div></div><div class="table-wrap"><table id="yearTable"></table></div></section>
+</div>
+<div id="viewAusw" hidden>
+<button class="btn mback" onclick="mBack()">‹ Zurück</button>
+<div class="top"><div><h1>Auswertungen</h1><div class="sub">Verläufe über mehrere Jahre, bis hinunter auf die einzelnen Posten</div></div></div>
+<div class="aw-bar"><span>Zeitraum</span><select id="awA" aria-label="Von Jahr"></select><span>bis</span><select id="awB" aria-label="Bis Jahr"></select>
+<div class="aw-seg" id="awG"><button data-g="y">Pro Jahr</button><button data-g="m">Pro Monat</button></div>
+<div class="aw-seg" id="awT" title="Auto: pro Jahr Säulen, pro Monat Linien"><button data-t="">Auto</button><button data-t="bars">Säulen</button><button data-t="lines">Linien</button></div>
+<label id="awAvgL"><input type="checkbox" id="awAvg"> Ø-Linien pro Jahr</label></div>
+<div class="aw-kp" id="awKp"></div><div class="aw-crumb" id="awCr"></div>
+<div class="aw-main"><div id="awBox"><div id="awCh"></div><div class="awtip" id="awTip" hidden></div></div><div id="awPosts"></div></div>
+<div class="sub" style="margin-top:8px">Ø = Durchschnitt über die abgeschlossenen Monate (laufender Monat zählt nicht mit). Saldo = Einnahmen − Fixe − Flexible Ausgaben − Sparen/Vermögen.</div>
 </div>
 <div id="viewSE" hidden>
 <button class="btn mback" onclick="mBack()">‹ Zurück</button>
@@ -255,7 +286,7 @@ body.mobile.m-se #mob{display:none}
 <div class="mcards" id="mCards"></div><div class="mlist" id="mDays"></div></section>
 <section id="mJahr" class="mv" hidden><div class="mnav"><h1 id="mYearTitle"></h1><button class="btn" id="mYearPrev" aria-label="Vorheriges Jahr">‹</button><button class="btn" id="mYearNow">Jetzt</button><button class="btn" id="mYearNext" aria-label="Nächstes Jahr">›</button></div>
 <div id="mYearTot"></div><div id="mBlocks"></div><div class="sub" style="margin-top:8px">Zum Eintragen und Ändern die Jahresübersicht am Computer nutzen.</div></section>
-<section id="mMehr" class="mv mmore" hidden><h1>Mehr</h1><div class="mlist"><button class="mrow" id="mGoSE">Nebeneinnahmen<b>›</b></button><button class="mrow" id="mGoOpt">Optionen und Datensicherung<b>›</b></button></div><div class="sub" id="mVer" style="margin-top:10px"></div></section>
+<section id="mMehr" class="mv mmore" hidden><h1>Mehr</h1><div class="mlist"><button class="mrow" id="mGoSE">Nebeneinnahmen<b>›</b></button><button class="mrow" id="mGoAw">Auswertungen<b>›</b></button><button class="mrow" id="mGoOpt">Optionen und Datensicherung<b>›</b></button></div><div class="sub" id="mVer" style="margin-top:10px"></div></section>
 <nav id="mTabs" aria-label="Hauptmenü"><button data-t="erf"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>Erfassen</button><button data-t="mon"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Monat</button><button data-t="jahr"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9.5h18M3 15h18M9 4v16M15 4v16"/></svg>Jahr</button><button data-t="mehr"><svg class="ni" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Mehr</button></nav>
 </div>
 <div id="mSheet" class="msheet" hidden><div class="msheet-box" role="dialog" aria-modal="true" aria-labelledby="mSheetTitle"><h2 id="mSheetTitle"></h2><div id="mSheetBody"></div><div class="modal-actions"><button class="btn go" id="mSheetClose">Fertig</button></div></div></div>
@@ -321,9 +352,9 @@ function enqueue(fn){queue=queue.catch(()=>{}).then(fn);return queue}
 function setNav(c){const l=document.querySelector('.layout');l.classList.toggle('collapsed',c);const b=$('navToggle');b.title=c?'Menü ausklappen':'Menü einklappen';b.setAttribute('aria-expanded',String(!c));try{localStorage.setItem('hb_nav_collapsed',c?'1':'0')}catch(e){}}
 function toggleNav(){setNav(!document.querySelector('.layout').classList.contains('collapsed'))}
 (function(){let c=false;try{c=localStorage.getItem('hb_nav_collapsed')==='1'}catch(e){}setNav(c)})();
-const VIEWS={monat:['viewMonat','navMonat'],jahr:['viewJahr','navJahr'],se:['viewSE','navSE']};
+const VIEWS={monat:['viewMonat','navMonat'],jahr:['viewJahr','navJahr'],se:['viewSE','navSE'],ausw:['viewAusw','navAusw']};
 function showView(v){closeNote(false);view=v;for(const [k,[vw,nv]] of Object.entries(VIEWS)){$(vw).hidden=k!==v;$(nv).classList.toggle('active',k===v)}
- if(v==='jahr'){year=current.getFullYear();loadYear()}else if(v==='se')loadSE();else load()}
+ if(v==='jahr'){year=current.getFullYear();loadYear()}else if(v==='se')loadSE();else if(v==='ausw')loadAusw();else load()}
 
 /* ---------- Monatsansicht ---------- */
 function ym(){return `${current.getFullYear()}-${pad(current.getMonth()+1)}`}
@@ -650,8 +681,8 @@ const get=m=>api('/api/monat?monat='+m);
 let tab='erf',mDate=today(),mCat=null,em=null,sheetDate=null;
 const mq=window.matchMedia?matchMedia('(max-width:700px)'):null;
 function apply(ev){const B=document.body,was=B.classList.contains('mobile'),on=!!(mq&&mq.matches);
- if(ev&&on&&!was){if(view==='se')B.classList.add('m-se');else tab=view==='jahr'?'jahr':'mon'}
- const goDesk=ev&&!on&&was,seNow=B.classList.contains('m-se'),dest=seNow?'se':tab==='jahr'?'jahr':'monat';
+ if(ev&&on&&!was){if(view==='se'||view==='ausw')B.classList.add('m-se');else tab=view==='jahr'?'jahr':'mon'}
+ const goDesk=ev&&!on&&was,seNow=B.classList.contains('m-se'),dest=seNow?view:tab==='jahr'?'jahr':'monat';
  B.classList.toggle('mobile',on);if(!on)B.classList.remove('m-se');
  $('mob').hidden=!on||B.classList.contains('m-se');if(on&&!$('mob').hidden)show(tab);
  if(goDesk&&typeof showView==='function')showView(dest)}
@@ -714,10 +745,88 @@ const mv=n=>{current.setMonth(current.getMonth()+n);loadMon()};
 $('mMonPrev').onclick=()=>mv(-1);$('mMonNext').onclick=()=>mv(1);$('mMonNow').onclick=()=>{current=new Date();current.setDate(1);loadMon()};
 $('mYearPrev').onclick=()=>{year--;loadYr()};$('mYearNext').onclick=()=>{year++;loadYr()};$('mYearNow').onclick=()=>{year=new Date().getFullYear();loadYr()};
 $('mGoOpt').onclick=openOptions;
+$('mGoAw').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true;showView('ausw')};
 $('mGoSE').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true;showView('se')};
 window.mBack=()=>{document.body.classList.remove('m-se');$('mob').hidden=false;show('mehr')};
 if(mq){mq.addEventListener?mq.addEventListener('change',()=>apply(true)):mq.addListener(()=>apply(true))}
 window.mobApply=apply;
+})();
+
+/* ---------- Auswertungen (0.5.16) ---------- */
+(function(){
+const GC={ein:'#198754',fix:'#3b6ea8',flex:'#7c5cbf',spar:'#c98a00',saldo:'#444441',aus:'#b42318'};
+const GN={ein:'Einnahmen',fix:'Fixe Ausgaben',flex:'Flexible Ausgaben',spar:'Sparen/Vermögen',saldo:'Saldo (Cash)',aus:'Ausgaben ohne Sparen'};
+const GR={'Einnahmen':'ein','Fixe Ausgaben':'fix','Flexible Ausgaben':'flex','Sparen/Vermögen':'spar'};
+const PC=['#3b6ea8','#7c5cbf','#198754','#c98a00','#b42318','#0f766e','#be5a9f','#64748b','#a16207','#2f855a'];
+const MN=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+const cy=new Date().getFullYear(),cm=new Date().getMonth(),z=()=>Array(12).fill(0);
+const done=(y,m)=>y<cy||(y===cy&&m<cm),live=(y,m)=>y<cy||(y===cy&&m<=cm);
+const sum=a=>a.reduce((p,q)=>p+q,0),nf=v=>Math.round(v).toLocaleString('de-DE')+' €';
+let S={a:cy-1,b:cy,g:'y',sel:null,type:'',avg:false,off:{}},D={},cur={};
+function pv(a,p){return p.m===null?(p.y>cy?null:sum(a.filter((_,m)=>live(p.y,m)))):(live(p.y,p.m)?a[p.m]:null)}
+function avgY(a,y){const d=a.filter((_,m)=>done(y,m));return d.length?sum(d)/d.length:null}
+function avgAll(k){let s=0,n=0;for(const y in D)D[y].g[k].forEach((v,m)=>{if(done(+y,m)){s+=v;n++}});return n?s/n:null}
+const arr=(k,y)=>D[y].g[k];
+async function loadAw(){const ys=[];for(let y=S.a;y<=S.b;y++)ys.push(y);
+ const r=await Promise.all(ys.map(y=>api('/api/jahr?jahr='+y)));D={};
+ r.forEach((j,i)=>{const o={g:{ein:z(),fix:z(),flex:z(),spar:z(),aus:z(),saldo:z()},p:{}};
+  for(const b of j.bloecke){const k=GR[b.gruppe];if(!k)continue;for(const p of b.posten){const a=p.monate.map(v=>Number(v||0));o.p[k+'|'+p.id]={n:p.bezeichnung,k,v:a};a.forEach((v,m)=>o.g[k][m]+=v)}}
+  for(let m=0;m<12;m++){o.g.aus[m]=o.g.fix[m]+o.g.flex[m];o.g.saldo[m]=o.g.ein[m]-o.g.fix[m]-o.g.flex[m]-o.g.spar[m]}
+  D[ys[i]]=o});render()}
+function nice(lo,hi){const raw=((hi-lo)||1)/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),st=[1,2,2.5,5,10].map(f=>f*mag).find(s=>s>=raw);return{st,mn:Math.floor(lo/st+1e-9)*st,mx:Math.ceil(hi/st-1e-9)*st}}
+function chart(per,ser,o){const W=640,H=280,L=58,B=40,T=10,n=per.length;let hi=0,lo=0;
+ if(o.stack)per.forEach((p,i)=>{let s=0;ser.forEach(r=>{if(r.v[i]>0)s+=r.v[i]});hi=Math.max(hi,s)});
+ else ser.forEach(r=>r.v.forEach(v=>{if(v!==null){hi=Math.max(hi,v);lo=Math.min(lo,v)}}));
+ (o.avgs||[]).forEach(a=>{hi=Math.max(hi,a.v);lo=Math.min(lo,a.v)});
+ const sc=nice(lo,hi),y=v=>T+(H-T-B)*(1-(v-sc.mn)/(sc.mx-sc.mn)),cw=(W-L-8)/n,x=i=>L+cw*(i+.5);let g='';
+ for(let v=sc.mn;v<=sc.mx+1e-9;v+=sc.st)g+=`<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e5e9f0" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#64748b">${Math.round(v).toLocaleString('de-DE')}</text>`;
+ if(sc.mn<0)g+=`<line x1="${L}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#94a3b8"/>`;
+ per.forEach((p,i)=>{g+=`<text x="${x(i)}" y="${H-22}" text-anchor="middle" font-size="11" fill="#64748b">${p.m===null?p.y:(n>12?MN[p.m][0]:MN[p.m])}</text>`;if(p.m!==null&&(p.m===0||i===0))g+=`<text x="${x(i)-cw/2+2}" y="${H-7}" font-size="11" font-weight="700" fill="#172033">${p.y}</text>`});
+ if(o.stack){const bw=Math.max(4,Math.min(46,cw*.7));per.forEach((p,i)=>{let acc=0;ser.forEach(r=>{const v=r.v[i];if(!(v>0))return;g+=`<rect x="${x(i)-bw/2}" y="${y(acc+v)}" width="${bw}" height="${Math.max(0,y(acc)-y(acc+v))}" fill="${r.c}"/>`;acc+=v})})}
+ else if(o.lines)ser.forEach(r=>{let d='',pen=false;r.v.forEach((v,i)=>{if(v===null){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});g+=`<path d="${d}" fill="none" stroke="${r.c}" stroke-width="2" stroke-linejoin="round"/>`;if(n<=14)r.v.forEach((v,i)=>{if(v!==null)g+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${r.c}"/>`})});
+ else{const k=ser.length,bw=Math.max(3,Math.min(20,cw*.8/k));per.forEach((p,i)=>ser.forEach((r,j)=>{const v=r.v[i];if(v===null)return;g+=`<rect x="${x(i)-bw*k/2+j*bw}" y="${v>=0?y(v):y(0)}" width="${Math.max(1,bw-1)}" height="${Math.abs(y(v)-y(0))}" rx="1.5" fill="${r.c}"/>`}))}
+ (o.avgs||[]).forEach(a=>{g+=`<line x1="${x(a.i0)-cw/2}" x2="${x(a.i1)+cw/2}" y1="${y(a.v)}" y2="${y(a.v)}" stroke="${a.c}" stroke-width="1.6" stroke-dasharray="6 4"/>`});
+ per.forEach((p,i)=>{g+=`<rect data-i="${i}" x="${x(i)-cw/2}" y="${T}" width="${cw}" height="${H-T-B}" fill="transparent"/>`});
+ cur.tip=i=>{const p=per[i],rows=ser.filter(r=>r.v[i]!==null).map(r=>`<div><i style="background:${r.c}"></i>${esc(r.n)}<span>${nf(r.v[i])}</span></div>`).join('');
+  const t=o.stack?`<div style="border-top:1px solid #e5e9f0;margin-top:3px;padding-top:3px"><b style="margin:0">Summe<span>${nf(ser.reduce((s,r)=>s+(r.v[i]||0),0))}</span></b></div>`:'';
+  return `<b>${p.m===null?p.y:MN[p.m]+' '+p.y}</b>${rows||'Noch keine Daten'}${t}`};
+ return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramm der Auswertung">${g}</svg>`}
+function render(){const ys=Object.keys(D).map(Number).sort((a,b)=>a-b);if(!ys.length)return;
+ const per=[];ys.forEach(yy=>{if(S.g==='y')per.push({y:yy,m:null});else for(let m=0;m<12;m++)per.push({y:yy,m})});
+ const lines=S.type?S.type==='lines':S.g==='m';
+ document.querySelectorAll('#awG button').forEach(b=>b.classList.toggle('on',b.dataset.g===S.g));
+ document.querySelectorAll('#awT button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.type));
+ $('awAvg').checked=S.avg&&S.g==='m';$('awAvg').disabled=S.g!=='m';$('awAvgL').title=S.g==='m'?'':'Nur in der Ansicht „Pro Monat“';
+ const tot=k=>ys.reduce((s,yy)=>s+sum(arr(k,yy).filter((_,m)=>live(yy,m))),0);
+ $('awKp').innerHTML=['ein','fix','flex','spar','saldo','aus'].map(k=>{const a=avgAll(k);return `<button data-k="${k}" class="${S.sel===k?'sel':''}"><small><i style="background:${GC[k]}"></i>${GN[k]}</small><div class="v">${nf(tot(k))}</div><div class="a">Ø ${a===null?'–':nf(a)} pro Monat</div></button>`}).join('');
+ const avgs=[],wantAvg=S.avg&&S.g==='m',mk=(a,c)=>{ys.forEach(yy=>{const v=avgY(a(yy),yy);if(v!==null){const i0=per.findIndex(p=>p.y===yy);avgs.push({c,v,i0,i1:i0+11})}})};
+ let ser,stack=false,html='';$('awPosts').innerHTML='';
+ if(!S.sel||S.sel==='saldo'||S.sel==='aus'){
+  const ks=S.sel==='aus'?['aus','saldo']:['ein','fix','flex','spar','saldo'];
+  ser=ks.map(k=>({n:GN[k],c:GC[k],v:per.map(p=>pv(arr(k,p.y),p))}));if(wantAvg)ks.forEach(k=>mk(yy=>arr(k,yy),GC[k]));
+  $('awCr').innerHTML=S.sel==='saldo'?'Der Saldo ist berechnet und lässt sich nicht aufbrechen. <a data-back="1">Zurück zur Übersicht</a>':S.sel==='aus'?'Ausgaben ohne Sparen und Saldo · <a data-back="1">Zurück zur Übersicht</a>':'Alle Hauptposten · Kennzahl oben anklicken, um sie in einzelne Posten aufzubrechen';
+ }else{
+  const keys=new Map();ys.forEach(yy=>{for(const k in D[yy].p)if(k.startsWith(S.sel+'|')&&!keys.has(k))keys.set(k,D[yy].p[k].n)});
+  const posts=[...keys].map(([k,n],i)=>({k,n,c:PC[i%PC.length]})),vis=posts.filter(p=>!S.off[p.k]);
+  stack=!lines;ser=vis.map(p=>({n:p.n,c:p.c,v:per.map(pr=>pv((D[pr.y].p[p.k]||{v:z()}).v,pr))}));
+  if(wantAvg){if(stack)mk(yy=>vis.reduce((s,p)=>s.map((v,m)=>v+((D[yy].p[p.k]||{v:z()}).v[m])),z()),'#172033');else vis.forEach(p=>mk(yy=>(D[yy].p[p.k]||{v:z()}).v,p.c))}
+  $('awCr').innerHTML=`<a data-back="1">Alle Hauptposten</a> › <b>${GN[S.sel]}</b> · Posten rechts an- und abwählen`;
+  $('awPosts').innerHTML=posts.length?posts.map(p=>`<label><input type="checkbox" data-p="${esc(p.k)}" ${S.off[p.k]?'':'checked'}><i style="background:${p.c}"></i>${esc(p.n)}</label>`).join(''):'Keine Posten.';
+ }
+ $('awCh').innerHTML=chart(per,ser,{stack,lines,avgs});hideTip()}
+function hideTip(){$('awTip').hidden=true}
+function tipAt(e){const r=e.target.closest&&e.target.closest('[data-i]');if(!r||!cur.tip){hideTip();return}
+ const t=$('awTip'),b=$('awBox').getBoundingClientRect();t.innerHTML=cur.tip(+r.dataset.i);t.hidden=false;
+ let x=e.clientX-b.left+14;if(x+t.offsetWidth>b.width)x=e.clientX-b.left-t.offsetWidth-14;t.style.left=Math.max(0,x)+'px';t.style.top=Math.max(0,e.clientY-b.top+10)+'px'}
+window.loadAusw=()=>{const A=$('awA'),B=$('awB');if(!A.options.length)for(let y=cy-10;y<=cy+1;y++){A.add(new Option(y,y));B.add(new Option(y,y))}A.value=S.a;B.value=S.b;loadAw()};
+$('awA').onchange=$('awB').onchange=()=>{S.a=+$('awA').value;S.b=+$('awB').value;if(S.a>S.b){S.b=S.a;$('awB').value=S.b}loadAw()};
+$('awG').onclick=e=>{if(e.target.dataset.g){S.g=e.target.dataset.g;render()}};
+$('awT').onclick=e=>{if(e.target.dataset.t!==undefined){S.type=e.target.dataset.t;render()}};
+$('awAvg').onchange=()=>{S.avg=$('awAvg').checked;render()};
+$('awKp').onclick=e=>{const b=e.target.closest('button');if(b){S.sel=S.sel===b.dataset.k?null:b.dataset.k;render()}};
+$('awCr').onclick=e=>{if(e.target.dataset.back){S.sel=null;render()}};
+$('awPosts').onchange=e=>{S.off[e.target.dataset.p]=!e.target.checked;render()};
+const bx=$('awBox');bx.addEventListener('pointermove',tipAt);bx.addEventListener('pointerdown',tipAt);bx.addEventListener('pointerleave',hideTip);
 })();
 
 api('/api/setup-demo',{method:'POST'}).then(()=>api('/api/version')).then(v=>{$('version').textContent='Version '+v.version;load();if(window.mobApply)mobApply()}).catch(e=>{$('status').textContent='Datenbank nicht erreichbar';console.error(e)})
