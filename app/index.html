@@ -237,6 +237,7 @@ body.mobile.m-se #mob{display:none}
 #awPosts{width:190px;font-size:13px}#awPosts label{display:flex;align-items:center;gap:6px;padding:3px 0}#awPosts i{width:10px;height:10px;border-radius:2px;display:inline-block}
 .awtip{position:absolute;z-index:5;pointer-events:none;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);border-radius:8px;padding:6px 10px;font-size:12.5px;white-space:nowrap}
 .awtip b{display:block;margin-bottom:2px}.awtip i{width:9px;height:9px;border-radius:2px;display:inline-block;margin-right:5px}.awtip span{float:right;margin-left:14px;font-variant-numeric:tabular-nums}
+.awall{margin-bottom:4px}.awall a{cursor:pointer;text-decoration:underline}.awtip.touch{pointer-events:auto}.awtip .go{margin-top:4px;color:#1d4ed8;font-weight:650}#awBox svg{cursor:pointer}
 @media(max-width:700px){.aw-kp{display:flex;overflow-x:auto}.aw-kp button{min-width:150px;flex:0 0 auto}.aw-main{flex-direction:column}#awPosts{width:100%}}
 </style>
 </head>
@@ -260,7 +261,7 @@ body.mobile.m-se #mob{display:none}
 <div class="aw-bar"><span>Zeitraum</span><select id="awA" aria-label="Von Jahr"></select><span>bis</span><select id="awB" aria-label="Bis Jahr"></select>
 <div class="aw-seg" id="awG"><button data-g="y">Pro Jahr</button><button data-g="m">Pro Monat</button></div>
 <div class="aw-seg" id="awT" title="Auto: pro Jahr Säulen, pro Monat Linien"><button data-t="">Auto</button><button data-t="bars">Säulen</button><button data-t="lines">Linien</button></div>
-<label id="awAvgL"><input type="checkbox" id="awAvg"> Ø-Linien pro Jahr</label></div>
+<label id="awAvgL"><input type="checkbox" id="awAvg"> Ø-Linien pro Jahr</label><label id="awTrL"><input type="checkbox" id="awTr"> Trend (3-Monats-Ø)</label></div>
 <div class="aw-kp" id="awKp"></div><div class="aw-crumb" id="awCr"></div>
 <div class="aw-main"><div id="awBox"><div id="awCh"></div><div class="awtip" id="awTip" hidden></div></div><div id="awPosts"></div></div>
 <div class="sub" style="margin-top:8px">Ø = Durchschnitt über die abgeschlossenen Monate (laufender Monat zählt nicht mit). Saldo = Einnahmen − Fixe − Flexible Ausgaben − Sparen/Vermögen.</div>
@@ -749,7 +750,7 @@ $('mGoAw').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true
 $('mGoSE').onclick=()=>{document.body.classList.add('m-se');$('mob').hidden=true;showView('se')};
 window.mBack=()=>{document.body.classList.remove('m-se');$('mob').hidden=false;show('mehr')};
 if(mq){mq.addEventListener?mq.addEventListener('change',()=>apply(true)):mq.addListener(()=>apply(true))}
-window.mobApply=apply;
+window.mobApply=apply;window.mGo=t=>{document.body.classList.remove('m-se');$('mob').hidden=false;show(t)};
 })();
 
 /* ---------- Auswertungen (0.5.16) ---------- */
@@ -762,7 +763,7 @@ const MN=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','De
 const cy=new Date().getFullYear(),cm=new Date().getMonth(),z=()=>Array(12).fill(0);
 const done=(y,m)=>y<cy||(y===cy&&m<cm),live=(y,m)=>y<cy||(y===cy&&m<=cm);
 const sum=a=>a.reduce((p,q)=>p+q,0),nf=v=>Math.round(v).toLocaleString('de-DE')+' €';
-let S={a:cy-1,b:cy,g:'y',sel:null,type:'',avg:false,off:{}},D={},cur={};
+let S={a:cy-1,b:cy,g:'y',sel:null,type:'',avg:false,tr:false,off:{}},D={},cur={};
 function pv(a,p){return p.m===null?(p.y>cy?null:sum(a.filter((_,m)=>live(p.y,m)))):(live(p.y,p.m)?a[p.m]:null)}
 function avgY(a,y){const d=a.filter((_,m)=>done(y,m));return d.length?sum(d)/d.length:null}
 function avgAll(k){let s=0,n=0;for(const y in D)D[y].g[k].forEach((v,m)=>{if(done(+y,m)){s+=v;n++}});return n?s/n:null}
@@ -777,7 +778,7 @@ function nice(lo,hi){const raw=((hi-lo)||1)/4,mag=Math.pow(10,Math.floor(Math.lo
 function chart(per,ser,o){const W=640,H=280,L=58,B=40,T=10,n=per.length;let hi=0,lo=0;
  if(o.stack)per.forEach((p,i)=>{let s=0;ser.forEach(r=>{if(r.v[i]>0)s+=r.v[i]});hi=Math.max(hi,s)});
  else ser.forEach(r=>r.v.forEach(v=>{if(v!==null){hi=Math.max(hi,v);lo=Math.min(lo,v)}}));
- (o.avgs||[]).forEach(a=>{hi=Math.max(hi,a.v);lo=Math.min(lo,a.v)});
+ (o.avgs||[]).forEach(a=>{hi=Math.max(hi,a.v);lo=Math.min(lo,a.v)});(o.trends||[]).forEach(t=>t.v.forEach(v=>{if(v!==null){hi=Math.max(hi,v);lo=Math.min(lo,v)}}));
  const sc=nice(lo,hi),y=v=>T+(H-T-B)*(1-(v-sc.mn)/(sc.mx-sc.mn)),cw=(W-L-8)/n,x=i=>L+cw*(i+.5);let g='';
  for(let v=sc.mn;v<=sc.mx+1e-9;v+=sc.st)g+=`<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e5e9f0" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#64748b">${Math.round(v).toLocaleString('de-DE')}</text>`;
  if(sc.mn<0)g+=`<line x1="${L}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#94a3b8"/>`;
@@ -785,8 +786,10 @@ function chart(per,ser,o){const W=640,H=280,L=58,B=40,T=10,n=per.length;let hi=0
  if(o.stack){const bw=Math.max(4,Math.min(46,cw*.7));per.forEach((p,i)=>{let acc=0;ser.forEach(r=>{const v=r.v[i];if(!(v>0))return;g+=`<rect x="${x(i)-bw/2}" y="${y(acc+v)}" width="${bw}" height="${Math.max(0,y(acc)-y(acc+v))}" fill="${r.c}"/>`;acc+=v})})}
  else if(o.lines)ser.forEach(r=>{let d='',pen=false;r.v.forEach((v,i)=>{if(v===null){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});g+=`<path d="${d}" fill="none" stroke="${r.c}" stroke-width="2" stroke-linejoin="round"/>`;if(n<=14)r.v.forEach((v,i)=>{if(v!==null)g+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${r.c}"/>`})});
  else{const k=ser.length,bw=Math.max(3,Math.min(20,cw*.8/k));per.forEach((p,i)=>ser.forEach((r,j)=>{const v=r.v[i];if(v===null)return;g+=`<rect x="${x(i)-bw*k/2+j*bw}" y="${v>=0?y(v):y(0)}" width="${Math.max(1,bw-1)}" height="${Math.abs(y(v)-y(0))}" rx="1.5" fill="${r.c}"/>`}))}
+ (o.trends||[]).forEach(t=>{let d='',pen=false;t.v.forEach((v,i)=>{if(v===null){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});g+=`<path d="${d}" fill="none" stroke="${t.c}" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0.1 7" opacity=".85"/>`});
  (o.avgs||[]).forEach(a=>{g+=`<line x1="${x(a.i0)-cw/2}" x2="${x(a.i1)+cw/2}" y1="${y(a.v)}" y2="${y(a.v)}" stroke="${a.c}" stroke-width="1.6" stroke-dasharray="6 4"/>`});
  per.forEach((p,i)=>{g+=`<rect data-i="${i}" x="${x(i)-cw/2}" y="${T}" width="${cw}" height="${H-T-B}" fill="transparent"/>`});
+ cur.per=per;cur.geom={y,x,cw,ser,stack:!!o.stack,lines:!!o.lines,bw:Math.max(3,Math.min(20,cw*.8/(ser.length||1))),H,W};
  cur.tip=i=>{const p=per[i],rows=ser.filter(r=>r.v[i]!==null).map(r=>`<div><i style="background:${r.c}"></i>${esc(r.n)}<span>${nf(r.v[i])}</span></div>`).join('');
   const t=o.stack?`<div style="border-top:1px solid #e5e9f0;margin-top:3px;padding-top:3px"><b style="margin:0">Summe<span>${nf(ser.reduce((s,r)=>s+(r.v[i]||0),0))}</span></b></div>`:'';
   return `<b>${p.m===null?p.y:MN[p.m]+' '+p.y}</b>${rows||'Noch keine Daten'}${t}`};
@@ -796,28 +799,41 @@ function render(){const ys=Object.keys(D).map(Number).sort((a,b)=>a-b);if(!ys.le
  const lines=S.type?S.type==='lines':S.g==='m';
  document.querySelectorAll('#awG button').forEach(b=>b.classList.toggle('on',b.dataset.g===S.g));
  document.querySelectorAll('#awT button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.type));
- $('awAvg').checked=S.avg&&S.g==='m';$('awAvg').disabled=S.g!=='m';$('awAvgL').title=S.g==='m'?'':'Nur in der Ansicht „Pro Monat“';
+ $('awAvg').checked=S.avg&&S.g==='m';$('awAvg').disabled=S.g!=='m';$('awAvgL').title=S.g==='m'?'':'Nur in der Ansicht „Pro Monat“';$('awTr').checked=S.tr&&S.g==='m';$('awTr').disabled=S.g!=='m';$('awTrL').title=S.g==='m'?'Geglätteter Verlauf: gleitender Durchschnitt über drei Monate':'Nur in der Ansicht „Pro Monat“';
  const tot=k=>ys.reduce((s,yy)=>s+sum(arr(k,yy).filter((_,m)=>live(yy,m))),0);
  $('awKp').innerHTML=['ein','fix','flex','spar','saldo','aus'].map(k=>{const a=avgAll(k);return `<button data-k="${k}" class="${S.sel===k?'sel':''}"><small><i style="background:${GC[k]}"></i>${GN[k]}</small><div class="v">${nf(tot(k))}</div><div class="a">Ø ${a===null?'–':nf(a)} pro Monat</div></button>`}).join('');
  const avgs=[],wantAvg=S.avg&&S.g==='m',mk=(a,c)=>{ys.forEach(yy=>{const v=avgY(a(yy),yy);if(v!==null){const i0=per.findIndex(p=>p.y===yy);avgs.push({c,v,i0,i1:i0+11})}})};
  let ser,stack=false,html='';$('awPosts').innerHTML='';
  if(!S.sel||S.sel==='saldo'||S.sel==='aus'){
-  const ks=S.sel==='aus'?['aus','saldo']:['ein','fix','flex','spar','saldo'];
-  ser=ks.map(k=>({n:GN[k],c:GC[k],v:per.map(p=>pv(arr(k,p.y),p))}));if(wantAvg)ks.forEach(k=>mk(yy=>arr(k,yy),GC[k]));
-  $('awCr').innerHTML=S.sel==='saldo'?'Der Saldo ist berechnet und lässt sich nicht aufbrechen. <a data-back="1">Zurück zur Übersicht</a>':S.sel==='aus'?'Ausgaben ohne Sparen und Saldo · <a data-back="1">Zurück zur Übersicht</a>':'Alle Hauptposten · Kennzahl oben anklicken, um sie in einzelne Posten aufzubrechen';
+  const ks=S.sel==='aus'?['aus']:S.sel==='saldo'?['saldo']:['ein','fix','flex','spar','saldo'];
+  ser=ks.map(k=>({k,n:GN[k],c:GC[k],v:per.map(p=>pv(arr(k,p.y),p))}));if(wantAvg)ks.forEach(k=>mk(yy=>arr(k,yy),GC[k]));
+  $('awCr').innerHTML=S.sel==='saldo'?'Saldo (Cash) · berechnet, lässt sich nicht aufbrechen · <a data-back="1">Zurück zur Übersicht</a>':S.sel==='aus'?'Ausgaben ohne Sparen (Fixe + Flexible) · <a data-back="1">Zurück zur Übersicht</a>':'Alle Hauptposten · Kennzahl oben anklicken, um sie in einzelne Posten aufzubrechen';
  }else{
   const keys=new Map();ys.forEach(yy=>{for(const k in D[yy].p)if(k.startsWith(S.sel+'|')&&!keys.has(k))keys.set(k,D[yy].p[k].n)});
   const posts=[...keys].map(([k,n],i)=>({k,n,c:PC[i%PC.length]})),vis=posts.filter(p=>!S.off[p.k]);
-  stack=!lines;ser=vis.map(p=>({n:p.n,c:p.c,v:per.map(pr=>pv((D[pr.y].p[p.k]||{v:z()}).v,pr))}));
+  stack=!lines;ser=vis.map(p=>({k:S.sel,n:p.n,c:p.c,v:per.map(pr=>pv((D[pr.y].p[p.k]||{v:z()}).v,pr))}));
   if(wantAvg){if(stack)mk(yy=>vis.reduce((s,p)=>s.map((v,m)=>v+((D[yy].p[p.k]||{v:z()}).v[m])),z()),'#172033');else vis.forEach(p=>mk(yy=>(D[yy].p[p.k]||{v:z()}).v,p.c))}
   $('awCr').innerHTML=`<a data-back="1">Alle Hauptposten</a> › <b>${GN[S.sel]}</b> · Posten rechts an- und abwählen`;
-  $('awPosts').innerHTML=posts.length?posts.map(p=>`<label><input type="checkbox" data-p="${esc(p.k)}" ${S.off[p.k]?'':'checked'}><i style="background:${p.c}"></i>${esc(p.n)}</label>`).join(''):'Keine Posten.';
+  $('awPosts').innerHTML=posts.length?'<div class="awall"><a data-all="1">Alle</a> · <a data-all="0">Keine</a></div>'+posts.map(p=>`<label><input type="checkbox" data-p="${esc(p.k)}" ${S.off[p.k]?'':'checked'}><i style="background:${p.c}"></i>${esc(p.n)}</label>`).join(''):'Keine Posten.';
  }
- $('awCh').innerHTML=chart(per,ser,{stack,lines,avgs});hideTip()}
-function hideTip(){$('awTip').hidden=true}
-function tipAt(e){const r=e.target.closest&&e.target.closest('[data-i]');if(!r||!cur.tip){hideTip();return}
- const t=$('awTip'),b=$('awBox').getBoundingClientRect();t.innerHTML=cur.tip(+r.dataset.i);t.hidden=false;
+ const ma=v=>v.map((x,i)=>{if(x===null)return null;let s=0,n=0;for(let j=i-1;j<=i+1;j++)if(j>=0&&j<v.length&&v[j]!==null){s+=v[j];n++}return s/n});
+ let trends=[];if(S.tr&&S.g==='m'){if(stack)trends=[{c:'#172033',v:ma(per.map((_,i)=>ser.some(r=>r.v[i]!==null)?ser.reduce((s,r)=>s+(r.v[i]||0),0):null))}];else trends=ser.map(r=>({c:r.c,v:ma(r.v)}))}
+ cur.postKeys=S.sel&&!['saldo','aus'].includes(S.sel)?[...Object.keys(D).reduce((m,yy)=>{for(const k in D[yy].p)if(k.startsWith(S.sel+'|'))m.add(k);return m},new Set())]:[];
+ $('awCh').innerHTML=chart(per,ser,{stack,lines,avgs,trends});hideTip()}
+function hideTip(){$('awTip').hidden=true;cur.target=null}
+let pt='mouse';
+function pick(i,sx,sy){const G=cur.geom;if(!G||!G.ser.length)return null;let best=null;
+ if(G.stack){let acc=0;for(const r of G.ser){const v=r.v[i];if(!(v>0))continue;if(sy<=G.y(acc)&&sy>=G.y(acc+v)){best=r;break}acc+=v}return best||G.ser[G.ser.length-1]}
+ if(!G.lines){const k=G.ser.length,j=Math.floor((sx-(G.x(i)-G.bw*k/2))/G.bw);return G.ser[Math.min(k-1,Math.max(0,j))]}
+ let d=1e9;G.ser.forEach(r=>{const v=r.v[i];if(v===null)return;const dd=Math.abs(G.y(v)-sy);if(dd<d){d=dd;best=r}});return best}
+function tipAt(e){if(e.pointerType)pt=e.pointerType;const r=e.target.closest&&e.target.closest('[data-i]'),svg=$('awCh').querySelector('svg');if(!r||!cur.tip||!svg){hideTip();return}
+ const i=+r.dataset.i,sr=svg.getBoundingClientRect(),sx=(e.clientX-sr.left)*cur.geom.W/(sr.width||cur.geom.W),sy=(e.clientY-sr.top)*cur.geom.H/(sr.height||cur.geom.H),s=pick(i,sx,sy),p=cur.per[i];
+ let hint='';cur.target=null;
+ if(s&&p&&s.v[i]!==null){const flex=(s.k||S.sel)==='flex'&&p.m!==null;cur.target=flex?{tab:'monat',y:p.y,m:p.m}:{tab:'jahr',y:p.y,m:p.m};
+  const lab=flex?'Monat '+MN[p.m]+' '+p.y:'Jahresübersicht '+p.y;hint=pt==='touch'?`<div class="go" data-go="1">${esc(s.n)}: ${lab} öffnen ›</div>`:`<div class="go">Klick: ${lab} öffnen</div>`}
+ const t=$('awTip'),b=$('awBox').getBoundingClientRect();t.classList.toggle('touch',pt==='touch');t.innerHTML=cur.tip(i)+hint;t.hidden=false;
  let x=e.clientX-b.left+14;if(x+t.offsetWidth>b.width)x=e.clientX-b.left-t.offsetWidth-14;t.style.left=Math.max(0,x)+'px';t.style.top=Math.max(0,e.clientY-b.top+10)+'px'}
+function go(t){current=new Date(t.y,t.m===null?0:t.m,1);year=t.y;if(document.body.classList.contains('mobile'))mGo(t.tab==='monat'?'mon':'jahr');else showView(t.tab)}
 window.loadAusw=()=>{const A=$('awA'),B=$('awB');if(!A.options.length)for(let y=cy-10;y<=cy+1;y++){A.add(new Option(y,y));B.add(new Option(y,y))}A.value=S.a;B.value=S.b;loadAw()};
 $('awA').onchange=$('awB').onchange=()=>{S.a=+$('awA').value;S.b=+$('awB').value;if(S.a>S.b){S.b=S.a;$('awB').value=S.b}loadAw()};
 $('awG').onclick=e=>{if(e.target.dataset.g){S.g=e.target.dataset.g;render()}};
@@ -825,8 +841,11 @@ $('awT').onclick=e=>{if(e.target.dataset.t!==undefined){S.type=e.target.dataset.
 $('awAvg').onchange=()=>{S.avg=$('awAvg').checked;render()};
 $('awKp').onclick=e=>{const b=e.target.closest('button');if(b){S.sel=S.sel===b.dataset.k?null:b.dataset.k;render()}};
 $('awCr').onclick=e=>{if(e.target.dataset.back){S.sel=null;render()}};
+$('awPosts').onclick=e=>{const a=e.target.closest('a[data-all]');if(!a)return;for(const k of cur.postKeys)S.off[k]=a.dataset.all==='0';render()};
+$('awTr').onchange=()=>{S.tr=$('awTr').checked;render()};
 $('awPosts').onchange=e=>{S.off[e.target.dataset.p]=!e.target.checked;render()};
-const bx=$('awBox');bx.addEventListener('pointermove',tipAt);bx.addEventListener('pointerdown',tipAt);bx.addEventListener('pointerleave',hideTip);
+const bx=$('awBox');bx.addEventListener('pointermove',tipAt);bx.addEventListener('pointerdown',tipAt);bx.addEventListener('pointerleave',()=>{if(pt!=='touch')hideTip()});
+bx.addEventListener('click',e=>{if(e.target.closest('[data-go]')&&cur.target)return go(cur.target);if(pt!=='touch'&&cur.target&&e.target.closest('[data-i]'))go(cur.target)});
 })();
 
 api('/api/setup-demo',{method:'POST'}).then(()=>api('/api/version')).then(v=>{$('version').textContent='Version '+v.version;load();if(window.mobApply)mobApply()}).catch(e=>{$('status').textContent='Datenbank nicht erreichbar';console.error(e)})
