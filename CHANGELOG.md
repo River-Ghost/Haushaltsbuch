@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.18
+- **Auswertungen, Handy:** Das Diagramm passt sich der Bildschirmbreite an (größere Schrift und Flächen statt einer verkleinerten Desktop-Grafik), die Ränder sind schmaler, und es wird beim Drehen neu gezeichnet.
+- **Auswertungen, Nebeneinnahmen:** Beim Aufbrechen der Einnahmen erscheinen die Nebeneinnahmen einzeln nach Art: **Dividenden, Zinsen, Sonstige Nebeneinnahmen** (statt einer Sammelzeile). Die Summe der Einnahmen bleibt gleich. Ein Klick auf diese Posten öffnet die Nebeneinnahmen.
+
 ## 0.5.17
 - **Auswertungen, Trend:** Neuer Schalter „Trend (3-Monats-Ø)“ in der Ansicht „Pro Monat“. Er zeichnet einen geglätteten Verlauf (gleitender Durchschnitt über drei Monate) als gepunktete Linie ein, bei gestapelten Posten für die Summe.
 - **Auswertungen, Sprung:** Klick auf das Diagramm öffnet die passende Übersicht. Flexible Ausgaben (Gesamtposten oder einzelne Posten) im Monatsverlauf öffnen den **Monat**, alles andere und alle Jahreswerte die **Jahresübersicht**. Am Handy erscheint dazu im Hinweisfenster ein Knopf „… öffnen ›“.
