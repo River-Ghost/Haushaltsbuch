@@ -916,6 +916,7 @@ CREATE TABLE IF NOT EXISTS sonstige_einnahmen (
     monat DATE NOT NULL,
     bezeichnung VARCHAR(120) NOT NULL,
     betrag NUMERIC(14,2) NOT NULL,
+    sortierung INTEGER NOT NULL DEFAULT 0,
     erstellt_am TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     aktualisiert_am TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT chk_se_monat CHECK (EXTRACT(DAY FROM monat) = 1),

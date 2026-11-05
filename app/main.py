@@ -19,7 +19,7 @@ MAX_UPLOAD = int(os.getenv("HB_MAX_UPLOAD", str(100 * 1024 * 1024)))
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.18"
+VERSION = "0.5.19"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -161,6 +161,11 @@ class SENew(SEBody):
 
 
 RHYTHMEN = {"monatlich": 1, "vierteljaehrlich": 3, "halbjaehrlich": 6, "jaehrlich": 12}
+
+
+class SEOrder(BaseModel):
+    monat: str = Field(pattern=r"^\d{4}-\d{2}$")
+    ids: list[UUID] = Field(max_length=500)
 
 
 class RepeatBody(BaseModel):
@@ -621,7 +626,7 @@ def se_view(monat: str = Query(..., pattern=r"^\d{4}-\d{2}$")):
         h = household(c)
         eintraege = c.execute(
             """SELECT id, bezeichnung, betrag FROM sonstige_einnahmen
-               WHERE haushalt_id=%s AND monat=%s ORDER BY erstellt_am, id""",
+               WHERE haushalt_id=%s AND monat=%s ORDER BY sortierung, erstellt_am, id""",
             (h["id"], first),
         ).fetchall()
         jahr_rows = c.execute(
@@ -660,11 +665,34 @@ def se_add(x: SENew):
         h = household(c)
         with c.transaction():
             row = c.execute(
-                """INSERT INTO sonstige_einnahmen(haushalt_id,monat,bezeichnung,betrag)
-                   VALUES(%s,%s,%s,%s) RETURNING id""",
-                (h["id"], date(year, month, 1), name, x.betrag),
+                """INSERT INTO sonstige_einnahmen(haushalt_id,monat,bezeichnung,betrag,sortierung)
+                   VALUES(%s,%s,%s,%s,
+                          (SELECT COALESCE(MAX(sortierung),0)+1 FROM sonstige_einnahmen
+                            WHERE haushalt_id=%s AND monat=%s)) RETURNING id""",
+                (h["id"], date(year, month, 1), name, x.betrag, h["id"], date(year, month, 1)),
             ).fetchone()
     return {"ok": True, "id": str(row["id"]), "art": se_art(name)}
+
+
+@app.post("/api/se-reihenfolge")
+def se_reihenfolge(x: SEOrder):
+    """Speichert die manuell sortierte Reihenfolge der Nebeneinnahmen eines Monats."""
+    year, month = parse_monat(x.monat)
+    with db() as c:
+        h = household(c)
+        with c.transaction():
+            rows = c.execute(
+                "SELECT id FROM sonstige_einnahmen WHERE haushalt_id=%s AND monat=%s",
+                (h["id"], date(year, month, 1)),
+            ).fetchall()
+            if len(set(x.ids)) != len(x.ids) or {r["id"] for r in rows} != set(x.ids):
+                raise HTTPException(400, "Die Reihenfolge passt nicht zu den Einträgen des Monats. Bitte neu laden.")
+            for i, eid in enumerate(x.ids, 1):
+                c.execute(
+                    "UPDATE sonstige_einnahmen SET sortierung=%s WHERE id=%s AND haushalt_id=%s",
+                    (i, eid, h["id"]),
+                )
+    return {"ok": True}
 
 
 @app.put("/api/se/{eintrag_id}")
@@ -721,8 +749,10 @@ def se_repeat(eintrag_id: UUID, x: RepeatBody):
                     uebersprungen.append(ziel.strftime("%Y-%m"))
                     continue
                 c.execute(
-                    "INSERT INTO sonstige_einnahmen(haushalt_id,monat,bezeichnung,betrag) VALUES(%s,%s,%s,0)",
-                    (h["id"], ziel, e["bezeichnung"]),
+                    """INSERT INTO sonstige_einnahmen(haushalt_id,monat,bezeichnung,betrag,sortierung)
+                       VALUES(%s,%s,%s,0,(SELECT COALESCE(MAX(sortierung),0)+1 FROM sonstige_einnahmen
+                                           WHERE haushalt_id=%s AND monat=%s))""",
+                    (h["id"], ziel, e["bezeichnung"], h["id"], ziel),
                 )
                 angelegt.append(ziel.strftime("%Y-%m"))
     return {"ok": True, "angelegt": angelegt, "uebersprungen": uebersprungen}

@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.19
+- **Nebeneinnahmen:** Die Zeilen in „Einträge im Monat“ lassen sich per Ziehen am Griff (⠿ links) **manuell umsortieren**, mit Maus und Finger. Die Reihenfolge wird pro Monat gespeichert. Neue Einträge kommen ans Ende. Neu: Migration 008 (Spalte `sortierung`, bestehende Einträge behalten ihre bisherige Reihenfolge), neue Schnittstelle `POST /api/se-reihenfolge`. Sicherungen älterer Versionen lassen sich weiter wiederherstellen.
+- **Auswertungen:** Bei den Ø-Linien pro Jahr steht der Wert klein am rechten Ende der Linie.
+
 ## 0.5.18
 - **Auswertungen, Handy:** Das Diagramm passt sich der Bildschirmbreite an (größere Schrift und Flächen statt einer verkleinerten Desktop-Grafik), die Ränder sind schmaler, und es wird beim Drehen neu gezeichnet.
 - **Auswertungen, Nebeneinnahmen:** Beim Aufbrechen der Einnahmen erscheinen die Nebeneinnahmen einzeln nach Art: **Dividenden, Zinsen, Sonstige Nebeneinnahmen** (statt einer Sammelzeile). Die Summe der Einnahmen bleibt gleich. Ein Klick auf diese Posten öffnet die Nebeneinnahmen.
