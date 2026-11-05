@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.20
+- **Behoben (Nebeneinnahmen):** Das Umsortieren per Griff (⠿) funktioniert jetzt zuverlässig und lässt sich mehrfach hintereinander nutzen. Während des Ziehens wird keine Text-Markierung mehr ausgelöst, die Bewegung wird am ganzen Fenster verfolgt.
+- Geändert (Auswertungen): Die Ø-Werte an den Linien sind kleiner.
+
 ## 0.5.19
 - **Nebeneinnahmen:** Die Zeilen in „Einträge im Monat“ lassen sich per Ziehen am Griff (⠿ links) **manuell umsortieren**, mit Maus und Finger. Die Reihenfolge wird pro Monat gespeichert. Neue Einträge kommen ans Ende. Neu: Migration 008 (Spalte `sortierung`, bestehende Einträge behalten ihre bisherige Reihenfolge), neue Schnittstelle `POST /api/se-reihenfolge`. Sicherungen älterer Versionen lassen sich weiter wiederherstellen.
 - **Auswertungen:** Bei den Ø-Linien pro Jahr steht der Wert klein am rechten Ende der Linie.

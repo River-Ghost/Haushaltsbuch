@@ -49,7 +49,7 @@ th{height:26px;padding:2px 8px}
 .sebez{padding:0}.se-b{width:100%;border:0;height:var(--row-h);padding:0 8px;font:inherit;font-size:13px;background:transparent;outline:none}
 .se-b:focus{background:#fffde8;box-shadow:inset 0 0 0 2px #c9a227}
 #seTable .ycell{width:112px;min-width:112px}.se-art{padding:0 8px;color:var(--muted);font-size:12px;white-space:nowrap;width:86px}.se-x{width:34px;text-align:center}
-#seTable th,#seYear th{position:static}.se-h{width:24px;min-width:24px;padding:0;text-align:center;color:var(--muted);cursor:grab;user-select:none;touch-action:none;font-size:16px}#seTable tr.dragging{background:#eef2f6;box-shadow:0 2px 10px rgba(15,23,42,.25);position:relative;z-index:2}#seTable tr.dragging .se-h{cursor:grabbing}.se-mon{padding:2px 8px;font-weight:650}
+#seTable th,#seYear th{position:static}.se-h{width:24px;min-width:24px;padding:0;text-align:center;color:var(--muted);cursor:grab;user-select:none;touch-action:none;font-size:16px}body.se-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}#seTable tr.dragging{background:#eef2f6;box-shadow:0 2px 10px rgba(15,23,42,.25);position:relative;z-index:2}#seTable tr.dragging .se-h{cursor:grabbing}.se-mon{padding:2px 8px;font-weight:650}
 .seyr{cursor:pointer}.seyr:hover td{background:#f1f5f9}.seyr.cur td{background:#fff7d6}
 
 /* Marke mit Icon, Dialog (0.5.0) */
@@ -641,16 +641,23 @@ function seCommit(row){return enqueue(async()=>{
   else{flash('seStatus','Speichere …');await put(`/api/se/${id}`,{bezeichnung:bez,betrag:amt.toFixed(2)});aEl.value=fmtz(amt)}
   await refreshSE();flash('seStatus','Gespeichert',1200)}
  catch(err){flash('seStatus','Fehler beim Speichern');alert('Speichern fehlgeschlagen: '+err.message)}})}
-(function initSEDrag(){const t=$('seTable');
- t.addEventListener('pointerdown',e=>{const h=e.target.closest('td.se-h');if(!h)return;const tr=h.closest('tr');if(!tr||!tr.dataset.id)return;e.preventDefault();h.setPointerCapture&&h.setPointerCapture(e.pointerId);tr.classList.add('dragging');
-  const body=tr.parentElement,rows=()=>[...body.querySelectorAll('tr[data-id]')].filter(r=>r.dataset.id&&r!==tr);
-  const move=ev=>{for(const r of rows()){const b=r.getBoundingClientRect();if(ev.clientY>=b.top&&ev.clientY<=b.bottom){if(ev.clientY<b.top+b.height/2)r.before(tr);else r.after(tr);break}}};
-  const up=async()=>{h.removeEventListener('pointermove',move);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);tr.classList.remove('dragging');
-   const ids=[...body.querySelectorAll('tr[data-id]')].map(r=>r.dataset.id).filter(Boolean),alt=semodel.eintraege.map(x=>x.id);
-   if(ids.join()===alt.join())return;
-   try{await api('/api/se-reihenfolge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({monat:ym(),ids})});semodel.eintraege.sort((a,b)=>ids.indexOf(a.id)-ids.indexOf(b.id))}
-   catch(err){alert('Reihenfolge nicht gespeichert: '+err.message);loadSE()}};
-  h.addEventListener('pointermove',move);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)})})();
+(function initSEDrag(){const t=$('seTable');let drag=null;
+ t.addEventListener('mousedown',e=>{if(e.target.closest('td.se-h'))e.preventDefault()});
+ t.addEventListener('pointerdown',e=>{if(e.button>0)return;const h=e.target.closest('td.se-h');if(!h)return;const tr=h.closest('tr');if(!tr||!tr.dataset.id)return;e.preventDefault();
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  drag={tr,body:tr.parentElement,id:e.pointerId};tr.classList.add('dragging');document.body.classList.add('se-dragging')});
+ document.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;e.preventDefault();
+  for(const r of drag.body.querySelectorAll('tr[data-id]')){if(!r.dataset.id||r===drag.tr)continue;const b=r.getBoundingClientRect();
+   if(e.clientY>=b.top&&e.clientY<=b.bottom){if(e.clientY<b.top+b.height/2)r.before(drag.tr);else r.after(drag.tr);break}}},{passive:false});
+ const end=async e=>{if(!drag||e.pointerId!==drag.id)return;const {tr,body}=drag;drag=null;tr.classList.remove('dragging');document.body.classList.remove('se-dragging');
+  if(window.getSelection)getSelection().removeAllRanges();
+  const ids=[...body.querySelectorAll('tr[data-id]')].map(r=>r.dataset.id).filter(Boolean),alt=semodel.eintraege.map(x=>x.id);
+  if(ids.join()===alt.join())return;
+  try{await api('/api/se-reihenfolge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({monat:ym(),ids})});semodel.eintraege.sort((x,y)=>ids.indexOf(x.id)-ids.indexOf(y.id))}
+  catch(err){alert('Reihenfolge nicht gespeichert: '+err.message);loadSE()}};
+ document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);
+ document.addEventListener('selectstart',e=>{if(drag)e.preventDefault()});
+})();
 (function initSEEvents(){const tb=$('seTable');
  tb.addEventListener('change',e=>{const row=e.target.closest('tr[data-id]');if(row&&e.target.matches('input'))seCommit(row)});
  tb.addEventListener('input',e=>{const row=e.target.closest('tr[data-id]'),body=row&&row.parentElement;if(row&&!row.dataset.id&&row===body.lastElementChild)body.insertAdjacentHTML('beforeend',seRow(null))});
@@ -799,7 +806,7 @@ function chart(per,ser,o){const bw0=$('awBox').clientWidth,W=bw0>0?Math.max(320,
  else if(o.lines)ser.forEach(r=>{let d='',pen=false;r.v.forEach((v,i)=>{if(v===null){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});g+=`<path d="${d}" fill="none" stroke="${r.c}" stroke-width="2" stroke-linejoin="round"/>`;if(n<=14)r.v.forEach((v,i)=>{if(v!==null)g+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${r.c}"/>`})});
  else{const k=ser.length,bw=Math.max(3,Math.min(20,cw*.8/k));per.forEach((p,i)=>ser.forEach((r,j)=>{const v=r.v[i];if(v===null)return;g+=`<rect x="${x(i)-bw*k/2+j*bw}" y="${v>=0?y(v):y(0)}" width="${Math.max(1,bw-1)}" height="${Math.abs(y(v)-y(0))}" rx="1.5" fill="${r.c}"/>`}))}
  (o.trends||[]).forEach(t=>{let d='',pen=false;t.v.forEach((v,i)=>{if(v===null){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});g+=`<path d="${d}" fill="none" stroke="${t.c}" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="0.1 7" opacity=".85"/>`});
- (o.avgs||[]).forEach(a=>{g+=`<line x1="${x(a.i0)-cw/2}" x2="${x(a.i1)+cw/2}" y1="${y(a.v)}" y2="${y(a.v)}" stroke="${a.c}" stroke-width="1.6" stroke-dasharray="6 4"/><text x="${x(a.i1)+cw/2-3}" y="${y(a.v)-3}" text-anchor="end" font-size="10" fill="${a.c}" opacity=".9" paint-order="stroke" stroke="#fff" stroke-width="3" stroke-linejoin="round">Ø ${Math.round(a.v).toLocaleString('de-DE')}</text>`});
+ (o.avgs||[]).forEach(a=>{g+=`<line x1="${x(a.i0)-cw/2}" x2="${x(a.i1)+cw/2}" y1="${y(a.v)}" y2="${y(a.v)}" stroke="${a.c}" stroke-width="1.6" stroke-dasharray="6 4"/><text x="${x(a.i1)+cw/2-3}" y="${y(a.v)-3}" text-anchor="end" font-size="8" fill="${a.c}" opacity=".85" paint-order="stroke" stroke="#fff" stroke-width="2.5" stroke-linejoin="round">Ø ${Math.round(a.v).toLocaleString('de-DE')}</text>`});
  per.forEach((p,i)=>{g+=`<rect data-i="${i}" x="${x(i)-cw/2}" y="${T}" width="${cw}" height="${H-T-B}" fill="transparent"/>`});
  cur.per=per;cur.geom={y,x,cw,ser,stack:!!o.stack,lines:!!o.lines,bw:Math.max(3,Math.min(20,cw*.8/(ser.length||1))),H,W};
  cur.tip=i=>{const p=per[i],rows=ser.filter(r=>r.v[i]!==null).map(r=>`<div><i style="background:${r.c}"></i>${esc(r.n)}<span>${nf(r.v[i])}</span></div>`).join('');
