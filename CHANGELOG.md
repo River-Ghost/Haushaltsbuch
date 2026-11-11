@@ -1,5 +1,12 @@
 # Änderungen
 
+## 0.5.21
+- **Auswertungen, Cash Position:** Neue siebte Kennzahl „Cash Position (aufsummiert)“. Sie zeigt den Saldo aufsummiert ab Beginn des gewählten Zeitraums; ein Klick zeigt den aufsummierten Verlauf.
+- **Auswertungen, Vorjahr:** Neuer Schalter „Vorjahr“ (Ansicht „Pro Monat“): derselbe Monat des Vorjahres als blasse Linie, die Werte stehen im Hinweisfenster.
+- **Auswertungen, Hochrechnung:** Neuer Schalter „Hochrechnung“: das laufende Jahr wird mit dem Ø der abgeschlossenen Monate bis Dezember hochgerechnet (gestrichelt; pro Jahr als Umriss-Säule).
+- **Optionen:** „Vorjahresvergleich anbieten“ und „Hochrechnung zum Jahresende anbieten“ schalten die beiden Schalter ganz ein oder aus.
+- **Handy, Erfassen:** Nach dem Speichern erscheint ein Knopf **Rückgängig** (stellt Betrag und Notiz wieder her). Die Kategorie-Knöpfe sind in zwei gleich breiten Spalten angeordnet.
+
 ## 0.5.20
 - **Behoben (Nebeneinnahmen):** Das Umsortieren per Griff (⠿) funktioniert jetzt zuverlässig und lässt sich mehrfach hintereinander nutzen. Während des Ziehens wird keine Text-Markierung mehr ausgelöst, die Bewegung wird am ganzen Fenster verfolgt.
 - Geändert (Auswertungen): Die Ø-Werte an den Linien sind kleiner.
