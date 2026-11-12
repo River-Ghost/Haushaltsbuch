@@ -159,6 +159,7 @@ body.opt-hlrow #monthTable tbody tr:has(input:focus) td,body.opt-hlrow #yearTabl
 
 /* Runde 8 (0.5.10): Datensicherung in den Optionen */
 .modal-box{max-height:calc(100vh - 32px);overflow:auto}
+.opt-grp{font-weight:700;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px}
 .opt-sep{border-top:1px solid var(--line);margin:16px 0 12px}.opt-head{font-weight:700;font-size:14px;margin-bottom:2px}
 .bk-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}a.btn{text-decoration:none;color:inherit;display:inline-flex;align-items:center}
 .bk-msg{margin-top:10px;font-size:13px;padding:8px 10px;border-radius:8px;background:#eef2f6;line-height:1.45}
@@ -182,7 +183,7 @@ body.mobile.m-se #mob{display:none}
 .mnav{display:flex;align-items:center;gap:8px;margin-bottom:10px}.mnav h1{flex:1;margin:0}
 .mnav .btn{min-width:44px;height:40px;font-size:16px}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
-.chip{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:22px;background:#fff;font:inherit;font-size:15px;color:var(--text)}
+.chip{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1.5px solid #aab6c6;box-shadow:0 1px 2px rgba(15,23,42,.12);border-radius:22px;background:#fff;font:inherit;font-size:15px;color:var(--text)}
 .chip.on{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:650}
 .hid-date{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .mlabel{font-weight:650;font-size:13px;color:var(--muted);margin-top:8px}
@@ -294,11 +295,14 @@ body.mobile.m-se #mob{display:none}
 <div id="mSheet" class="msheet" hidden><div class="msheet-box" role="dialog" aria-modal="true" aria-labelledby="mSheetTitle"><h2 id="mSheetTitle"></h2><div id="mSheetBody"></div><div class="modal-actions"><button class="btn go" id="mSheetClose">Fertig</button></div></div></div>
 <div id="optModal" class="modal" hidden><div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="optTitle">
 <h2 id="optTitle">Optionen</h2><div class="sub">Die Einstellungen gelten für diesen Browser.</div>
+<div class="opt-grp">Monat und Jahr (Tabellen)</div>
 <label class="opt"><input type="checkbox" id="optHlRow"><span>Zeile mit dem Cursor hervorheben</span></label>
 <label class="opt"><input type="checkbox" id="optHlHead"><span>Spalten- und Zeilenüberschrift beim Darüberfahren hervorheben</span></label>
+<div class="opt-grp">Jahr</div>
 <label class="opt"><input type="checkbox" id="optCards"><span>Kennzahlen in der Jahresübersicht anzeigen</span></label>
-<label class="opt"><input type="checkbox" id="optPrev"><span>Auswertungen: Vorjahresvergleich anbieten</span></label>
-<label class="opt"><input type="checkbox" id="optFc"><span>Auswertungen: Hochrechnung zum Jahresende anbieten</span></label>
+<div class="opt-grp">Auswertungen</div>
+<label class="opt"><input type="checkbox" id="optPrev"><span>Vorjahresvergleich anbieten (Schalter „Vorjahr“)</span></label>
+<label class="opt"><input type="checkbox" id="optFc"><span>Hochrechnung zum Jahresende anbieten (Schalter „Hochrechnung“)</span></label>
 <div class="opt-sep"></div>
 <div class="opt-head">Datensicherung</div>
 <div class="sub">Eine Sicherung enthält alle Daten. Du kannst sie auf einem anderen Haushaltsbuch, auch auf einem zweiten Server, wieder einspielen.</div>

@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.22
+- **Optionen:** Die Einstellungen sind nach Ansicht gruppiert: „Monat und Jahr (Tabellen)“, „Jahr“ und „Auswertungen“.
+- **Handy, Erfassen:** Kategorie- und Datum-Knöpfe heben sich durch kräftigeren Rand und leichten Schatten besser vom Hintergrund ab.
+
 ## 0.5.21
 - **Auswertungen, Cash Position:** Neue siebte Kennzahl „Cash Position (aufsummiert)“. Sie zeigt den Saldo aufsummiert ab Beginn des gewählten Zeitraums; ein Klick zeigt den aufsummierten Verlauf.
 - **Auswertungen, Vorjahr:** Neuer Schalter „Vorjahr“ (Ansicht „Pro Monat“): derselbe Monat des Vorjahres als blasse Linie, die Werte stehen im Hinweisfenster.
