@@ -1,5 +1,8 @@
 # Änderungen
 
+## 0.5.23
+- **Behoben (Auswertungen):** In den gestapelten Säulen (alle vier Gruppen beim Aufbrechen) lag der erste Posten bisher unten, im Hinweisfenster und in der Postenliste aber oben. Jetzt steht der erste Posten in der Säule **oben**, die Reihenfolge ist überall gleich. Das gilt auch für den Klick auf ein Säulenstück.
+
 ## 0.5.22
 - **Optionen:** Die Einstellungen sind nach Ansicht gruppiert: „Monat und Jahr (Tabellen)“, „Jahr“ und „Auswertungen“.
 - **Handy, Erfassen:** Kategorie- und Datum-Knöpfe heben sich durch kräftigeren Rand und leichten Schatten besser vom Hintergrund ab.
