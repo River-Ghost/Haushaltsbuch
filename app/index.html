@@ -229,8 +229,8 @@ body.mobile.m-se #mob{display:none}
 .aw-seg button.on{background:var(--nav);color:#fff;font-weight:650}
 .aw-bar label{display:flex;gap:6px;align-items:center}
 .aw-kp{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:10px}
-.aw-kp button{text-align:left;background:#fff;border:2px solid transparent;border-radius:10px;padding:7px 10px;box-shadow:var(--shadow);font:inherit;color:var(--text);cursor:pointer}
-.aw-kp button.sel{border-color:#4f6b8a;background:#eef2f6}
+.aw-kp button{text-align:left;background:#fff;border:1.5px solid #b5c0cf;border-left:5px solid var(--c,#b5c0cf);border-radius:10px;padding:7px 10px;box-shadow:var(--shadow);font:inherit;color:var(--text);cursor:pointer}
+.aw-kp button.sel{border-color:#4f6b8a;border-left-color:var(--c,#4f6b8a);background:#d5e0ec;box-shadow:0 0 0 1px #4f6b8a}
 .aw-kp small{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}.aw-kp i{width:9px;height:9px;border-radius:2px;display:inline-block}
 .aw-kp .v{font-weight:700;font-variant-numeric:tabular-nums}.aw-kp .a{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .aw-crumb{min-height:24px;margin:4px 0 8px;font-size:14px}.aw-crumb a{cursor:pointer;text-decoration:underline}
@@ -838,12 +838,13 @@ function render(){const ys=Object.keys(D).map(Number).filter(y=>y>=S.a&&y<=S.b).
  document.querySelectorAll('#awT button').forEach(b=>b.classList.toggle('on',b.dataset.t===S.type));
  $('awAvg').checked=S.avg&&S.g==='m';$('awAvg').disabled=S.g!=='m';$('awAvgL').title=S.g==='m'?'':'Nur in der Ansicht „Pro Monat“';$('awTr').checked=S.tr&&S.g==='m';$('awTr').disabled=S.g!=='m';$('awTrL').title=S.g==='m'?'Geglätteter Verlauf: gleitender Durchschnitt über drei Monate':'Nur in der Ansicht „Pro Monat“';
  $('awPvL').hidden=!getOpt('prev');$('awFcL').hidden=!getOpt('fc');$('awPv').checked=S.pv&&S.g==='m';$('awPv').disabled=S.g!=='m';$('awPvL').title=S.g==='m'?'Blasse Linie: derselbe Monat im Vorjahr':'Nur in der Ansicht „Pro Monat“';
+ $('awAvgL').hidden=S.g!=='m';$('awTrL').hidden=S.g!=='m';$('awPvL').hidden=!getOpt('prev')||S.g!=='m';$('awFcL').hidden=!getOpt('fc')||!hasCy||cm===0;
  $('awFc').checked=S.fc&&hasCy;$('awFc').disabled=!hasCy||cm===0;$('awFcL').title=hasCy?'Rechnet das laufende Jahr mit dem Ø der abgeschlossenen Monate bis Dezember hoch (gestrichelt)':'Der Zeitraum enthält das laufende Jahr nicht';
  const cashM={},cashY={};let run=0;ys.forEach(yy=>{cashM[yy]=arr('saldo',yy).map((v,m)=>live(yy,m)?(run+=v):null);cashY[yy]=yy>cy?null:run});
  const val=(k,p)=>k==='cash'?(p.m===null?cashY[p.y]:cashM[p.y][p.m]):pv(arr(k,p.y),p);
  const hasData=yy=>D[yy]&&sum(D[yy].g.ein)+sum(D[yy].g.fix)+sum(D[yy].g.flex)>0;
  const tot=k=>k==='cash'?run:ys.reduce((s,yy)=>s+sum(arr(k,yy).filter((_,m)=>live(yy,m))),0);
- $('awKp').innerHTML=['ein','fix','flex','spar','saldo','aus','cash'].map(k=>{const a=avgAll(k);return `<button data-k="${k}" class="${S.sel===k?'sel':''}"><small><i style="background:${GC[k]}"></i>${GN[k]}</small><div class="v">${nf(tot(k))}</div><div class="a">${k==='cash'?'Saldo summiert seit '+S.a:'Ø '+(a===null?'–':nf(a))+' pro Monat'}</div></button>`}).join('');
+ $('awKp').innerHTML=['ein','fix','flex','spar','saldo','aus','cash'].map(k=>{const a=avgAll(k);return `<button data-k="${k}" style="--c:${GC[k]}" class="${S.sel===k?'sel':''}"><small><i style="background:${GC[k]}"></i>${GN[k]}</small><div class="v">${nf(tot(k))}</div><div class="a">${k==='cash'?'Saldo summiert seit '+S.a:'Ø '+(a===null?'–':nf(a))+' pro Monat'}</div></button>`}).join('');
  const avgs=[],wantAvg=S.avg&&S.g==='m',mk=(a,c)=>{ys.forEach(yy=>{const v=avgY(a(yy),yy);if(v!==null){const i0=per.findIndex(p=>p.y===yy);avgs.push({c,v,i0,i1:i0+11})}})};
  let ser,stack=false,vis=[],pvTotal=null;$('awPosts').innerHTML='';
  const pprev=(k,p)=>{const d=D[p.y-1];return d&&hasData(p.y-1)&&p.m!==null?d.g[k][p.m]:null};

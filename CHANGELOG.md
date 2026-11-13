@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.24
+- **Auswertungen:** Die Schalter „Ø-Linien pro Jahr“, „Trend (3-Monats-Ø)“, „Vorjahr“ und „Hochrechnung“ erscheinen nur noch, wenn sie in der aktuellen Ansicht auch wählbar sind (Ø, Trend und Vorjahr nur in „Pro Monat“; Vorjahr und Hochrechnung zusätzlich nur, wenn die Option eingeschaltet ist; Hochrechnung nur, wenn der Zeitraum das laufende Jahr enthält).
+- **Auswertungen:** Die Kennzahl-Knöpfe heben sich besser ab (kräftigerer Rand, farbiger Streifen links, deutlichere Markierung der Auswahl).
+
 ## 0.5.23
 - **Behoben (Auswertungen):** In den gestapelten Säulen (alle vier Gruppen beim Aufbrechen) lag der erste Posten bisher unten, im Hinweisfenster und in der Postenliste aber oben. Jetzt steht der erste Posten in der Säule **oben**, die Reihenfolge ist überall gleich. Das gilt auch für den Klick auf ein Säulenstück.
 
