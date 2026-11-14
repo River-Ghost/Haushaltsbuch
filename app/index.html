@@ -266,7 +266,7 @@ body.mobile.m-se #mob{display:none}
 <label id="awAvgL"><input type="checkbox" id="awAvg"> Ø-Linien pro Jahr</label><label id="awTrL"><input type="checkbox" id="awTr"> Trend (3-Monats-Ø)</label><label id="awPvL"><input type="checkbox" id="awPv"> Vorjahr</label><label id="awFcL"><input type="checkbox" id="awFc"> Hochrechnung</label></div>
 <div class="aw-kp" id="awKp"></div><div class="aw-crumb" id="awCr"></div>
 <div class="aw-main"><div id="awBox"><div id="awCh"></div><div class="awtip" id="awTip" hidden></div></div><div id="awPosts"></div></div>
-<div class="sub" style="margin-top:8px">Ø = Durchschnitt über die abgeschlossenen Monate (laufender Monat zählt nicht mit). Hochrechnung: im laufenden Monat nur noch offene Beträge, danach der erwartete Betrag; monatliche Posten monatlich, vierteljährliche und jährliche Zahlungen nur in den Monaten, in denen sie nach dem bisherigen Rhythmus fällig sind. Saldo = Einnahmen − Fixe − Flexible Ausgaben − Sparen/Vermögen.</div>
+<div class="sub" style="margin-top:8px">Ø = Durchschnitt über die abgeschlossenen Monate (laufender Monat zählt nicht mit). Hochrechnung: im laufenden Monat nur noch offene Beträge, danach der erwartete Betrag; monatliche Posten monatlich, vierteljährliche und jährliche Zahlungen nur in den Monaten, in denen sie nach dem bisherigen Rhythmus fällig sind. Dividenden und Zinsen: Vorjahresmonat als Vorlage; sonstige Nebeneinnahmen werden nicht hochgerechnet. Saldo = Einnahmen − Fixe − Flexible Ausgaben − Sparen/Vermögen.</div>
 </div>
 <div id="viewSE" hidden>
 <button class="btn mback" onclick="mBack()">‹ Zurück</button>
@@ -794,7 +794,8 @@ let S={a:cy-1,b:cy,g:'y',sel:null,type:'',avg:false,tr:false,pv:false,fc:false,o
 function pv(a,p){return p.m===null?(p.y>cy?null:sum(a.filter((_,m)=>live(p.y,m)))):(live(p.y,p.m)?a[p.m]:null)}
 function avgY(a,y){const d=a.filter((_,m)=>done(y,m));return d.length?sum(d)/d.length:null}
 /* Hochrechnung je Posten: laufender Monat = nur noch Offenes, Folgemonate = erwarteter Betrag nach Rhythmus */
-function fcPost(a,pa,grp){const n=cm,out=z();if(n===0)return out;
+function fcPost(a,pa,grp,mode){const n=cm,out=z();if(n===0)return out;
+ if(mode==='prev'){const bk=a[cm]||0;for(let m=cm;m<12;m++){const e=pa?(pa[m]||0):0;out[m]=m===cm?(bk>0?0:e):e}return out}
  const t=(pa||z()).concat(a.slice(0,n)),L=pa?12:n,w=t.slice(t.length-L),nz=w.filter(v=>v>0);if(!nz.length)return out;
  const share=nz.length/L,last=nz[nz.length-1],mean=sum(w)/L,booked=a[cm]||0;
  const put=(m,e)=>{out[m]=m===cm?(grp==='flex'?Math.max(e-booked,0):(booked>0?0:e)):e};
@@ -879,7 +880,7 @@ function render(){const ys=Object.keys(D).map(Number).filter(y=>y>=S.a&&y<=S.b).
   $('awPosts').innerHTML=posts.length?'<div class="awall"><a data-all="1">Alle</a> · <a data-all="0">Keine</a></div>'+posts.map(p=>`<label><input type="checkbox" data-p="${esc(p.k)}" ${S.off[p.k]?'':'checked'}><i style="background:${p.c}"></i>${esc(p.n)}</label>`).join(''):'Keine Posten.';
  }
  if(fcOn){const Fp={},Fg={ein:z(),fix:z(),flex:z(),spar:z()};
-  for(const key in D[cy].p){const e=D[cy].p[key],pe=D[cy-1]&&hasData(cy-1)?D[cy-1].p[key]:null;Fp[key]=fcPost(e.v,pe?pe.v:null,e.k);Fp[key].forEach((f,m)=>{Fg[e.k][m]+=f})}
+  for(const key in D[cy].p){const e=D[cy].p[key],pe=D[cy-1]&&hasData(cy-1)?D[cy-1].p[key]:null;Fp[key]=key==='ein|se_sonst'?z():fcPost(e.v,pe?pe.v:null,e.k,(key==='ein|se_div'||key==='ein|se_zins')?'prev':null);Fp[key].forEach((f,m)=>{Fg[e.k][m]+=f})}
   Fg.aus=Fg.fix.map((v,m)=>v+Fg.flex[m]);Fg.saldo=Fg.ein.map((v,m)=>v-Fg.fix[m]-Fg.flex[m]-Fg.spar[m]);
   const fvP=a=>per.map(p=>p.y!==cy?0:p.m===null?sum(a.slice(cm)):(p.m>=cm?a[p.m]:0));
   if(!S.sel||SINGLE.includes(S.sel)){ser.forEach(r=>{if(r.k!=='cash')r.fv=fvP(Fg[r.k])})}

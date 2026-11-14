@@ -25,7 +25,8 @@ Anwendung werden geladen und gebaut).
 
 Am Ende steht die Adresse der Weboberfläche da, z. B. `http://192.168.178.50:8080`.
 
-- Das Root-Passwort des Containers liegt in `/root/haushaltsbuch-<CT-ID>.creds` auf dem Proxmox-Host.
+- Das Root-Passwort des Containers legst du bei der Installation selbst fest (mindestens 8 Zeichen, mit Wiederholung). Lässt du das Feld leer, wird ein zufälliges Passwort erzeugt und in `/root/haushaltsbuch-<CT-ID>.creds` auf dem Proxmox-Host gespeichert. Ein selbst festgelegtes Passwort steht nicht in dieser Datei.
+- Anmelden: In Proxmox über Container → Konsole (Benutzer `root`) oder auf dem Host mit `pct enter <CT-ID>`.
 - Die Datenbank-Zugangsdaten werden zufällig erzeugt und liegen nur im Container in `/opt/haushaltsbuch/.env`.
 - Bei DHCP die IP-Adresse im Router reservieren, damit sie sich nicht ändert.
 - Ein vorhandener Nginx kann später davor geschaltet werden (Proxy-Ziel `http://<IP>:8080`,

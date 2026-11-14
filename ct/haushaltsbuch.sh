@@ -62,6 +62,43 @@ choose() { # choose VARIABLE "Text" tag1 "Beschreibung1" tag2 "Beschreibung2" ..
   printf -v "$__v" '%s' "$__r"
 }
 
+random_password() { local p; p="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24 || true)"; [[ -n "$p" ]] || die "Konnte kein Passwort erzeugen."; printf '%s' "$p"; }
+
+# Root-Passwort des Containers: selbst festlegen (mind. 8 Zeichen) oder leer lassen = zufällig.
+ROOT_PASSWORD=""; PW_SET=0
+ask_password() {
+  local p1 p2 t1="Root-Passwort für den Container festlegen (mindestens 8 Zeichen).\nLeer lassen = zufälliges Passwort, das in /root/haushaltsbuch-<CT-ID>.creds gespeichert wird."
+  # Für unbeaufsichtigte Installationen: HB_ROOT_PASSWORD=... setzen (mindestens 8 Zeichen).
+  if [[ -n "${HB_ROOT_PASSWORD:-}" ]]; then
+    ((${#HB_ROOT_PASSWORD} >= 8)) || die "HB_ROOT_PASSWORD ist zu kurz (mindestens 8 Zeichen)."
+    ROOT_PASSWORD="$HB_ROOT_PASSWORD"; PW_SET=1; return
+  fi
+  while true; do
+    if ((USE_TUI)); then
+      p1=$(whiptail --backtitle "$BACKTITLE" --title "$APP" --passwordbox "$t1" 12 72 3>&1 1>&2 2>&3) || cancelled
+    else
+      printf '%b\n' "$t1"; read -r -s -p "Passwort: " p1 || p1=""; echo
+    fi
+    if [[ -z "$p1" ]]; then ROOT_PASSWORD="$(random_password)"; PW_SET=0; return; fi
+    if ((${#p1} < 8)); then
+      msg_warn "Das Passwort ist zu kurz (mindestens 8 Zeichen)."
+      ((USE_TUI)) && whiptail --msgbox "Das Passwort ist zu kurz (mindestens 8 Zeichen)." 8 60 || true
+      continue
+    fi
+    if ((USE_TUI)); then
+      p2=$(whiptail --backtitle "$BACKTITLE" --title "$APP" --passwordbox "Passwort zur Kontrolle noch einmal eingeben:" 10 60 3>&1 1>&2 2>&3) || cancelled
+    else
+      read -r -s -p "Passwort wiederholen: " p2 || cancelled; echo
+    fi
+    if [[ "$p1" != "$p2" ]]; then
+      msg_warn "Die Passwörter stimmen nicht überein."
+      ((USE_TUI)) && whiptail --msgbox "Die Passwörter stimmen nicht überein." 8 60 || true
+      continue
+    fi
+    ROOT_PASSWORD="$p1"; PW_SET=1; return
+  done
+}
+
 confirm() { # confirm "Text"  -> 0 = ja
   if ((USE_TUI)); then
     whiptail --backtitle "$BACKTITLE" --title "$APP" --yesno "$1" 22 76
@@ -193,6 +230,7 @@ summary() {
   Netzwerk:     ${net} (${BRIDGE}${VLAN:+, VLAN ${VLAN}})
   CPU / RAM:    ${CORES} Kerne / ${RAM} MiB
   Festplatte:   ${DISK} GB auf ${CONTAINER_STORAGE}
+  Root-Passwort: $( ((PW_SET)) && echo 'von dir festgelegt' || echo 'zufällig erzeugt (steht in der .creds-Datei)')
   Version:      ${APP} ${APP_VERSION}\n
 Installation starten?" || cancelled
 }
@@ -218,8 +256,7 @@ create_container() {
   local net0="name=eth0,bridge=${BRIDGE}"
   if [[ "$NETMODE" == static ]]; then net0+=",ip=${IP},gw=${GATEWAY}"; else net0+=",ip=dhcp"; fi
   [[ -n "$VLAN" ]] && net0+=",tag=${VLAN}"
-  ROOT_PASSWORD="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 24 || true)"
-  [[ -n "$ROOT_PASSWORD" ]] || die "Konnte kein Passwort erzeugen."
+  [[ -n "$ROOT_PASSWORD" ]] || ROOT_PASSWORD="$(random_password)"
   local -a args=(
     "$CTID" "${TEMPLATE_STORAGE}:vztmpl/${TEMPLATE}"
     --hostname "$HOSTNAME_CT" --cores "$CORES" --memory "$RAM" --swap "$SWAP"
@@ -279,7 +316,7 @@ Haushaltsbuch – Zugangsdaten
 Erstellt:     $(date '+%Y-%m-%d %H:%M:%S %z')
 Container:    ${CTID} (${HOSTNAME_CT})
 Weboberfläche: http://${IP_ADDR}:${APP_PORT}
-Root-Passwort des Containers: ${ROOT_PASSWORD}
+Root-Passwort des Containers: $( ((PW_SET)) && echo '(von dir bei der Installation festgelegt)' || echo "${ROOT_PASSWORD}")
 
 Die Datenbank-Zugangsdaten liegen nur im Container: /opt/haushaltsbuch/.env
 CRED
@@ -343,6 +380,7 @@ main() {
     advanced) set_defaults; advanced_settings ;;
   esac
   validate
+  ask_password
   summary
   find_template
   create_container

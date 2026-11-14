@@ -1,5 +1,9 @@
 # Änderungen
 
+## 0.5.26
+- **Installer:** Das Root-Passwort des Containers kann jetzt bei der Installation selbst festgelegt werden (mindestens 8 Zeichen, mit Wiederholung). Leer lassen erzeugt wie bisher ein zufälliges Passwort in `/root/haushaltsbuch-<ID>.creds`. Ein selbst festgelegtes Passwort wird nicht in diese Datei geschrieben. Für unbeaufsichtigte Installationen: Umgebungsvariable `HB_ROOT_PASSWORD`.
+- **Auswertungen, Hochrechnung:** „Sonstige Nebeneinnahmen“ werden nicht mehr hochgerechnet. **Dividenden und Zinsen** nehmen den Vorjahresmonat als Vorlage (im laufenden Monat nur, wenn noch nichts gebucht ist).
+
 ## 0.5.25
 - **Auswertungen, Hochrechnung:** Bei Säulen werden jetzt **Säulen** statt Linien verwendet (blass und gestrichelt, oben auf den bisherigen Werten gestapelt). Im laufenden Monat wird nur noch der **offene** Teil hochgerechnet: schon gebuchte feste Posten zählen nicht noch einmal, bei flexiblen Ausgaben wird nur der Rest bis zum Durchschnitt aufgesetzt.
 - **Zahlungsrhythmus:** Monatliche Posten werden monatlich fortgeschrieben (letzter Betrag, bei flexiblen Ausgaben der Durchschnitt). Vierteljährliche, halbjährliche und jährliche Zahlungen erscheinen nur noch in den Monaten, in denen sie nach dem bisherigen Rhythmus fällig sind (jährliche anhand des Vorjahres). Beträge im Hinweisfenster als „+ Hochrechnung“.
