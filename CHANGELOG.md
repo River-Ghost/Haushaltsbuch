@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.25
+- **Auswertungen, Hochrechnung:** Bei Säulen werden jetzt **Säulen** statt Linien verwendet (blass und gestrichelt, oben auf den bisherigen Werten gestapelt). Im laufenden Monat wird nur noch der **offene** Teil hochgerechnet: schon gebuchte feste Posten zählen nicht noch einmal, bei flexiblen Ausgaben wird nur der Rest bis zum Durchschnitt aufgesetzt.
+- **Zahlungsrhythmus:** Monatliche Posten werden monatlich fortgeschrieben (letzter Betrag, bei flexiblen Ausgaben der Durchschnitt). Vierteljährliche, halbjährliche und jährliche Zahlungen erscheinen nur noch in den Monaten, in denen sie nach dem bisherigen Rhythmus fällig sind (jährliche anhand des Vorjahres). Beträge im Hinweisfenster als „+ Hochrechnung“.
+- Das Vorjahr wird dafür bei Bedarf nachgeladen.
+
 ## 0.5.24
 - **Auswertungen:** Die Schalter „Ø-Linien pro Jahr“, „Trend (3-Monats-Ø)“, „Vorjahr“ und „Hochrechnung“ erscheinen nur noch, wenn sie in der aktuellen Ansicht auch wählbar sind (Ø, Trend und Vorjahr nur in „Pro Monat“; Vorjahr und Hochrechnung zusätzlich nur, wenn die Option eingeschaltet ist; Hochrechnung nur, wenn der Zeitraum das laufende Jahr enthält).
 - **Auswertungen:** Die Kennzahl-Knöpfe heben sich besser ab (kräftigerer Rand, farbiger Streifen links, deutlichere Markierung der Auswahl).

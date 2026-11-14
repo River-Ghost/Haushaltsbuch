@@ -266,7 +266,7 @@ body.mobile.m-se #mob{display:none}
 <label id="awAvgL"><input type="checkbox" id="awAvg"> Ø-Linien pro Jahr</label><label id="awTrL"><input type="checkbox" id="awTr"> Trend (3-Monats-Ø)</label><label id="awPvL"><input type="checkbox" id="awPv"> Vorjahr</label><label id="awFcL"><input type="checkbox" id="awFc"> Hochrechnung</label></div>
 <div class="aw-kp" id="awKp"></div><div class="aw-crumb" id="awCr"></div>
 <div class="aw-main"><div id="awBox"><div id="awCh"></div><div class="awtip" id="awTip" hidden></div></div><div id="awPosts"></div></div>
-<div class="sub" style="margin-top:8px">Ø = Durchschnitt über die abgeschlossenen Monate (laufender Monat zählt nicht mit). Saldo = Einnahmen − Fixe − Flexible Ausgaben − Sparen/Vermögen.</div>
+<div class="sub" style="margin-top:8px">Ø = Durchschnitt über die abgeschlossenen Monate (laufender Monat zählt nicht mit). Hochrechnung: im laufenden Monat nur noch offene Beträge, danach der erwartete Betrag; monatliche Posten monatlich, vierteljährliche und jährliche Zahlungen nur in den Monaten, in denen sie nach dem bisherigen Rhythmus fällig sind. Saldo = Einnahmen − Fixe − Flexible Ausgaben − Sparen/Vermögen.</div>
 </div>
 <div id="viewSE" hidden>
 <button class="btn mback" onclick="mBack()">‹ Zurück</button>
@@ -793,9 +793,21 @@ const sum=a=>a.reduce((p,q)=>p+q,0),nf=v=>Math.round(v).toLocaleString('de-DE')+
 let S={a:cy-1,b:cy,g:'y',sel:null,type:'',avg:false,tr:false,pv:false,fc:false,off:{}},D={},cur={};
 function pv(a,p){return p.m===null?(p.y>cy?null:sum(a.filter((_,m)=>live(p.y,m)))):(live(p.y,p.m)?a[p.m]:null)}
 function avgY(a,y){const d=a.filter((_,m)=>done(y,m));return d.length?sum(d)/d.length:null}
+/* Hochrechnung je Posten: laufender Monat = nur noch Offenes, Folgemonate = erwarteter Betrag nach Rhythmus */
+function fcPost(a,pa,grp){const n=cm,out=z();if(n===0)return out;
+ const t=(pa||z()).concat(a.slice(0,n)),L=pa?12:n,w=t.slice(t.length-L),nz=w.filter(v=>v>0);if(!nz.length)return out;
+ const share=nz.length/L,last=nz[nz.length-1],mean=sum(w)/L,booked=a[cm]||0;
+ const put=(m,e)=>{out[m]=m===cm?(grp==='flex'?Math.max(e-booked,0):(booked>0?0:e)):e};
+ if(grp==='flex'&&share>=.5){for(let m=cm;m<12;m++)put(m,mean);return out}
+ if(share>=.9){for(let m=cm;m<12;m++)put(m,grp==='flex'?mean:last);return out}
+ let d=0;for(const c of [2,3,4,6]){if(L<c*2)continue;let ok=nz.length>=2;for(let i=0;i+c<L&&ok;i++)if((w[i]>0)!==(w[i+c]>0))ok=false;if(ok){d=c;break}}
+ if(!d)d=12;const ext=t.slice();
+ for(let m=cm;m<12;m++){const ti=12+m,src=ext[ti-d],e=src>0?src:0;ext[ti]=e;put(m,e)}
+ return out}
+window.awFcPost=fcPost;
 function avgAll(k){if(k==='cash')return null;let s=0,n=0;for(const y in D){if(+y<S.a||+y>S.b)continue;D[y].g[k].forEach((v,m)=>{if(done(+y,m)){s+=v;n++}})}return n?s/n:null}
 const arr=(k,y)=>D[y].g[k];
-async function loadAw(){const ys=[];for(let y=(S.pv&&getOpt('prev')&&S.a>2000)?S.a-1:S.a;y<=S.b;y++)ys.push(y);
+async function loadAw(){let y0=S.a;if(S.pv&&getOpt('prev'))y0=Math.min(y0,S.a-1);if(S.fc&&getOpt('fc')&&S.a<=cy&&S.b>=cy)y0=Math.min(y0,cy-1);y0=Math.max(2000,y0);const ys=[];for(let y=y0;y<=S.b;y++)ys.push(y);
  const r=await Promise.all(ys.map(y=>api('/api/jahr?jahr='+y))),se=await Promise.all(ys.map(y=>api('/api/se?monat='+y+'-01').catch(()=>null)));D={};
  r.forEach((j,i)=>{const o={g:{ein:z(),fix:z(),flex:z(),spar:z(),aus:z(),saldo:z()},p:{}};
   for(const b of j.bloecke){const k=GR[b.gruppe];if(!k)continue;for(const p of b.posten){const a=p.monate.map(v=>Number(v||0));o.p[k+'|'+p.id]={n:p.bezeichnung,k,v:a};a.forEach((v,m)=>o.g[k][m]+=v)}}
@@ -805,19 +817,23 @@ async function loadAw(){const ys=[];for(let y=(S.pv&&getOpt('prev')&&S.a>2000)?S
   D[ys[i]]=o});render()}
 function nice(lo,hi){const raw=((hi-lo)||1)/4,mag=Math.pow(10,Math.floor(Math.log10(raw))),st=[1,2,2.5,5,10].map(f=>f*mag).find(s=>s>=raw);return{st,mn:Math.floor(lo/st+1e-9)*st,mx:Math.ceil(hi/st-1e-9)*st}}
 function chart(per,ser,o){const bw0=$('awBox').clientWidth,W=bw0>0?Math.max(320,Math.min(640,Math.round(bw0))):640,H=W<500?300:280,L=W<500?46:58,B=40,T=10,n=per.length;let hi=0,lo=0;
- if(o.stack)per.forEach((p,i)=>{let s=0;ser.forEach(r=>{if(r.v[i]>0)s+=r.v[i]});hi=Math.max(hi,s)});
+ if(o.stack)per.forEach((p,i)=>{let s=0;ser.forEach(r=>{if(r.v[i]>0)s+=r.v[i];if(r.fv&&r.fv[i]>0)s+=r.fv[i]});hi=Math.max(hi,s)});
  else ser.forEach(r=>r.v.forEach(v=>{if(v!==null){hi=Math.max(hi,v);lo=Math.min(lo,v)}}));
+ ser.forEach(r=>{if(r.fv)r.fv.forEach((f,i)=>{if(Math.abs(f)>.005){const b=(r.v[i]||0)+f;hi=Math.max(hi,b);lo=Math.min(lo,b)}})});
  (o.avgs||[]).forEach(a=>{hi=Math.max(hi,a.v);lo=Math.min(lo,a.v)});(o.trends||[]).forEach(t=>t.v.forEach(v=>{if(v!==null){hi=Math.max(hi,v);lo=Math.min(lo,v)}}));
  ser.forEach(r=>(r.pvv||[]).forEach(v=>{if(v!=null){hi=Math.max(hi,v);lo=Math.min(lo,v)}}));(o.pvTotal||[]).forEach(v=>{if(v!=null)hi=Math.max(hi,v)});(o.fcs||[]).forEach(f=>{(f.line||[[0,f.v]]).forEach(q=>{hi=Math.max(hi,q[1]);lo=Math.min(lo,q[1])})});
  const sc=nice(lo,hi),y=v=>T+(H-T-B)*(1-(v-sc.mn)/(sc.mx-sc.mn)),cw=(W-L-8)/n,x=i=>L+cw*(i+.5);let g='';
  for(let v=sc.mn;v<=sc.mx+1e-9;v+=sc.st)g+=`<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#e5e9f0" stroke-width="1"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#64748b">${Math.round(v).toLocaleString('de-DE')}</text>`;
  if(sc.mn<0)g+=`<line x1="${L}" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#94a3b8"/>`;
  per.forEach((p,i)=>{g+=`<text x="${x(i)}" y="${H-22}" text-anchor="middle" font-size="11" fill="#64748b">${p.m===null?p.y:(n>12?MN[p.m][0]:MN[p.m])}</text>`;if(p.m!==null&&(p.m===0||i===0))g+=`<text x="${x(i)-cw/2+2}" y="${H-7}" font-size="11" font-weight="700" fill="#172033">${p.y}</text>`});
- if(o.stack){const bw=Math.max(4,Math.min(46,cw*.7));per.forEach((p,i)=>{let acc=0;[...ser].reverse().forEach(r=>{const v=r.v[i];if(!(v>0))return;g+=`<rect x="${x(i)-bw/2}" y="${y(acc+v)}" width="${bw}" height="${Math.max(0,y(acc)-y(acc+v))}" fill="${r.c}"/>`;acc+=v})})}
+ if(o.stack){const bw=Math.max(4,Math.min(46,cw*.7));per.forEach((p,i)=>{let acc=0;[...ser].reverse().forEach(r=>{const v=r.v[i];if(!(v>0))return;g+=`<rect x="${x(i)-bw/2}" y="${y(acc+v)}" width="${bw}" height="${Math.max(0,y(acc)-y(acc+v))}" fill="${r.c}"/>`;acc+=v});[...ser].reverse().forEach(r=>{const f=r.fv&&r.fv[i];if(!(f>.005))return;g+=`<rect x="${x(i)-bw/2}" y="${y(acc+f)}" width="${bw}" height="${Math.max(0,y(acc)-y(acc+f))}" fill="${r.c}" fill-opacity=".28" stroke="${r.c}" stroke-dasharray="3 3"/>`;acc+=f})})}
  else if(o.lines)ser.forEach(r=>{let d='',pen=false;r.v.forEach((v,i)=>{if(v===null){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});g+=`<path d="${d}" fill="none" stroke="${r.c}" stroke-width="2" stroke-linejoin="round"/>`;if(n<=14)r.v.forEach((v,i)=>{if(v!==null)g+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="${r.c}"/>`})});
- else{const k=ser.length,bw=Math.max(3,Math.min(20,cw*.8/k));per.forEach((p,i)=>ser.forEach((r,j)=>{const v=r.v[i];if(v===null)return;g+=`<rect x="${x(i)-bw*k/2+j*bw}" y="${v>=0?y(v):y(0)}" width="${Math.max(1,bw-1)}" height="${Math.abs(y(v)-y(0))}" rx="1.5" fill="${r.c}"/>`}))}
+ else{const k=ser.length,bw=Math.max(3,Math.min(20,cw*.8/k));per.forEach((p,i)=>ser.forEach((r,j)=>{const v=r.v[i],f=r.fv&&r.fv[i],bx=x(i)-bw*k/2+j*bw;if(v!==null)g+=`<rect x="${bx}" y="${v>=0?y(v):y(0)}" width="${Math.max(1,bw-1)}" height="${Math.abs(y(v)-y(0))}" rx="1.5" fill="${r.c}"/>`;if(f&&Math.abs(f)>.005){const b=v||0,t=b+f;g+=`<rect x="${bx}" y="${y(Math.max(b,t))}" width="${Math.max(1,bw-1)}" height="${Math.abs(y(t)-y(b))}" rx="1.5" fill="${r.c}" fill-opacity=".28" stroke="${r.c}" stroke-dasharray="3 3"/>`}}))}
  const pl=(a,c,w,op,da)=>{let d='',pen=false;a.forEach((v,i)=>{if(v===null||v===undefined){pen=false;return}d+=(pen?'L':'M')+x(i)+' '+y(v)+' ';pen=true});return `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" opacity="${op}"${da?` stroke-dasharray="${da}"`:''}/>`};
- ser.forEach(r=>{if(r.pvv)g+=pl(r.pvv,r.c,1.6,.38)});if(o.pvTotal)g+=pl(o.pvTotal,'#172033',1.6,.38);
+ ser.forEach(r=>{if(r.pvv)g+=pl(r.pvv,r.c,1.6,.38)});
+ if(o.lines)ser.forEach(r=>{if(!r.fv)return;let d='',open=false;r.fv.forEach((f,i)=>{if(Math.abs(f)>.005){const val=(r.v[i]||0)+f;if(!open){const p0=i>0?r.v[i-1]:null;d+=(p0!==null&&p0!==undefined)?'M'+x(i-1)+' '+y(p0)+' L'+x(i)+' '+y(val)+' ':'M'+x(i)+' '+y(val)+' ';open=true}else d+='L'+x(i)+' '+y(val)+' '}else open=false});
+  if(d)g+=`<path d="${d}" fill="none" stroke="${r.c}" stroke-width="1.8" stroke-dasharray="3 3" opacity=".75"/>`;
+  if(o.ym)r.fv.forEach((f,i)=>{if(Math.abs(f)>.005)g+=`<circle cx="${x(i)}" cy="${y((r.v[i]||0)+f)}" r="5" fill="none" stroke="${r.c}" stroke-dasharray="3 3"/>`})});if(o.pvTotal)g+=pl(o.pvTotal,'#172033',1.6,.38);
  (o.fcs||[]).forEach(f=>{const st=`fill="none" stroke="${f.c}" stroke-width="1.6" stroke-dasharray="3 3"`;if(f.line){g+=`<path d="${f.line.map((q,j)=>(j?'L':'M')+x(q[0])+' '+y(q[1])).join(' ')}" ${st} opacity=".7"/>`;return}
   if(o.stack){const bw=Math.max(4,Math.min(46,cw*.7));g+=`<rect x="${x(f.i)-bw/2}" y="${y(Math.max(f.v,0))}" width="${bw}" height="${Math.abs(y(f.v)-y(0))}" ${st}/>`}
   else if(o.lines)g+=`<circle cx="${x(f.i)}" cy="${y(f.v)}" r="5" ${st}/>`;
@@ -826,7 +842,7 @@ function chart(per,ser,o){const bw0=$('awBox').clientWidth,W=bw0>0?Math.max(320,
  (o.avgs||[]).forEach(a=>{g+=`<line x1="${x(a.i0)-cw/2}" x2="${x(a.i1)+cw/2}" y1="${y(a.v)}" y2="${y(a.v)}" stroke="${a.c}" stroke-width="1.6" stroke-dasharray="6 4"/><text x="${x(a.i1)+cw/2-3}" y="${y(a.v)-3}" text-anchor="end" font-size="8" fill="${a.c}" opacity=".85" paint-order="stroke" stroke="#fff" stroke-width="2.5" stroke-linejoin="round">Ø ${Math.round(a.v).toLocaleString('de-DE')}</text>`});
  per.forEach((p,i)=>{g+=`<rect data-i="${i}" x="${x(i)-cw/2}" y="${T}" width="${cw}" height="${H-T-B}" fill="transparent"/>`});
  cur.per=per;cur.geom={y,x,cw,ser,stack:!!o.stack,lines:!!o.lines,bw:Math.max(3,Math.min(20,cw*.8/(ser.length||1))),H,W};
- cur.tip=i=>{const p=per[i],rows=ser.filter(r=>r.v[i]!==null).map(r=>`<div><i style="background:${r.c}"></i>${esc(r.n)}<span>${nf(r.v[i])}${r.pvv&&r.pvv[i]!=null?` <small style="color:#64748b">Vj. ${nf(r.pvv[i])}</small>`:''}</span></div>`).join('')+(o.fcs||[]).filter(f=>f.line?i>=f.line[1][0]:f.i===i).map(f=>`<div style="color:#64748b">Hochrechnung ${esc(f.n)}<span>${nf(f.line?f.line[1][1]:f.v)}</span></div>`).join('');
+ cur.tip=i=>{const p=per[i],rows=ser.filter(r=>r.v[i]!==null||(r.fv&&Math.abs(r.fv[i])>.005)).map(r=>`<div><i style="background:${r.c}"></i>${esc(r.n)}<span>${r.v[i]!==null?nf(r.v[i]):'–'}${r.fv&&Math.abs(r.fv[i])>.005?` <small style="color:#64748b">+ Hochrechnung ${nf(r.fv[i])}</small>`:''}${r.pvv&&r.pvv[i]!=null?` <small style="color:#64748b">Vj. ${nf(r.pvv[i])}</small>`:''}</span></div>`).join('')+(o.fcs||[]).filter(f=>f.line?i>=f.line[1][0]:f.i===i).map(f=>`<div style="color:#64748b">Hochrechnung ${esc(f.n)}<span>${nf(f.line?f.line[1][1]:f.v)}</span></div>`).join('');
   const t=o.stack?`<div style="border-top:1px solid #e5e9f0;margin-top:3px;padding-top:3px"><b style="margin:0">Summe<span>${nf(ser.reduce((s,r)=>s+(r.v[i]||0),0))}${o.pvTotal&&o.pvTotal[i]!=null?` <small style="color:#64748b;font-weight:400">Vj. ${nf(o.pvTotal[i])}</small>`:''}</span></b></div>`:'';
   return `<b>${p.m===null?p.y:MN[p.m]+' '+p.y}</b>${rows||'Noch keine Daten'}${t}`};
  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Diagramm der Auswertung">${g}</svg>`}
@@ -862,16 +878,16 @@ function render(){const ys=Object.keys(D).map(Number).filter(y=>y>=S.a&&y<=S.b).
   $('awCr').innerHTML=`<a data-back="1">Alle Hauptposten</a> › <b>${GN[S.sel]}</b> · Posten rechts an- und abwählen`;
   $('awPosts').innerHTML=posts.length?'<div class="awall"><a data-all="1">Alle</a> · <a data-all="0">Keine</a></div>'+posts.map(p=>`<label><input type="checkbox" data-p="${esc(p.k)}" ${S.off[p.k]?'':'checked'}><i style="background:${p.c}"></i>${esc(p.n)}</label>`).join(''):'Keine Posten.';
  }
- const fcs=[];
- if(fcOn){const n=cm,i0=per.findIndex(p=>p.y===cy),fo=a=>{const d=a.slice(0,n),avg=sum(d)/n;return{avg,total:sum(d)+avg*(12-n),last:d[n-1]}};
-  const gen=(a,c,nm,sj)=>{const f=fo(a);if(S.g==='y')fcs.push({i:i0,v:f.total,c,n:nm,sj});else fcs.push({c,n:nm,line:[[i0+n-1,f.last],[i0+n,f.avg],[i0+11,f.avg]]})};
-  if(!S.sel||SINGLE.includes(S.sel)){ser.forEach((r,j)=>{if(r.k!=='cash')gen(arr(r.k,cy),r.c,r.n,j)})}
-  else if(stack&&S.g==='y')gen(vis.reduce((s,q)=>s.map((v,m)=>v+((D[cy].p[q.k]||{v:z()}).v[m])),z()),'#172033','Summe',-1);
-  else vis.forEach((q,j)=>gen((D[cy].p[q.k]||{v:z()}).v,q.c,q.n,j))}
+ if(fcOn){const Fp={},Fg={ein:z(),fix:z(),flex:z(),spar:z()};
+  for(const key in D[cy].p){const e=D[cy].p[key],pe=D[cy-1]&&hasData(cy-1)?D[cy-1].p[key]:null;Fp[key]=fcPost(e.v,pe?pe.v:null,e.k);Fp[key].forEach((f,m)=>{Fg[e.k][m]+=f})}
+  Fg.aus=Fg.fix.map((v,m)=>v+Fg.flex[m]);Fg.saldo=Fg.ein.map((v,m)=>v-Fg.fix[m]-Fg.flex[m]-Fg.spar[m]);
+  const fvP=a=>per.map(p=>p.y!==cy?0:p.m===null?sum(a.slice(cm)):(p.m>=cm?a[p.m]:0));
+  if(!S.sel||SINGLE.includes(S.sel)){ser.forEach(r=>{if(r.k!=='cash')r.fv=fvP(Fg[r.k])})}
+  else vis.forEach((q,j)=>{ser[j].fv=fvP(Fp[q.k]||z())})}
  const ma=v=>v.map((x,i)=>{if(x===null)return null;let s=0,n=0;for(let j=i-1;j<=i+1;j++)if(j>=0&&j<v.length&&v[j]!==null){s+=v[j];n++}return s/n});
  let trends=[];if(S.tr&&S.g==='m'){if(stack)trends=[{c:'#172033',v:ma(per.map((_,i)=>ser.some(r=>r.v[i]!==null)?ser.reduce((s,r)=>s+(r.v[i]||0),0):null))}];else trends=ser.map(r=>({c:r.c,v:ma(r.v)}))}
  cur.postKeys=S.sel&&!SINGLE.includes(S.sel)?[...Object.keys(D).reduce((m,yy)=>{for(const k in D[yy].p)if(k.startsWith(S.sel+'|'))m.add(k);return m},new Set())]:[];
- $('awCh').innerHTML=chart(per,ser,{stack,lines,avgs,trends,fcs,pvTotal});hideTip()}
+ $('awCh').innerHTML=chart(per,ser,{stack,lines,avgs,trends,pvTotal,ym:S.g==='y'});hideTip()}
 window.awRefresh=()=>{if(Object.keys(D).length)render()};
 function hideTip(){$('awTip').hidden=true;cur.target=null}
 let pt='mouse';
@@ -896,7 +912,7 @@ $('awKp').onclick=e=>{const b=e.target.closest('button');if(b){S.sel=S.sel===b.d
 $('awCr').onclick=e=>{if(e.target.dataset.back){S.sel=null;render()}};
 $('awPosts').onclick=e=>{const a=e.target.closest('a[data-all]');if(!a)return;for(const k of cur.postKeys)S.off[k]=a.dataset.all==='0';render()};
 $('awTr').onchange=()=>{S.tr=$('awTr').checked;render()};
-$('awPv').onchange=()=>{S.pv=$('awPv').checked;loadAw()};$('awFc').onchange=()=>{S.fc=$('awFc').checked;render()};
+$('awPv').onchange=()=>{S.pv=$('awPv').checked;loadAw()};$('awFc').onchange=()=>{S.fc=$('awFc').checked;loadAw()};
 $('awPosts').onchange=e=>{S.off[e.target.dataset.p]=!e.target.checked;render()};
 let rt=0;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(!$('viewAusw').hidden&&Object.keys(D).length)render()},150)});
 const bx=$('awBox');bx.addEventListener('pointermove',tipAt);bx.addEventListener('pointerdown',tipAt);bx.addEventListener('pointerleave',()=>{if(pt!=='touch')hideTip()});
