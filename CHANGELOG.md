@@ -1,5 +1,10 @@
 # Änderungen
 
+## 0.5.28
+- **Nebeneinnahmen:** Ein neuer Eintrag kann jetzt auch **nur mit Bezeichnung** angelegt werden. Er wird mit Betrag 0 gespeichert („noch offen“, zählt nirgends) und der Betrag kann später nachgetragen werden. Bisher wurde eine Zeile ohne Betrag stillschweigend nicht gespeichert. Die Schnittstelle `POST /api/se` akzeptiert dafür Betrag 0.
+- **Nebeneinnahmen:** Trägt man Bezeichnung und Betrag schnell hintereinander ein, überschreibt das Speichern der Bezeichnung den eben getippten Betrag nicht mehr.
+- **Nebeneinnahmen:** Nach dem Umsortieren ist immer eine freie Zeile für neue Einträge vorhanden.
+
 ## 0.5.26
 - **Installer:** Das Root-Passwort des Containers kann jetzt bei der Installation selbst festgelegt werden (mindestens 8 Zeichen, mit Wiederholung). Leer lassen erzeugt wie bisher ein zufälliges Passwort in `/root/haushaltsbuch-<ID>.creds`. Ein selbst festgelegtes Passwort wird nicht in diese Datei geschrieben. Für unbeaufsichtigte Installationen: Umgebungsvariable `HB_ROOT_PASSWORD`.
 - **Auswertungen, Hochrechnung:** „Sonstige Nebeneinnahmen“ werden nicht mehr hochgerechnet. **Dividenden und Zinsen** nehmen den Vorjahresmonat als Vorlage (im laufenden Monat nur, wenn noch nichts gebucht ist).

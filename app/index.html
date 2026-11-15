@@ -640,11 +640,12 @@ function seCommit(row){return enqueue(async()=>{
  const revert=()=>{bEl.value=row.dataset.b||'';aEl.value=Number(row.dataset.a)?fmt(row.dataset.a):''};
  try{
   if(!id){
-   if(raw==='')return;
-   if(!(amt>0)){aEl.value='';flash('seStatus','Bitte einen Betrag größer 0 eingeben.',3000);return}
+   if(raw===''&&bez==='')return;
+   const val=raw===''?0:amt;
+   if(!(val>=0)){aEl.value='';flash('seStatus','Bitte einen gültigen Betrag eingeben.',3000);return}
    flash('seStatus','Speichere …');
-   const r=await put('/api/se',{monat:ym(),bezeichnung:bez||'Sonstiges',betrag:amt.toFixed(2)},'POST');
-   row.dataset.id=r.id;if(!bez)bEl.value='Sonstiges';aEl.value=fmt(amt);row.querySelector('.se-x').innerHTML=SE_DEL}
+   const r=await put('/api/se',{monat:ym(),bezeichnung:bez||'Sonstiges',betrag:val.toFixed(2)},'POST');
+   row.dataset.id=r.id;if(!bez)bEl.value='Sonstiges';if(aEl.value.trim()===raw)aEl.value=val?fmt(val):'';row.querySelector('.se-x').innerHTML=SE_DEL}
   else if(bez===''){revert();flash('seStatus','Die Bezeichnung darf nicht leer sein. Zum Löschen den Knopf × benutzen.',3500);return}
   else if(!(amt>=0)){revert();flash('seStatus','Bitte einen gültigen Betrag eingeben.',3000);return}
   else{flash('seStatus','Speichere …');await put(`/api/se/${id}`,{bezeichnung:bez,betrag:amt.toFixed(2)});aEl.value=fmtz(amt)}
@@ -659,7 +660,7 @@ function seCommit(row){return enqueue(async()=>{
   for(const r of drag.body.querySelectorAll('tr[data-id]')){if(!r.dataset.id||r===drag.tr)continue;const b=r.getBoundingClientRect();
    if(e.clientY>=b.top&&e.clientY<=b.bottom){if(e.clientY<b.top+b.height/2)r.before(drag.tr);else r.after(drag.tr);break}}},{passive:false});
  const end=async e=>{if(!drag||e.pointerId!==drag.id)return;const {tr,body}=drag;drag=null;tr.classList.remove('dragging');document.body.classList.remove('se-dragging');
-  if(window.getSelection)getSelection().removeAllRanges();
+  if(window.getSelection)getSelection().removeAllRanges();ensureBlank();
   const ids=[...body.querySelectorAll('tr[data-id]')].map(r=>r.dataset.id).filter(Boolean),alt=semodel.eintraege.map(x=>x.id);
   if(ids.join()===alt.join())return;
   try{await api('/api/se-reihenfolge',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({monat:ym(),ids})});semodel.eintraege.sort((x,y)=>ids.indexOf(x.id)-ids.indexOf(y.id))}

@@ -19,7 +19,7 @@ MAX_UPLOAD = int(os.getenv("HB_MAX_UPLOAD", str(100 * 1024 * 1024)))
 BASE = Path(__file__).parent
 # Die Version steht bewusst im Code und nicht in der .env, damit sie nach einem
 # Update nie veraltet angezeigt wird.
-VERSION = "0.5.26"
+VERSION = "0.5.28"
 app = FastAPI(title=os.getenv("APP_NAME", "Haushaltsbuch"), version=VERSION)
 app.mount("/static", StaticFiles(directory=BASE / "static"), name="static")
 
@@ -156,8 +156,8 @@ class SEBody(BaseModel):
 
 class SENew(SEBody):
     monat: str = Field(pattern=r"^\d{4}-\d{2}$")
-    # Ein neuer Eintrag per Eingabezeile braucht einen Betrag.
-    betrag: Decimal = Field(gt=0, max_digits=14, decimal_places=2)
+    # Auch ein neuer Eintrag per Eingabezeile darf ohne Betrag angelegt werden (0 = noch offen).
+    betrag: Decimal = Field(ge=0, max_digits=14, decimal_places=2)
 
 
 RHYTHMEN = {"monatlich": 1, "vierteljaehrlich": 3, "halbjaehrlich": 6, "jaehrlich": 12}
