@@ -1,5 +1,8 @@
 # Änderungen
 
+## 0.5.29
+- **Nebeneinnahmen am Handy:** Die Spalte **Bezeichnung** ist jetzt deutlich breiter (bei 390 px Bildschirmbreite etwa 200 statt etwa 75 px). Dafür sind Griff, Betrag und die Knöpfe ⇢ und × schmaler, die abgeleitete Spalte „Art“ wird am Handy ausgeblendet. Am Desktop ändert sich nichts.
+
 ## 0.5.28
 - **Nebeneinnahmen:** Ein neuer Eintrag kann jetzt auch **nur mit Bezeichnung** angelegt werden. Er wird mit Betrag 0 gespeichert („noch offen“, zählt nirgends) und der Betrag kann später nachgetragen werden. Bisher wurde eine Zeile ohne Betrag stillschweigend nicht gespeichert. Die Schnittstelle `POST /api/se` akzeptiert dafür Betrag 0.
 - **Nebeneinnahmen:** Trägt man Bezeichnung und Betrag schnell hintereinander ein, überschreibt das Speichern der Bezeichnung den eben getippten Betrag nicht mehr.
